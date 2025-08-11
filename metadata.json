@@ -1,0 +1,6 @@
+{
+  "name": "Calculadora de Infusão Contínua Veterinária",
+  "description": "Uma calculadora de infusão contínua (CRI) para auxiliar veterinários no cálculo preciso de dosagens de medicamentos para cães e gatos. Permite a seleção de pacientes, medicamentos e veículos de infusão para obter instruções claras e rápidas.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}

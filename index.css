@@ -1,0 +1,133 @@
+/* Untitled UI-ish tokens and dark mode helpers */
+:root {
+  color-scheme: light dark;
+  --ui-bg: 255 255 255;
+  --ui-foreground: 15 23 42; /* slate-900 */
+  --ui-card: 255 255 255;
+  --ui-muted: 100 116 139; /* slate-500 */
+  --ui-primary: 30 58 138; /* blue-900 */
+  --ui-primary-contrast: 255 255 255;
+  --range-track: #e2e8f0; /* slate-200 */
+}
+
+.dark {
+  --ui-bg: 2 6 23; /* slate-950 */
+  --ui-foreground: 226 232 240; /* slate-200 */
+  --ui-card: 15 23 42; /* slate-900 */
+  --ui-muted: 148 163 184; /* slate-400 */
+  --ui-primary: 30 64 175; /* blue-800 */
+  --ui-primary-contrast: 255 255 255;
+  --range-track: #475569; /* slate-600 */
+}
+
+/* Inputs default: light white, dark slate-900 */
+input, select, textarea {
+  background-color: #ffffff;
+  color: #0f172a; /* slate-900 */
+}
+.dark input, .dark select, .dark textarea {
+  background-color: #0f172a; /* slate-900 */
+  color: #e2e8f0; /* slate-200 */
+}
+
+/* Placeholder contrast */
+input::placeholder, textarea::placeholder, select::placeholder {
+  color: #64748b; /* slate-500 */
+}
+.dark input::placeholder, .dark textarea::placeholder, .dark select::placeholder {
+  color: #94a3b8; /* slate-400 */
+}
+
+/* Text selection color */
+::selection {
+  background: #1d4ed8; /* blue-700 */
+  color: #ffffff;
+}
+.dark ::selection {
+  background: #60a5fa; /* blue-400 */
+  color: #0f172a; /* slate-900 */
+}
+
+/* Range slider track/thumb for consistent theming */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  background: transparent;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  background-color: var(--range-track);
+  border-radius: 9999px;
+}
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  background-color: var(--range-track);
+  border-radius: 9999px;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background-color: #2563eb; /* blue-600 */
+  border-radius: 9999px;
+  border: 2px solid #ffffff;
+  margin-top: -4px; /* center on 8px track */
+}
+.dark input[type="range"]::-webkit-slider-thumb {
+  border-color: #0f172a; /* dark ring */
+}
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background-color: #2563eb;
+  border-radius: 9999px;
+  border: 2px solid #ffffff;
+}
+.dark input[type="range"]::-moz-range-thumb {
+  border-color: #0f172a;
+}
+input[type="range"]:focus {
+  outline: none;
+}
+
+/* Drug modal standard text colors */
+.drug-modal p, .drug-modal li {
+  color: inherit;
+}
+.drug-modal strong {
+  color: #0f172a;
+}
+.dark .drug-modal strong {
+  color: #e2e8f0;
+}
+
+/* Checkbox/label readability by inheritance */
+label, .form-label {
+  color: inherit;
+}
+
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-spinner {
+  -moz-appearance: textfield;
+}
+
+/* Scrollbars subtle */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.5);
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
