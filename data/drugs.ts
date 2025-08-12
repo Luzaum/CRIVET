@@ -411,42 +411,7 @@ export const DRUGS: Drug[] = [
       citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
     }
   },
-  // --- Infusões Combinadas ---
-  {
-    id: 'mlk_dog',
-    name: 'MLK (Morfina, Lido, Cetamina) para Cães',
-    category: 'Infusões Combinadas',
-    concentrations: [],
-    criDoses: [],
-    isCombo: true,
-    comboDetails: {
-        description: 'Protocolo analgésico multimodal clássico para dor severa em cães. Calcule a receita para qualquer volume de seringa ou bolsa.',
-        targetSpecies: 'dog',
-        ingredients: [
-            { drugId: 'morfina', name: 'Morfina', dose: 0.2, unit: CriDoseUnit.mg_kg_h },
-            { drugId: 'lidocaina', name: 'Lidocaína', dose: 2.1, unit: CriDoseUnit.mg_kg_h }, // 35 mcg/kg/min
-            { drugId: 'cetamina', name: 'Cetamina', dose: 0.6, unit: CriDoseUnit.mg_kg_h }, // 10 mcg/kg/min
-        ],
-    }
-  },
-  {
-    id: 'flk_dog',
-    name: 'FLK (Fentanil, Lido, Cetamina) para Cães',
-    category: 'Infusões Combinadas',
-    concentrations: [],
-    criDoses: [],
-    isCombo: true,
-    comboDetails: {
-        description: 'Alternativa à MLK, útil para analgesia potente em cães, especialmente no período transoperatório. O fentanil permite titulação mais rápida.',
-        targetSpecies: 'dog',
-        ingredients: [
-            { drugId: 'fentanil', name: 'Fentanil', dose: 4, unit: CriDoseUnit.mcg_kg_h },
-            { drugId: 'lidocaina', name: 'Lidocaína', dose: 2.1, unit: CriDoseUnit.mg_kg_h }, // 35 mcg/kg/min
-            { drugId: 'cetamina', name: 'Cetamina', dose: 0.6, unit: CriDoseUnit.mg_kg_h }, // 10 mcg/kg/min
-        ],
-        notes: 'A dose de Lidocaína neste protocolo (2.1 mg/kg/h ou 35 mcg/kg/min) é uma dose analgésica padrão. Monitore o paciente de perto para sinais de toxicidade.'
-    }
-  },
+
   // --- Agentes Cardiovasculares ---
   {
     id: 'dobutamina',

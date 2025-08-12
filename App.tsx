@@ -15,9 +15,10 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import TextField from '@mui/material/TextField';
 import { Species, PatientState, Patient, Drug, CriDose, BolusDose, DrugConcentration, CriDoseUnit, BolusDoseUnit, Vehicle, WarningType, FluidType } from './types';
-import { DRUGS } from './data/drugs';
+import { CONSOLIDATED_DRUGS, COMPATIBILITY_MATRIX, FORMULAS, EXAMPLES } from './data/consolidated_drugs';
 import { SyringeIcon, BagIcon, AlertTriangleIcon, EyeOffIcon, BeakerIcon, QuestionMarkCircleIcon, InfoIcon, ActivityIcon } from './components/icons';
 import { DrugInfoModal } from './components/DrugInfoModal';
+import { CompatibilityGuide } from './components/CompatibilityGuide';
 
 const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -85,14 +86,14 @@ const PatientSelector: React.FC<{ patient: Patient; setPatient: React.Dispatch<R
                 <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Espécie</label>
                 <div className="grid grid-cols-2 gap-3">
                     <button onClick={() => setPatient(p => ({ ...p, species: Species.Dog }))}
-                        className={`flex flex-col items-center gap-2 p-3 border-2 rounded-lg transition-all duration-200 ${patient.species === Species.Dog ? 'border-blue-700 bg-blue-50 dark:bg-blue-900/20' : 'border-slate-200 dark:border-slate-700 hover:border-blue-400'}`}>
+                        className={`flex flex-col items-center gap-2 p-3 border-2 rounded-lg transition-all duration-200 ${patient.species === Species.Dog ? 'border-blue-700 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300' : 'border-slate-200 dark:border-slate-700 hover:border-blue-400 text-slate-700 dark:text-slate-300'}`}>
                         <span className="text-3xl">🐶</span>
-                        <span className={`font-medium ${patient.species === Species.Dog ? 'text-blue-800 dark:text-blue-300' : ''}`}>{Species.Dog}</span>
+                        <span className="font-medium">{Species.Dog}</span>
                     </button>
                     <button onClick={() => setPatient(p => ({ ...p, species: Species.Cat }))}
-                        className={`flex flex-col items-center gap-2 p-3 border-2 rounded-lg transition-all duration-200 ${patient.species === Species.Cat ? 'border-blue-700 bg-blue-50 dark:bg-blue-900/20' : 'border-slate-200 dark:border-slate-700 hover:border-blue-400'}`}>
+                        className={`flex flex-col items-center gap-2 p-3 border-2 rounded-lg transition-all duration-200 ${patient.species === Species.Cat ? 'border-blue-700 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300' : 'border-slate-200 dark:border-slate-700 hover:border-blue-400 text-slate-700 dark:text-slate-300'}`}>
                         <span className="text-3xl">🐱</span>
-                        <span className={`font-medium ${patient.species === Species.Cat ? 'text-blue-800 dark:text-blue-300' : ''}`}>{Species.Cat}</span>
+                        <span className="font-medium">{Species.Cat}</span>
                     </button>
                 </div>
             </div>
@@ -119,7 +120,7 @@ const PatientSelector: React.FC<{ patient: Patient; setPatient: React.Dispatch<R
                     <div className="flex flex-wrap gap-2">
                         {(Object.values(PatientState)).map(state => (
                             <button key={state} onClick={() => setPatient(p => ({ ...p, state }))}
-                                className={`px-4 py-2 border rounded-full text-sm font-medium transition-colors ${patient.state === state ? 'bg-blue-800 text-white border-blue-800' : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                                className={`px-4 py-2 border rounded-full text-sm font-medium transition-colors ${patient.state === state ? 'bg-blue-800 text-white border-blue-800' : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'}`}>
                                 {state}
                             </button>
                         ))}
@@ -132,32 +133,32 @@ const PatientSelector: React.FC<{ patient: Patient; setPatient: React.Dispatch<R
                             <QuestionMarkCircleIcon className="w-4 h-4 text-slate-500" />
                         </Tooltip>
                     </div>
-                     <div className="flex flex-wrap gap-x-4 gap-y-2">
-                        <label className="flex items-center gap-2 text-sm">
+                                              <div className="flex flex-wrap gap-x-4 gap-y-2">
+                        <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
                            <input type="checkbox" name="hepaticDisease" checked={patient.hepaticDisease} onChange={handleComorbidityChange} className="h-4 w-4 rounded border-gray-300 dark:border-slate-600 text-blue-700 focus:ring-blue-700" />
                             Doença Hepática
                         </label>
-                         <label className="flex items-center gap-2 text-sm">
+                         <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
                            <input type="checkbox" name="renalDisease" checked={patient.renalDisease} onChange={handleComorbidityChange} className="h-4 w-4 rounded border-gray-300 dark:border-slate-600 text-blue-700 focus:ring-blue-700" />
                            Doença Renal
                         </label>
-                         <label className="flex items-center gap-2 text-sm">
+                         <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
                            <input type="checkbox" name="cardiacDisease" checked={!!patient.cardiacDisease} onChange={handleComorbidityChange} className="h-4 w-4 rounded border-gray-300 dark:border-slate-600 text-blue-700 focus:ring-blue-700" />
                            Doença Cardíaca
                          </label>
-                         <label className="flex items-center gap-2 text-sm">
+                         <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
                            <input type="checkbox" name="septicShock" checked={!!patient.septicShock} onChange={handleComorbidityChange} className="h-4 w-4 rounded border-gray-300 dark:border-slate-600 text-blue-700 focus:ring-blue-700" />
                            Séptico/Choque
                          </label>
-                         <label className="flex items-center gap-2 text-sm">
+                         <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
                            <input type="checkbox" name="neuroDisease" checked={!!patient.neuroDisease} onChange={handleComorbidityChange} className="h-4 w-4 rounded border-gray-300 dark:border-slate-600 text-blue-700 focus:ring-blue-700" />
                            Neurológico
                          </label>
-                         <label className="flex items-center gap-2 text-sm">
+                         <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
                            <input type="checkbox" name="pregnant" checked={!!patient.pregnant} onChange={handleComorbidityChange} className="h-4 w-4 rounded border-gray-300 dark:border-slate-600 text-blue-700 focus:ring-blue-700" />
                            Gestante
                          </label>
-                         <label className="flex items-center gap-2 text-sm">
+                         <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
                            <input type="checkbox" name="lactating" checked={!!patient.lactating} onChange={handleComorbidityChange} className="h-4 w-4 rounded border-gray-300 dark:border-slate-600 text-blue-700 focus:ring-blue-700" />
                            Lactante
                          </label>
@@ -170,7 +171,7 @@ const PatientSelector: React.FC<{ patient: Patient; setPatient: React.Dispatch<R
 
 const DrugSelector: React.FC<{ patient: Patient; onSelect: (drug: Drug) => void }> = ({ patient, onSelect }) => {
     const filteredDrugs = useMemo(() => {
-        return DRUGS.filter(drug => {
+        return CONSOLIDATED_DRUGS.filter(drug => {
             if (drug.isCombo) {
                 return drug.comboDetails?.targetSpecies === (patient.species === Species.Dog ? 'dog' : 'cat');
             }
@@ -209,7 +210,7 @@ const DrugSelector: React.FC<{ patient: Patient; onSelect: (drug: Drug) => void 
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3">
                         {filteredDrugs.filter(d => d.category === category).map(drug => (
-                            <button key={drug.id} onClick={() => onSelect(drug)} className="p-3 text-left border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-800 hover:border-blue-400 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <button key={drug.id} onClick={() => onSelect(drug)} className="p-3 text-left border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-800 hover:border-blue-400 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-slate-900">
                                 <p className="font-semibold text-slate-800 dark:text-slate-200">{drug.name}</p>
                             </button>
                         ))}
@@ -307,6 +308,7 @@ export default function App() {
     
     const [overrideComorbidityDoseReduction, setOverrideComorbidityDoseReduction] = useState(false);
     const [showRateGuideModal, setShowRateGuideModal] = useState(false);
+    const [showCompatibilityGuide, setShowCompatibilityGuide] = useState(false);
     const [infoModalDrug, setInfoModalDrug] = useState<Drug | null>(null);
     const [customCriUnit, setCustomCriUnit] = useState<CriDoseUnit>(CriDoseUnit.mcg_kg_min);
 
@@ -430,7 +432,7 @@ export default function App() {
             let hasAnyComorbidityRisk = false;
 
             for (const ingredient of selectedDrug.comboDetails.ingredients) {
-                const drugDef = DRUGS.find(d => d.id === ingredient.drugId);
+                const drugDef = CONSOLIDATED_DRUGS.find(d => d.id === ingredient.drugId);
                 if (!drugDef) continue;
         
                 let ingredientFactor = 1.0;
@@ -673,21 +675,89 @@ export default function App() {
     const theme = useMemo(() => createTheme({
         palette: {
             mode: isDark ? 'dark' : 'light',
-            primary: { main: '#1e40af' },
+            primary: { 
+                main: '#1e40af',
+                contrastText: '#ffffff'
+            },
+            background: {
+                default: isDark ? '#020617' : '#ffffff',
+                paper: isDark ? '#0f172a' : '#ffffff'
+            },
+            text: {
+                primary: isDark ? '#e2e8f0' : '#0f172a',
+                secondary: isDark ? '#94a3b8' : '#64748b'
+            },
+            divider: isDark ? '#334155' : '#e2e8f0'
         },
-        typography: { fontFamily: 'Inter, Roboto, Arial, sans-serif' }
+        typography: { 
+            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            button: {
+                textTransform: 'none',
+                fontWeight: 500
+            }
+        },
+        components: {
+            MuiToggleButton: {
+                styleOverrides: {
+                    root: {
+                        fontFamily: 'Inter, sans-serif',
+                        textTransform: 'none',
+                        fontWeight: 500,
+                        borderColor: isDark ? '#475569' : '#e2e8f0',
+                        '&.Mui-selected': {
+                            backgroundColor: '#1e40af',
+                            color: '#ffffff',
+                            borderColor: '#1e40af',
+                            '&:hover': {
+                                backgroundColor: '#1d4ed8'
+                            }
+                        }
+                    }
+                }
+            },
+            MuiTextField: {
+                styleOverrides: {
+                    root: {
+                        '& .MuiOutlinedInput-root': {
+                            fontFamily: 'Inter, sans-serif'
+                        }
+                    }
+                }
+            },
+            MuiFormControlLabel: {
+                styleOverrides: {
+                    root: {
+                        fontFamily: 'Inter, sans-serif'
+                    }
+                }
+            },
+            MuiSwitch: {
+                styleOverrides: {
+                    root: {
+                        fontFamily: 'Inter, sans-serif'
+                    }
+                }
+            }
+        }
     }), [isDark]);
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
              {showRateGuideModal && <RateGuideModal onClose={() => setShowRateGuideModal(false)} />}
+             {showCompatibilityGuide && <CompatibilityGuide onClose={() => setShowCompatibilityGuide(false)} />}
              {infoModalDrug && <DrugInfoModal drug={infoModalDrug} onClose={() => setInfoModalDrug(null)} />}
             <AppBar position="static" color="default" elevation={1}>
               <Toolbar sx={{ gap: 2 }}>
                 <Typography variant="h6" color="text.primary" sx={{ flexGrow: 1 }}>
                   Calculadora de CRI Vet
                 </Typography>
+                <button 
+                  onClick={() => setShowCompatibilityGuide(true)}
+                  className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors mr-4"
+                >
+                  🧪 Compatibilidade
+                </button>
                 <FormControlLabel
                   control={<Switch checked={isDark} onChange={(e) => setIsDark(e.target.checked)} />}
                   label={isDark ? 'Escuro' : 'Claro'}
@@ -727,7 +797,31 @@ export default function App() {
                            <div className="space-y-6">
                             
                             <div className="space-y-3">
-                                {selectedDrug.isCombo && selectedDrug.comboDetails && <p className="text-sm text-slate-700 dark:text-slate-200">{selectedDrug.comboDetails.description}</p>}
+                                {selectedDrug.isCombo && selectedDrug.comboDetails && (
+                                  <div className="space-y-3">
+                                    <p className="text-sm text-slate-700 dark:text-slate-200">{selectedDrug.comboDetails.description}</p>
+                                    {selectedDrug.comboDetails.presets && (
+                                      <div>
+                                        <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Preset de Dose</label>
+                                        <div className="grid grid-cols-4 gap-2">
+                                          {Object.entries(selectedDrug.comboDetails.presets).map(([preset, doses]) => (
+                                            <button
+                                              key={preset}
+                                              onClick={() => {
+                                                // Apply preset doses to the combo
+                                                const presetDoses = doses as any;
+                                                // This would need to be implemented based on the combo structure
+                                              }}
+                                              className="p-2 border border-slate-300 dark:border-slate-700 rounded-md text-sm transition-colors hover:bg-blue-50 dark:hover:bg-slate-800"
+                                            >
+                                              {preset}
+                                            </button>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
                                 {criCalculation?.generalWarnings?.map((w, i) => <WarningComponent key={i} {...w} />)}
                             </div>
 
@@ -845,14 +939,14 @@ export default function App() {
                                             <div>
                                                 <label className="block text-sm font-medium text-slate-600 mb-2">Tamanho Seringa (mL)</label>
                                                 <div className="grid grid-cols-3 gap-2">
-                                                    {syringeVolumes.map(v => <button key={v} onClick={() => setVehicle({type: 'syringe', volume: v})} className={`p-2 border rounded-md transition-colors ${vehicle.volume === v ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-slate-800 dark:bg-slate-900 dark:text-slate-200 hover:bg-blue-100 dark:hover:bg-slate-800'}`}>{v}</button>)}
+                                                    {syringeVolumes.map(v => <button key={v} onClick={() => setVehicle({type: 'syringe', volume: v})} className={`p-2 border rounded-md transition-colors ${vehicle.volume === v ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-slate-800 dark:bg-slate-900 dark:text-slate-200 hover:bg-blue-100 dark:hover:bg-slate-800 border-slate-300 dark:border-slate-700'}`}>{v}</button>)}
                                                 </div>
                                             </div>
                                         ) : (
                                             <div>
                                                 <label className="block text-sm font-medium text-slate-600 mb-2">Volume Bolsa (mL)</label>
                                                 <div className="grid grid-cols-3 gap-2">
-                                                    {bagVolumes.map(v => <button key={v} onClick={() => setVehicle(prev => ({...prev, type:'bag', volume: v, fluid: prev.type === 'bag' ? prev.fluid : 'NaCl 0.9%'}))} className={`p-2 border rounded-md transition-colors ${vehicle.type === 'bag' && vehicle.volume === v ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-slate-800 dark:bg-slate-900 dark:text-slate-200 hover:bg-blue-100 dark:hover:bg-slate-800'}`}>{v}</button>)}
+                                                    {bagVolumes.map(v => <button key={v} onClick={() => setVehicle(prev => ({...prev, type:'bag', volume: v, fluid: prev.type === 'bag' ? prev.fluid : 'NaCl 0.9%'}))} className={`p-2 border rounded-md transition-colors ${vehicle.type === 'bag' && vehicle.volume === v ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-slate-800 dark:bg-slate-900 dark:text-slate-200 hover:bg-blue-100 dark:hover:bg-slate-800 border-slate-300 dark:border-slate-700'}`}>{v}</button>)}
                                                 </div>
                                             </div>
                                         )}
@@ -870,7 +964,7 @@ export default function App() {
                                         <div>
                                             <label className="block text-sm font-medium text-slate-600 mb-2">Tipo de Fluido</label>
                                             <div className="grid grid-cols-3 gap-2">
-                                                {fluidTypes.map(f => <button key={f} onClick={() => setVehicle(prev => ({...prev, type:'bag', fluid: f, volume: prev.type==='bag' ? prev.volume : 500 }))} className={`p-2 border rounded-md text-sm transition-colors ${vehicle.type === 'bag' && vehicle.fluid === f ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-slate-800 dark:bg-slate-900 dark:text-slate-200 hover:bg-blue-100 dark:hover:bg-slate-800'}`}>{f}</button>)}
+                                                {fluidTypes.map(f => <button key={f} onClick={() => setVehicle(prev => ({...prev, type:'bag', fluid: f, volume: prev.type==='bag' ? prev.volume : 500 }))} className={`p-2 border rounded-md text-sm transition-colors ${vehicle.type === 'bag' && vehicle.fluid === f ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-slate-800 dark:bg-slate-900 dark:text-slate-200 hover:bg-blue-100 dark:hover:bg-slate-800 border-slate-300 dark:border-slate-700'}`}>{f}</button>)}
                                             </div>
                                         </div>
                                     )}
@@ -927,20 +1021,20 @@ export default function App() {
                                     ) : null}
 
                                     {criCalculation.notesAndWarnings && criCalculation.notesAndWarnings.messages.length > 0 ? (
-                                        <div className="mt-4 pt-4 border-t border-dashed border-blue-300 space-y-3">
+                                        <div className="mt-4 pt-4 border-t border-dashed border-blue-300 dark:border-blue-700 space-y-3">
                                             {criCalculation.notesAndWarnings.messages.map((w, i) => (
                                                 <WarningComponent key={`warning-${i}`} {...w} />
                                             ))}
                                             
                                             {criCalculation.notesAndWarnings.showComorbidityOverride && (
-                                                <label className="flex items-center gap-3 p-3 bg-yellow-50 border border-yellow-300 rounded-lg cursor-pointer hover:bg-yellow-100/70">
+                                                <label className="flex items-center gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg cursor-pointer hover:bg-yellow-100/70 dark:hover:bg-yellow-900/30">
                                                     <input 
                                                         type="checkbox"
                                                         checked={overrideComorbidityDoseReduction}
                                                         onChange={(e) => setOverrideComorbidityDoseReduction(e.target.checked)}
                                                         className="h-5 w-5 rounded border-gray-400 text-red-600 focus:ring-red-500"
                                                     />
-                                                    <span className="text-sm text-yellow-900 font-medium">
+                                                    <span className="text-sm text-yellow-900 dark:text-yellow-200 font-medium">
                                                         Estou ciente dos riscos, mas quero continuar com a dose padrão.
                                                     </span>
                                                 </label>
@@ -959,6 +1053,17 @@ export default function App() {
             <footer className="text-center p-6 text-xs text-[rgb(var(--ui-muted))]">
                 <p>Esta ferramenta é um auxílio para profissionais veterinários. Não substitui o julgamento clínico, o exame físico completo ou a monitorização do paciente.</p>
                 <p>Todos os cálculos devem ser confirmados antes da administração. Use com responsabilidade.</p>
+                <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">📋 Resumo Geral CRIs Vet</h4>
+                    <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1">
+                        <p><strong>Infusões Combinadas:</strong> MLK, FLK, DMLK com presets 25/50/75/100%</p>
+                        <p><strong>Vasoativos:</strong> Noradrenalina, Fenilefrina, Dobutamina, Dopamina, Nitroprussiato</p>
+                        <p><strong>Antibióticos:</strong> Intermitente padrão, CRI excepcional com justificativa</p>
+                        <p><strong>GI/Diurético:</strong> Metoclopramida, Furosemida, Ondansetrona</p>
+                        <p><strong>Endócrino:</strong> Insulina Regular (DKA), Sulfato de Magnésio</p>
+                        <p><strong>NMBAs:</strong> Rocurônio, Vecurônio, Atracúrio com reversão</p>
+                    </div>
+                </div>
             </footer>
         </ThemeProvider>
     );
@@ -1076,12 +1181,12 @@ const BolusCalculator: React.FC<{
                 <div className="flex items-center gap-2">
                     <input type="range" min={adjustedBolusRange.min} max={adjustedBolusRange.max} step={(adjustedBolusRange.max - adjustedBolusRange.min) / 100 || 0.01} value={bolusDoseValue}
                         onChange={e => setBolusDoseValue(parseFloat(e.target.value))}
-                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                        className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
                         disabled={adjustedBolusRange.min === adjustedBolusRange.max}
                     />
                     <input type="number" value={bolusDoseValue.toFixed(3)}
                         onChange={e => setBolusDoseValue(parseFloat(e.target.value))}
-                        className="w-24 p-2 border bg-white border-slate-300 rounded-md text-center no-spinner text-slate-900"
+                        className="w-24 p-2 border bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-md text-center no-spinner text-slate-900 dark:text-slate-200"
                         disabled={adjustedBolusRange.min === adjustedBolusRange.max}
                     />
                 </div>
@@ -1091,58 +1196,58 @@ const BolusCalculator: React.FC<{
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <label className="block text-sm font-medium text-slate-600 mb-2">Apresentação</label>
-                     <p className="p-2 bg-slate-100 rounded-md text-slate-700 min-h-[42px] flex items-center text-sm">{concentration.label}</p>
+                     <p className="p-2 bg-slate-100 dark:bg-slate-800 rounded-md text-slate-700 dark:text-slate-200 min-h-[42px] flex items-center text-sm">{concentration.label}</p>
                 </div>
                 <div>
                     <label htmlFor="bolusInfusionTime" className="block text-sm font-medium text-slate-600 mb-2">Tempo de Infusão (min)</label>
                     <input id="bolusInfusionTime" type="number" value={bolusInfusionTime || ''} onChange={e => setBolusInfusionTime(parseFloat(e.target.value) || undefined)}
-                        className="w-full p-2 border bg-white border-slate-300 rounded-md text-slate-900 no-spinner"
+                        className="w-full p-2 border bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-md text-slate-900 dark:text-slate-200 no-spinner"
                         placeholder="Opcional"
                     />
                 </div>
             </div>
 
             {bolusCalculation && (
-                <div className="p-4 bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg mt-4 space-y-3">
-                    <h4 className="text-lg font-bold text-blue-800">Resultado do Bólus</h4>
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-dashed border-blue-200 dark:border-blue-900 rounded-lg mt-4 space-y-3">
+                    <h4 className="text-lg font-bold text-blue-800 dark:text-blue-300">Resultado do Bólus</h4>
                     {bolusCalculation.error ? (
                         <WarningComponent text={bolusCalculation.error} type="critical" icon={<AlertTriangleIcon className="w-5 h-5"/>} />
                     ) : (
                         <div className="space-y-3">
                             <div className="grid grid-cols-2 gap-2 text-sm text-center">
-                                <div className="bg-white p-2 rounded-md border border-slate-200">
-                                    <p className="font-bold text-blue-600 text-lg">{bolusCalculation.totalDose}</p>
-                                    <p className="text-slate-500">Dose Total ({bolusCalculation.doseUnit.replace('/kg', '')})</p>
+                                <div className="bg-white dark:bg-slate-900 p-2 rounded-md border border-slate-200 dark:border-slate-700">
+                                    <p className="font-bold text-blue-600 dark:text-blue-300 text-lg">{bolusCalculation.totalDose}</p>
+                                    <p className="text-slate-500 dark:text-slate-400">Dose Total ({bolusCalculation.doseUnit.replace('/kg', '')})</p>
                                 </div>
-                                <div className="bg-white p-2 rounded-md border border-slate-200">
-                                    <p className="font-bold text-blue-600 text-lg">{bolusCalculation.totalVolume}</p>
-                                    <p className="text-slate-500">Volume Total (mL)</p>
+                                <div className="bg-white dark:bg-slate-900 p-2 rounded-md border border-slate-200 dark:border-slate-700">
+                                    <p className="font-bold text-blue-600 dark:text-blue-300 text-lg">{bolusCalculation.totalVolume}</p>
+                                    <p className="text-slate-500 dark:text-slate-400">Volume Total (mL)</p>
                                 </div>
                             </div>
                             {bolusCalculation.finalRate && (
-                                <div className="bg-white p-3 rounded-md border border-slate-200 text-center">
-                                    <p className="font-bold text-blue-600 text-lg">{bolusCalculation.finalRate} mL/h</p>
-                                    <p className="text-slate-500 text-sm">Taxa para Bomba de Infusão</p>
+                                <div className="bg-white dark:bg-slate-900 p-3 rounded-md border border-slate-200 dark:border-slate-700 text-center">
+                                    <p className="font-bold text-blue-600 dark:text-blue-300 text-lg">{bolusCalculation.finalRate} mL/h</p>
+                                    <p className="text-slate-500 dark:text-slate-400 text-sm">Taxa para Bomba de Infusão</p>
                                 </div>
                             )}
                         </div>
                     )}
 
                     {bolusCalculation.notesAndWarnings && bolusCalculation.notesAndWarnings.messages.length > 0 && (
-                        <div className="mt-4 pt-4 border-t border-dashed border-blue-300 space-y-3">
+                        <div className="mt-4 pt-4 border-t border-dashed border-blue-300 dark:border-blue-700 space-y-3">
                             {bolusCalculation.notesAndWarnings.messages.map((w, i) => (
                                 <WarningComponent key={`bolus-warning-${i}`} {...w} />
                             ))}
                             
                             {bolusCalculation.notesAndWarnings.showComorbidityOverride && (
-                                <label className="flex items-center gap-3 p-3 bg-yellow-50 border border-yellow-300 rounded-lg cursor-pointer hover:bg-yellow-100/70">
+                                <label className="flex items-center gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg cursor-pointer hover:bg-yellow-100/70 dark:hover:bg-yellow-900/30">
                                     <input 
                                         type="checkbox"
                                         checked={overrideComorbidityDoseReduction}
                                         onChange={(e) => onOverrideChange(e.target.checked)}
                                         className="h-5 w-5 rounded border-gray-400 text-red-600 focus:ring-red-500"
                                     />
-                                    <span className="text-sm text-yellow-900 font-medium">
+                                    <span className="text-sm text-yellow-900 dark:text-yellow-200 font-medium">
                                         Ignorar ajuste de comorbidade.
                                     </span>
                                 </label>

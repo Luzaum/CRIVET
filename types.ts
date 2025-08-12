@@ -130,10 +130,15 @@ export interface ComboDetails {
     targetSpecies: 'dog' | 'cat';
     ingredients: Array<{
         drugId: string;
-        name: string;
         dose: number;
         unit: CriDoseUnit;
     }>;
+    presets?: {
+        '25%': Record<string, number>;
+        '50%': Record<string, number>;
+        '75%': Record<string, number>;
+        '100%': Record<string, number>;
+    };
     notes?: string;
 }
 

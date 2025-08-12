@@ -8,6 +8,8 @@
   --ui-primary: 30 58 138; /* blue-900 */
   --ui-primary-contrast: 255 255 255;
   --range-track: #e2e8f0; /* slate-200 */
+  --ui-border: 226 232 240; /* slate-200 */
+  --ui-border-hover: 203 213 225; /* slate-300 */
 }
 
 .dark {
@@ -18,22 +20,45 @@
   --ui-primary: 30 64 175; /* blue-800 */
   --ui-primary-contrast: 255 255 255;
   --range-track: #475569; /* slate-600 */
+  --ui-border: 51 65 85; /* slate-700 */
+  --ui-border-hover: 71 85 105; /* slate-600 */
+}
+
+/* Global font settings */
+* {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Smooth theme transitions */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 /* Inputs default: light white, dark slate-900 */
 input, select, textarea {
   background-color: #ffffff;
   color: #0f172a; /* slate-900 */
+  border-color: rgb(var(--ui-border));
 }
+
 .dark input, .dark select, .dark textarea {
   background-color: #0f172a; /* slate-900 */
   color: #e2e8f0; /* slate-200 */
+  border-color: rgb(var(--ui-border));
+}
+
+/* Input focus states */
+input:focus, select:focus, textarea:focus {
+  border-color: rgb(var(--ui-primary));
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--ui-primary), 0.1);
 }
 
 /* Placeholder contrast */
 input::placeholder, textarea::placeholder, select::placeholder {
   color: #64748b; /* slate-500 */
 }
+
 .dark input::placeholder, .dark textarea::placeholder, .dark select::placeholder {
   color: #94a3b8; /* slate-400 */
 }
@@ -43,6 +68,7 @@ input::placeholder, textarea::placeholder, select::placeholder {
   background: #1d4ed8; /* blue-700 */
   color: #ffffff;
 }
+
 .dark ::selection {
   background: #60a5fa; /* blue-400 */
   color: #0f172a; /* slate-900 */
@@ -55,16 +81,19 @@ input[type="range"] {
   width: 100%;
   background: transparent;
 }
+
 input[type="range"]::-webkit-slider-runnable-track {
   height: 8px;
   background-color: var(--range-track);
   border-radius: 9999px;
 }
+
 input[type="range"]::-moz-range-track {
   height: 8px;
   background-color: var(--range-track);
   border-radius: 9999px;
 }
+
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -74,31 +103,74 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 9999px;
   border: 2px solid #ffffff;
   margin-top: -4px; /* center on 8px track */
+  cursor: pointer;
 }
+
 .dark input[type="range"]::-webkit-slider-thumb {
   border-color: #0f172a; /* dark ring */
 }
+
 input[type="range"]::-moz-range-thumb {
   width: 16px;
   height: 16px;
   background-color: #2563eb;
   border-radius: 9999px;
   border: 2px solid #ffffff;
+  cursor: pointer;
 }
+
 .dark input[type="range"]::-moz-range-thumb {
   border-color: #0f172a;
 }
+
 input[type="range"]:focus {
   outline: none;
+}
+
+/* Button consistency */
+button {
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+/* Material-UI theme overrides for consistency */
+.MuiToggleButton-root {
+  font-family: 'Inter', sans-serif !important;
+  text-transform: none !important;
+  font-weight: 500 !important;
+}
+
+.MuiToggleButtonGroup-root .MuiToggleButton-root {
+  border-color: rgb(var(--ui-border)) !important;
+}
+
+.MuiToggleButtonGroup-root .MuiToggleButton-root.Mui-selected {
+  background-color: rgb(var(--ui-primary)) !important;
+  color: rgb(var(--ui-primary-contrast)) !important;
+  border-color: rgb(var(--ui-primary)) !important;
+}
+
+.MuiTextField-root .MuiOutlinedInput-root {
+  font-family: 'Inter', sans-serif !important;
+}
+
+.MuiFormControlLabel-root {
+  font-family: 'Inter', sans-serif !important;
+}
+
+.MuiSwitch-root {
+  font-family: 'Inter', sans-serif !important;
 }
 
 /* Drug modal standard text colors */
 .drug-modal p, .drug-modal li {
   color: inherit;
 }
+
 .drug-modal strong {
   color: #0f172a;
 }
+
 .dark .drug-modal strong {
   color: #e2e8f0;
 }
@@ -106,13 +178,16 @@ input[type="range"]:focus {
 /* Checkbox/label readability by inheritance */
 label, .form-label {
   color: inherit;
+  font-family: inherit;
 }
 
+/* Remove spinner from number inputs */
 .no-spinner::-webkit-outer-spin-button,
 .no-spinner::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
 .no-spinner {
   -moz-appearance: textfield;
 }
@@ -122,12 +197,63 @@ label, .form-label {
   width: 10px;
   height: 10px;
 }
+
 *::-webkit-scrollbar-thumb {
   background-color: rgba(148, 163, 184, 0.5);
   border-radius: 8px;
 }
+
 *::-webkit-scrollbar-track {
   background: transparent;
+}
+
+/* Dark mode scrollbar */
+.dark *::-webkit-scrollbar-thumb {
+  background-color: rgba(71, 85, 105, 0.5);
+}
+
+/* Consistent border colors */
+.border-slate-200 {
+  border-color: rgb(var(--ui-border));
+}
+
+.border-slate-300 {
+  border-color: rgb(var(--ui-border-hover));
+}
+
+.dark .border-slate-700 {
+  border-color: rgb(var(--ui-border));
+}
+
+.dark .border-slate-600 {
+  border-color: rgb(var(--ui-border-hover));
+}
+
+/* Consistent background colors */
+.bg-slate-100 {
+  background-color: rgba(var(--ui-border), 0.5);
+}
+
+.dark .bg-slate-800 {
+  background-color: rgb(var(--ui-card));
+}
+
+/* Consistent text colors */
+.text-slate-600 {
+  color: rgb(var(--ui-muted));
+}
+
+.dark .text-slate-300 {
+  color: rgb(var(--ui-foreground));
+}
+
+/* Focus ring consistency */
+.focus\:ring-blue-700:focus {
+  box-shadow: 0 0 0 3px rgba(var(--ui-primary), 0.1);
+}
+
+.focus\:border-blue-700:focus {
+  border-color: rgb(var(--ui-primary));
 }
 
 
