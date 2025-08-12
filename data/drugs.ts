@@ -3,7 +3,7 @@ import { Drug, CriDoseUnit, BolusDoseUnit, WarningType, FluidType } from '../typ
 export const DRUGS: Drug[] = [
   // --- Analgésicos e Anestésicos ---
   {
-    id: 'fentanil',
+    id: 'fentanyl',
     name: 'Fentanil',
     category: 'Analgésicos e Anestésicos',
     concentrations: [{ value: 50, unit: 'μg/mL', label: '0.05 mg/mL (50 μg/mL)' }],
@@ -70,7 +70,7 @@ export const DRUGS: Drug[] = [
     }
   },
   {
-    id: 'morfina',
+    id: 'morphine',
     name: 'Morfina',
     category: 'Analgésicos e Anestésicos',
     concentrations: [{ value: 10, unit: 'mg/mL', label: '10 mg/mL' }],
@@ -195,7 +195,7 @@ export const DRUGS: Drug[] = [
     }
   },
   {
-    id: 'butorfanol',
+    id: 'butorphanol',
     name: 'Butorfanol',
     category: 'Analgésicos e Anestésicos',
     concentrations: [{ value: 10, unit: 'mg/mL', label: '10 mg/mL' }],
@@ -223,7 +223,7 @@ export const DRUGS: Drug[] = [
     }
   },
   {
-    id: 'cetamina',
+    id: 'ketamine',
     name: 'Cetamina',
     category: 'Analgésicos e Anestésicos',
     concentrations: [{ value: 100, unit: 'mg/mL', label: '100 mg/mL' }],
@@ -252,7 +252,7 @@ export const DRUGS: Drug[] = [
     }
   },
   {
-    id: 'lidocaina',
+    id: 'lidocaine',
     name: 'Lidocaína',
     category: 'Analgésicos e Anestésicos',
     concentrations: [{ value: 20, unit: 'mg/mL', label: '2% (20 mg/mL)' }],
@@ -286,7 +286,7 @@ export const DRUGS: Drug[] = [
     }
   },
   {
-    id: 'dexmedetomidina',
+    id: 'dexmedetomidine',
     name: 'Dexmedetomidina',
     category: 'Analgésicos e Anestésicos',
     concentrations: [{ value: 500, unit: 'μg/mL', label: '0.5 mg/mL (500 μg/mL)' }],
@@ -413,7 +413,7 @@ export const DRUGS: Drug[] = [
 
   // --- Agentes Cardiovasculares ---
   {
-    id: 'dobutamina',
+    id: 'dobutamine',
     name: 'Dobutamina',
     category: 'Agentes Cardiovasculares',
     concentrations: [{ value: 12500, unit: 'μg/mL', label: '250mg em 20mL (padrão)' }],
@@ -470,7 +470,7 @@ export const DRUGS: Drug[] = [
     }
   },
   {
-    id: 'norepinefrina',
+    id: 'norepinephrine',
     name: 'Norepinefrina',
     category: 'Agentes Cardiovasculares',
     concentrations: [{ value: 1, unit: 'mg/mL', label: '1 mg/mL' }],
@@ -619,7 +619,7 @@ export const DRUGS: Drug[] = [
   },
   // --- Bloqueadores Neuromusculares ---
   {
-    id: 'rocuronio',
+    id: 'rocuronium',
     name: 'Rocurônio',
     category: 'Bloqueadores Neuromusculares',
     concentrations: [{ value: 10, unit: 'mg/mL', label: '10 mg/mL' }],
@@ -673,7 +673,7 @@ export const DRUGS: Drug[] = [
   },
   // --- Antimicrobianos ---
   {
-    id: 'ampicilina-sulbactam',
+    id: 'ampicillin-sulbactam',
     name: 'Ampicilina/Sulbactam',
     category: 'Antimicrobianos',
     concentrations: [],
@@ -707,7 +707,7 @@ export const DRUGS: Drug[] = [
   },
   // --- Endócrino ---
   {
-    id: 'insulina-regular',
+    id: 'insulin-regular',
     name: 'Insulina Regular (Humulin R, Novolin R)',
     category: 'Endócrino',
     concentrations: [{ value: 100, unit: 'U/mL', label: '100 U/mL' }],
@@ -804,7 +804,7 @@ export const DRUGS: Drug[] = [
   },
   // --- Diversos ---
   {
-    id: 'metoclopramida',
+    id: 'metoclopramide',
     name: 'Metoclopramida',
     category: 'Diversos',
     concentrations: [{ value: 5, unit: 'mg/mL', label: '5 mg/mL' }],
