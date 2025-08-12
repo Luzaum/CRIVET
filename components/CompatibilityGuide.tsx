@@ -98,6 +98,36 @@ export const CompatibilityGuide: React.FC<CompatibilityGuideProps> = ({ onClose 
                    {EXPANDED_FORMULAS.criToBolus}
                  </div>
                </div>
+               <div>
+                 <span className="font-semibold text-blue-800 dark:text-blue-300">Fórmula Adicional:</span>
+                 <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+                   {ADDITIONAL_FORMULAS.additional}
+                 </div>
+               </div>
+               <div>
+                 <span className="font-semibold text-blue-800 dark:text-blue-300">Conversão Adicional:</span>
+                 <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+                   {ADDITIONAL_FORMULAS.conversion}
+                 </div>
+               </div>
+               <div>
+                 <span className="font-semibold text-blue-800 dark:text-blue-300">Volume Adicional:</span>
+                 <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+                   {ADDITIONAL_FORMULAS.volume}
+                 </div>
+               </div>
+               <div>
+                 <span className="font-semibold text-blue-800 dark:text-blue-300">Bólus Adicional:</span>
+                 <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+                   {ADDITIONAL_FORMULAS.bolus}
+                 </div>
+               </div>
+               <div>
+                 <span className="font-semibold text-blue-800 dark:text-blue-300">CRI Adicional:</span>
+                 <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+                   {ADDITIONAL_FORMULAS.cri}
+                 </div>
+               </div>
              </div>
            </div>
 
