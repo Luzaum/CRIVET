@@ -9,6 +9,9 @@ import { COMPREHENSIVE_DRUGS } from './comprehensive_drugs';
 // Importando dados do arquivo expanded
 import { EXPANDED_DRUGS } from './expanded_drugs';
 
+// Importando dados do arquivo additional
+import { ADDITIONAL_DRUGS } from './additional_drugs';
+
 // Função para remover duplicatas baseado no ID
 function removeDuplicates(drugs: Drug[]): Drug[] {
   const seen = new Set();
@@ -25,7 +28,8 @@ function removeDuplicates(drugs: Drug[]): Drug[] {
 export const CONSOLIDATED_DRUGS: Drug[] = removeDuplicates([
   ...ORIGINAL_DRUGS,
   ...COMPREHENSIVE_DRUGS,
-  ...EXPANDED_DRUGS
+  ...EXPANDED_DRUGS,
+  ...ADDITIONAL_DRUGS
 ]);
 
 // Exportando também as outras constantes
@@ -38,3 +42,10 @@ export {
   COMORBIDITY_ADJUSTMENTS,
   CHECKLISTS
 } from './expanded_drugs';
+export {
+  ADDITIONAL_COMPATIBILITY_MATRIX,
+  ADDITIONAL_FORMULAS,
+  ADDITIONAL_EXAMPLES,
+  ADDITIONAL_TOOLTIPS,
+  ADDITIONAL_CHECKLISTS
+} from './additional_drugs';
