@@ -1,5 +1,15 @@
 import React from 'react';
-import { COMPATIBILITY_MATRIX, FORMULAS, EXAMPLES } from '../data/consolidated_drugs';
+import { 
+  COMPATIBILITY_MATRIX, 
+  FORMULAS, 
+  EXAMPLES,
+  EXPANDED_COMPATIBILITY_MATRIX,
+  EXPANDED_FORMULAS,
+  EXPANDED_EXAMPLES,
+  TOOLTIPS,
+  COMORBIDITY_ADJUSTMENTS,
+  CHECKLISTS
+} from '../data/consolidated_drugs';
 
 interface CompatibilityGuideProps {
   onClose: () => void;
@@ -15,78 +25,90 @@ export const CompatibilityGuide: React.FC<CompatibilityGuideProps> = ({ onClose 
         </div>
         <div className="p-6 overflow-y-auto space-y-6">
           
-          {/* Compatibilidade Semáforo */}
-          <div>
-            <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">🟢🟡🔴 Compatibilidade Y-site</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Object.entries(COMPATIBILITY_MATRIX).map(([drug, compatibility]) => (
-                <div key={drug} className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
-                  <h5 className="font-semibold text-slate-800 dark:text-slate-200 mb-2 capitalize">{drug}</h5>
-                  <div className="space-y-2">
-                    <div>
-                      <span className="text-green-600 font-medium">🟢 Compatível:</span>
-                      <div className="text-sm text-slate-600 dark:text-slate-300 mt-1">
-                        {compatibility['🟢']?.join(', ') || 'Nenhum'}
-                      </div>
-                    </div>
-                    {compatibility['🟡'] && (
-                      <div>
-                        <span className="text-yellow-600 font-medium">🟡 Cautela:</span>
-                        <div className="text-sm text-slate-600 dark:text-slate-300 mt-1">
-                          {compatibility['🟡'].join(', ')}
-                        </div>
-                      </div>
-                    )}
-                    <div>
-                      <span className="text-red-600 font-medium">🔴 Incompatível:</span>
-                      <div className="text-sm text-slate-600 dark:text-slate-300 mt-1">
-                        {compatibility['🔴']?.join(', ') || 'Nenhum'}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+                     {/* Compatibilidade Semáforo */}
+           <div>
+             <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">🟢🟡🔴 Compatibilidade Y-site</h4>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               {Object.entries({...COMPATIBILITY_MATRIX, ...EXPANDED_COMPATIBILITY_MATRIX}).map(([drug, compatibility]) => (
+                 <div key={drug} className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+                   <h5 className="font-semibold text-slate-800 dark:text-slate-200 mb-2 capitalize">{drug}</h5>
+                   <div className="space-y-2">
+                     <div>
+                       <span className="text-green-600 font-medium">🟢 Compatível:</span>
+                       <div className="text-sm text-slate-600 dark:text-slate-300 mt-1">
+                         {compatibility['🟢']?.join(', ') || 'Nenhum'}
+                       </div>
+                     </div>
+                     {compatibility['🟡'] && (
+                       <div>
+                         <span className="text-yellow-600 font-medium">🟡 Cautela:</span>
+                         <div className="text-sm text-slate-600 dark:text-slate-300 mt-1">
+                           {compatibility['🟡'].join(', ')}
+                         </div>
+                       </div>
+                     )}
+                     <div>
+                       <span className="text-red-600 font-medium">🔴 Incompatível:</span>
+                       <div className="text-sm text-slate-600 dark:text-slate-300 mt-1">
+                         {compatibility['🔴']?.join(', ') || 'Nenhum'}
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+               ))}
+             </div>
+           </div>
 
-          {/* Fórmulas */}
-          <div>
-            <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">🧮 Fórmulas Universais</h4>
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-3">
-              <div>
-                <span className="font-semibold text-blue-800 dark:text-blue-300">Fórmula Universal:</span>
-                <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
-                  {FORMULAS.universal}
-                </div>
-              </div>
-              <div>
-                <span className="font-semibold text-blue-800 dark:text-blue-300">Conversão Útil:</span>
-                <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
-                  {FORMULAS.conversion}
-                </div>
-              </div>
-              <div>
-                <span className="font-semibold text-blue-800 dark:text-blue-300">Volume/Tempo Fixos:</span>
-                <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
-                  {FORMULAS.volumeTime}
-                </div>
-              </div>
-            </div>
-          </div>
+                     {/* Fórmulas */}
+           <div>
+             <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">🧮 Fórmulas Universais</h4>
+             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-3">
+               <div>
+                 <span className="font-semibold text-blue-800 dark:text-blue-300">Fórmula Universal:</span>
+                 <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+                   {EXPANDED_FORMULAS.universal}
+                 </div>
+               </div>
+               <div>
+                 <span className="font-semibold text-blue-800 dark:text-blue-300">Conversão Útil:</span>
+                 <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+                   {EXPANDED_FORMULAS.conversion}
+                 </div>
+               </div>
+               <div>
+                 <span className="font-semibold text-blue-800 dark:text-blue-300">Volume/Tempo Fixos:</span>
+                 <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+                   {EXPANDED_FORMULAS.volumeTime}
+                 </div>
+               </div>
+               <div>
+                 <span className="font-semibold text-blue-800 dark:text-blue-300">Bólus para CRI:</span>
+                 <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+                   {EXPANDED_FORMULAS.bolusToCRI}
+                 </div>
+               </div>
+               <div>
+                 <span className="font-semibold text-blue-800 dark:text-blue-300">CRI para Bólus:</span>
+                 <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+                   {EXPANDED_FORMULAS.criToBolus}
+                 </div>
+               </div>
+             </div>
+           </div>
 
-          {/* Exemplos */}
-          <div>
-            <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">📝 Exemplos Rápidos</h4>
-            <div className="space-y-3">
-              {EXAMPLES.map((example, index) => (
-                <div key={index} className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
-                  <h5 className="font-semibold text-slate-800 dark:text-slate-200">{example.title}</h5>
-                  <div className="text-sm text-slate-600 dark:text-slate-300 mt-1">{example.description}</div>
-                  <div className="font-mono text-sm text-blue-600 dark:text-blue-300 mt-2">{example.calculation}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+                     {/* Exemplos */}
+           <div>
+             <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">📝 Exemplos Rápidos</h4>
+             <div className="space-y-3">
+               {[...EXAMPLES, ...EXPANDED_EXAMPLES].map((example, index) => (
+                 <div key={index} className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+                   <h5 className="font-semibold text-slate-800 dark:text-slate-200">{example.title}</h5>
+                   <div className="text-sm text-slate-600 dark:text-slate-300 mt-1">{example.description}</div>
+                   <div className="font-mono text-sm text-blue-600 dark:text-blue-300 mt-2">{example.calculation}</div>
+                 </div>
+               ))}
+             </div>
+           </div>
 
           {/* Boas Práticas */}
           <div>

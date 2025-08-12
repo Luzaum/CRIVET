@@ -1,4 +1,3 @@
-
 import { Drug, CriDoseUnit, BolusDoseUnit, WarningType, FluidType } from '../types';
 
 export const DRUGS: Drug[] = [
@@ -36,7 +35,7 @@ export const DRUGS: Drug[] = [
       monitoring: ["Frequência respiratória e ETCO₂", "Frequência cardíaca", "Pressão arterial", "Profundidade da sedação"],
       goodPractice: ["Sempre usar bomba de infusão para garantir precisão.", "Evite interrupção brusca (risco de hiperalgesia/rebote).", "Planejar analgesia de resgate ao descontinuar a infusão."],
       contraindications: ["Usar com cautela em pacientes com aumento da pressão intracraniana."],
-      citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
+      citations: ["Plumb's Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
     }
   },
   {
@@ -67,7 +66,7 @@ export const DRUGS: Drug[] = [
       },
       monitoring: ["Frequência respiratória", "Pressão arterial", "Frequência cardíaca", "Saturação de oxigênio"],
       goodPractice: ["Sempre administrar via bomba de infusão.", "Assegure analgesia multimodal (ex: AINE, dipirona, morfina) antes do término da infusão."],
-      citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+      citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   {
@@ -100,7 +99,7 @@ export const DRUGS: Drug[] = [
         },
         monitoring: ["Frequência respiratória", "Nível de sedação", "Sinais de náusea/vômito", "Temperatura corporal (especialmente em gatos)"],
         goodPractice: ["Considerar pré-medicação com antiemético (ex: maropitant).", "Administrar bolus lentamente para reduzir risco de vômito e hipotensão."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
     }
   },
    {
@@ -131,7 +130,7 @@ export const DRUGS: Drug[] = [
         },
         monitoring: ["Frequência cardíaca", "Frequência respiratória", "Nível de sedação"],
         goodPractice: ["Menor propensão a causar vômito em comparação com a morfina."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   {
@@ -162,7 +161,7 @@ export const DRUGS: Drug[] = [
         },
         monitoring: ["Temperatura (especialmente em gatos)", "Frequência respiratória", "Nível de sedação"],
         goodPractice: [],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   {
@@ -192,7 +191,7 @@ export const DRUGS: Drug[] = [
         },
         monitoring: ["Nível de analgesia", "Temperatura (hipertermia rara em gatos)"],
         goodPractice: ["Pode antagonizar o efeito de opioides puros (fentanil) se administrados depois. Naloxona tem dificuldade em reverter seus efeitos."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   {
@@ -220,7 +219,7 @@ export const DRUGS: Drug[] = [
         },
         monitoring: ["Nível de sedação", "Frequência cardíaca"],
         goodPractice: ["Pode reverter parcialmente a analgesia e a depressão respiratória de opioides puros.", "Sua analgesia para dor somática intensa é limitada."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   {
@@ -249,7 +248,7 @@ export const DRUGS: Drug[] = [
         monitoring: ["Frequência cardíaca", "Pressão arterial", "Qualidade da recuperação (pode causar disforia)"],
         goodPractice: ["Sempre usada em combinação com opioides e/ou lidocaína (MLK/FLK) para analgesia multimodal e para mitigar efeitos disfóricos."],
         contraindications: ["Cardiomiopatia hipertrófica obstrutiva (CMHo)", "Hipertensão sistêmica grave não controlada."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
     }
   },
   {
@@ -283,7 +282,7 @@ export const DRUGS: Drug[] = [
         monitoring: ["ECG contínuo", "Pressão arterial", "Sinais de toxicidade do SNC (tremores, convulsões, nistagmo, depressão)"],
         goodPractice: ["Sempre usar bomba de infusão.", "Verificar se a apresentação é SEM EPINEFRINA para uso IV."],
         contraindications: ["Hipersensibilidade a anestésicos locais do tipo amida", "Bloqueio atrioventricular de alto grau (sem marcapasso)."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
     }
   },
   {
@@ -313,7 +312,7 @@ export const DRUGS: Drug[] = [
       monitoring: ["Frequência cardíaca (bradicardia é esperada)", "Pressão arterial", "Temperatura (risco de hipotermia)"],
       goodPractice: ["A CRI em microdose fornece analgesia com menor impacto hemodinâmico que bolus.", "Reversível com atipamezol se necessário."],
       contraindications: ["Doença cardiovascular grave", "Disfunção hepática ou renal severa", "Gestação."],
-      citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+      citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   {
@@ -343,7 +342,7 @@ export const DRUGS: Drug[] = [
         monitoring: ["Nível de sedação", "Frequência e esforço respiratório"],
         goodPractice: ["Frequentemente usado em combinação com opioides para sedação balanceada.", "Antagonista (flumazenil) está disponível para reversão."],
         contraindications: ["Hipersensibilidade a benzodiazepínicos", "Glaucoma de ângulo fechado."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   {
@@ -374,7 +373,7 @@ export const DRUGS: Drug[] = [
       },
       monitoring: ["Pressão arterial", "Frequência e padrão respiratório, SpO2, ETCO2", "Temperatura"],
       goodPractice: ["Técnica asséptica rigorosa no manuseio. Frascos sem conservantes devem ser descartados após 6-12h.", "Administrar com analgesia adequada, pois não possui efeito analgésico."],
-      citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+      citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
    {
@@ -408,7 +407,7 @@ export const DRUGS: Drug[] = [
       },
       monitoring: ["Pressão arterial", "Frequência respiratória", "Saturação de oxigênio"],
       goodPractice: ["Recuperação pode ser agitada se não houver pré-medicação ou analgesia adequada."],
-      citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
+      citations: ["Plumb's Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
     }
   },
 
@@ -439,7 +438,7 @@ export const DRUGS: Drug[] = [
         },
         monitoring: ["ECG contínuo", "Pressão arterial", "Ecocardiograma para avaliar contratilidade", "Lactato"],
         goodPractice: ["Titular a dose lentamente para atingir o efeito clínico desejado.", "Corrigir hipovolemia antes de iniciar."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   {
@@ -467,7 +466,7 @@ export const DRUGS: Drug[] = [
         monitoring: ["ECG contínuo", "Pressão arterial (idealmente invasiva)", "Débito urinário"],
         goodPractice: ["ALERTA VESICANTE: Extravasamento pode causar necrose tecidual. Administrar em veia central se possível.", "Corrigir hipovolemia antes de iniciar a infusão."],
         contraindications: ["Feocromocitoma", "Taquiarritmias ventriculares não tratadas."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
     }
   },
   {
@@ -493,7 +492,7 @@ export const DRUGS: Drug[] = [
         },
         monitoring: ["Pressão arterial invasiva (obrigatório)", "ECG contínuo", "Lactato sérico", "Perfusão periférica"],
         goodPractice: ["ALERTA VESICANTE. Administrar via cateter venoso central.", "Titular a dose lentamente para evitar hipertensão rebote.", "Não retirar abruptamente."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
    {
@@ -526,7 +525,7 @@ export const DRUGS: Drug[] = [
         monitoring: ["Pressão arterial invasiva (obrigatório)", "Estado ácido-base (acidose metabólica é sinal precoce de toxicidade por cianeto)", "Lactato", "Sinais de toxicidade por tiocianato se uso > 48h"],
         goodPractice: ["Não dar flush na linha (risco de bolus e hipotensão severa).", "Considerar co-infusão de hidroxocobalamina em uso prolongado.", "Descartar a solução se ficar azul, verde ou muito escura."],
         contraindications: ["Hipertensão compensatória (ex: shunt portossistêmico, estenose aórtica)."],
-        citations: ["Plumb’s 10th ed. – preparo em D5W e proteção da luz", "Plumb’s 10th ed. – doses e monitorização"]
+        citations: ["Plumb's 10th ed. – preparo em D5W e proteção da luz", "Plumb's 10th ed. – doses e monitorização"]
     }
   },
    {
@@ -558,7 +557,7 @@ export const DRUGS: Drug[] = [
         monitoring: ["ECG contínuo", "Pressão arterial"],
         goodPractice: ["Não administrar com beta-bloqueadores IV pelo risco de depressão miocárdica severa."],
         contraindications: ["Bloqueio AV de 2º ou 3º grau (sem marcapasso)", "Hipotensão severa", "Síndrome do nó sinusal doente."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   {
@@ -588,7 +587,7 @@ export const DRUGS: Drug[] = [
         monitoring: ["ECG contínuo", "Pressão arterial"],
         goodPractice: ["Seu efeito cessa rapidamente após a interrupção da infusão."],
         contraindications: ["Insuficiência cardíaca descompensada", "Choque cardiogênico", "Bradicardia sinusal severa", "Bloqueio AV de alto grau."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   {
@@ -615,7 +614,7 @@ export const DRUGS: Drug[] = [
         adjustments: {},
         monitoring: ["Pressão arterial", "Débito urinário", "Perfusão periférica (risco de isquemia)"],
         goodPractice: ["Não titular como a norepinefrina. A dose é geralmente fixa ou ajustada minimamente.", "Adjuvante à norepinefrina, não um substituto."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   // --- Bloqueadores Neuromusculares ---
@@ -642,7 +641,7 @@ export const DRUGS: Drug[] = [
         },
         monitoring: ["Monitor de transmissão neuromuscular (TOF)", "Ventilação (capnografia, volume corrente)"],
         goodPractice: ["Sempre administrar com sedação/anestesia profunda. Não possui efeito analgésico.", "Reversível com neostigmina/glicopirrolato ou sugamadex."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   {
@@ -669,7 +668,7 @@ export const DRUGS: Drug[] = [
         },
         monitoring: ["Monitor de transmissão neuromuscular (TOF)", "Ventilação"],
         goodPractice: ["Pode causar liberação de histamina se administrado em bolus rápido. Administrar lentamente (1-2 min).", "Sempre administrar com sedação/anestesia profunda."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   // --- Antimicrobianos ---
@@ -703,7 +702,7 @@ export const DRUGS: Drug[] = [
         },
         monitoring: ["Sinais de reação alérgica", "Função renal em uso prolongado"],
         goodPractice: ["Administrar em infusão lenta (15-30 min) para reduzir flebite."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   // --- Endócrino ---
@@ -717,27 +716,24 @@ export const DRUGS: Drug[] = [
       { species: 'both', min: 0.1, max: 0.25, unit: BolusDoseUnit.U_kg, notes: "Administrar apenas se Potássio > 3.5 mEq/L" }
     ],
     info: {
-        indicationSummary: ["Insulina de ação rápida para tratamento de cetoacidose diabética (CAD) e hiperglicemia severa em pacientes críticos."],
-        mechanism: "Liga-se a receptores celulares para facilitar a captação de glicose pelos tecidos muscular e adiposo, reduzindo a glicemia. Promove o armazenamento de glicogênio e inibe a gliconeogênese hepática.",
+        indicationSummary: ["Insulina de ação rápida para controle de hiperglicemia aguda, cetoacidose diabética e controle perioperatório."],
+        mechanism: "Insulina de ação rápida que reduz a glicemia ao facilitar a captação de glicose pelos tecidos e inibir a produção hepática de glicose.",
         dosesText: {
-            dog: { cri: "0.05-0.1 U/kg/h", bolus: "0.1-0.25 U/kg IV (apenas se K+ > 3.5 mEq/L)" },
-            cat: { cri: "0.05-0.1 U/kg/h", bolus: "0.1-0.25 U/kg IV (apenas se K+ > 3.5 mEq/L)" },
-            notes: "Objetivo na CAD: reduzir a glicemia em 50-75 mg/dL por hora. Queda muito rápida pode causar edema cerebral. As doses de manutenção SC são diferentes."
+            dog: { cri: "0.05-0.1 U/kg/h", bolus: "0.1-0.25 U/kg IV" },
+            cat: { cri: "0.05-0.1 U/kg/h", bolus: "0.1-0.25 U/kg IV" }
         },
-        diluents: { recommended: ['NaCl 0.9%'] },
+        diluents: { recommended: ['NaCl 0.9%'], notes: "Diluir em NaCl 0.9% para CRI. Preparar bolsa de 250mL com dose calculada." },
         photoprotection: false,
-        compatibility: {
-            incompatibilities: ["Norepinefrina", "Dobutamina"],
-            notes: "É comum administrar em linha separada para evitar adsorção e garantir precisão. Interações: Efeito hipoglicêmico aumentado por beta-bloqueadores, salicilatos. Efeito diminuído por corticosteroides, diuréticos tiazídicos."
-        },
+        compatibility: { incompatibilities: ["Bicarbonato", "Dopamina", "Furosemida"], ySite: ["Dobutamina", "Norepinefrina", "Fentanil"] },
         adjustments: {
-            renal: "Reduzir dose em 25-50% em disfunção renal, pelo risco de hipoglicemia.",
+            renal: "Monitorar de perto. A necessidade de insulina pode mudar.",
+            hepatic: "Monitorar de perto. A necessidade de insulina pode mudar.",
             pregnancy: "A necessidade de insulina pode variar. Monitoramento intensivo é necessário."
         },
-        monitoring: ["Glicemia (a cada 1-2h em CAD)", "Potássio e Fósforo sérico (a cada 4-6h)", "Estado ácido-base", "Sinais clínicos de hipoglicemia (fraqueza, ataxia, tremores, convulsões)"],
-        goodPractice: ["Sempre usar seringas U-100 para a insulina de 100 U/mL para evitar erros de dosagem.", "Para CRI, lavar o equipo com ~50mL da solução de insulina para saturar os sítios de ligação do plástico antes de conectar ao paciente.", "Ajustar a taxa de infusão baseado em medições seriadas de glicose."],
+        monitoring: ["Curva glicêmica seriada", "Sinais de hipoglicemia", "Glicosúria", "Frutosamina (para avaliação a longo prazo)", "Peso corporal"],
+        goodPractice: ["Homogeneizar a suspensão rolando o frasco suavemente. Não agitar.", "Usar apenas seringas calibradas para U-40.", "A remissão diabética é uma possibilidade em gatos; monitorar de perto para evitar hipoglicemia."],
         contraindications: ["Hipoglicemia"],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed.", "DiBartola – Fluid, Electrolyte, and Acid-Base Disorders"]
+        citations: ["Plumb's Veterinary Drug Handbook", "AAHA Diabetes Management Guidelines for Dogs and Cats"]
     }
   },
   {
@@ -770,7 +766,7 @@ export const DRUGS: Drug[] = [
       monitoring: ["Curva glicêmica seriada", "Sinais clínicos de hipoglicemia (fraqueza, ataxia, convulsões)", "Glicosúria", "Consumo de água e apetite", "Peso corporal"],
       goodPractice: ["Homogeneizar a suspensão rolando o frasco suavemente entre as mãos. Não agitar vigorosamente.", "Variar os locais de injeção subcutânea para evitar lipodistrofia.", "Educar o tutor sobre os sinais de hipoglicemia e como agir."],
       contraindications: ["Hipoglicemia"],
-      citations: ["Plumb’s Veterinary Drug Handbook", "Feldman and Nelson's Canine and Feline Endocrinology and Reproduction"]
+      citations: ["Plumb's Veterinary Drug Handbook", "Feldman and Nelson's Canine and Feline Endocrinology and Reproduction"]
     }
   },
   {
@@ -803,7 +799,7 @@ export const DRUGS: Drug[] = [
       monitoring: ["Curva glicêmica seriada", "Sinais de hipoglicemia", "Glicosúria", "Frutosamina (para avaliação a longo prazo)", "Peso corporal"],
       goodPractice: ["Homogeneizar a suspensão rolando o frasco suavemente. Não agitar.", "Usar apenas seringas calibradas para U-40.", "A remissão diabética é uma possibilidade em gatos; monitorar de perto para evitar hipoglicemia."],
       contraindications: ["Hipoglicemia"],
-      citations: ["Plumb’s Veterinary Drug Handbook", "AAHA Diabetes Management Guidelines for Dogs and Cats"]
+      citations: ["Plumb's Veterinary Drug Handbook", "AAHA Diabetes Management Guidelines for Dogs and Cats"]
     }
   },
   // --- Diversos ---
@@ -833,7 +829,7 @@ export const DRUGS: Drug[] = [
         monitoring: ["Sinais de efeitos extrapiramidais (tratar com difenidramina se ocorrer)"],
         goodPractice: ["Proteger a bolsa/seringa da luz durante a infusão."],
         contraindications: ["Obstrução ou perfuração gastrointestinal", "Epilepsia (pode diminuir o limiar convulsivo)."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   {
@@ -862,7 +858,7 @@ export const DRUGS: Drug[] = [
         },
         monitoring: ["Sinais de vômito", "Pressão arterial (pode causar hipotensão sob anestesia)"],
         goodPractice: ["A injeção SC pode ser dolorosa; refrigerar o frasco pode diminuir o desconforto."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
   {
@@ -893,7 +889,7 @@ export const DRUGS: Drug[] = [
         },
         monitoring: ["ECG se houver risco de arritmia"],
         goodPractice: ["Administrar bolus IV lentamente (2-5 minutos) para evitar hipotensão e tontura."],
-        citations: ["Plumb’s Veterinary Drug Handbook, 10th Ed."]
+        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
 ];

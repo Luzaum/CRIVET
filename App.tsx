@@ -1053,17 +1053,7 @@ export default function App() {
             <footer className="text-center p-6 text-xs text-[rgb(var(--ui-muted))]">
                 <p>Esta ferramenta é um auxílio para profissionais veterinários. Não substitui o julgamento clínico, o exame físico completo ou a monitorização do paciente.</p>
                 <p>Todos os cálculos devem ser confirmados antes da administração. Use com responsabilidade.</p>
-                <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                    <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">📋 Resumo Geral CRIs Vet</h4>
-                    <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1">
-                        <p><strong>Infusões Combinadas:</strong> MLK, FLK, DMLK com presets 25/50/75/100%</p>
-                        <p><strong>Vasoativos:</strong> Noradrenalina, Fenilefrina, Dobutamina, Dopamina, Nitroprussiato</p>
-                        <p><strong>Antibióticos:</strong> Intermitente padrão, CRI excepcional com justificativa</p>
-                        <p><strong>GI/Diurético:</strong> Metoclopramida, Furosemida, Ondansetrona</p>
-                        <p><strong>Endócrino:</strong> Insulina Regular (DKA), Sulfato de Magnésio</p>
-                        <p><strong>NMBAs:</strong> Rocurônio, Vecurônio, Atracúrio com reversão</p>
-                    </div>
-                </div>
+
             </footer>
         </ThemeProvider>
     );
