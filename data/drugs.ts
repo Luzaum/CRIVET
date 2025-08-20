@@ -251,6 +251,959 @@ export const DRUGS: Drug[] = [
         citations: ["Plumb's Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
     }
   },
+
+  // --- ANTIBIÓTICOS ---
+  {
+    id: 'ampicillin-sulbactam',
+    name: 'Ampicilina + Sulbactam',
+    category: 'Antimicrobianos',
+    isPowder: true,
+    preparationGuide: `<strong>Reconstituição do Frasco:</strong><br/>
+<ul class="list-disc list-inside mt-1 space-y-1">
+  <li><strong>Frasco 1.5g:</strong> reconstituir com 3.2 mL de diluente → 4 mL finais (375 mg/mL)</li>
+  <li><strong>Frasco 3g:</strong> reconstituir com 6.4 mL de diluente → 8 mL finais (375 mg/mL)</li>
+</ul>
+<strong>Diluente para reconstituição:</strong> Água para Injeção Estéril ou NaCl 0.9%<br/>
+<strong>Diluente para infusão:</strong> NaCl 0.9% (preferencial) - evitar Ringer Lactato<br/>
+<strong>Estabilidade:</strong> 8 horas após reconstituição em temperatura ambiente`,
+    concentrations: [
+      { value: 375, unit: 'mg/mL', label: '375 mg/mL (pós-reconstituição)' }
+    ],
+    criDoses: [
+      { 
+        species: 'both', 
+        cri: { min: 100, max: 150, default: 125, unit: CriDoseUnit.mg_kg_day },
+        useCase: 'CRI para infecções graves',
+        notes: 'Dose de ataque: 30-50 mg/kg IV em 30 min. Manutenção: 100-150 mg/kg/dia em CRI. Fármaco tempo-dependente - maximiza T>MIC.'
+      }
+    ],
+    bolusDoses: [
+      { 
+        species: 'both', 
+        min: 30, max: 50, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 30,
+        useCase: 'Administração intermitente',
+        notes: 'Diluir em 50-100 mL NaCl 0.9%. Infundir em 15-30 min. Evitar Ringer Lactato.'
+      }
+    ],
+    info: {
+      indicationSummary: [
+        "Sepse e choque séptico (comunitário sem uso recente de antimicrobianos)",
+        "Peritonite",
+        "Neutropenia febril com sepse",
+        "Infecções por Clostridium perfringens",
+        "Profilaxia cirúrgica"
+      ],
+      mechanism: "Beta-lactâmico + inibidor de beta-lactamase. Tempo-dependente - eficácia máxima mantendo concentração acima da CIM por 50-70% do intervalo.",
+      dosesText: {
+        dog: { cri: "100-150 mg/kg/dia (CRI)", bolus: "30 mg/kg IV q8h (Textbook)" },
+        cat: { cri: "100-150 mg/kg/dia (CRI)", bolus: "30 mg/kg IV q8h (Textbook)" },
+        notes: "Para sepse: combinar com Enrofloxacina (22 mg/kg IV q8h + Enrofloxacina). CRI superior para infecções graves (maximiza T>MIC)."
+      },
+      diluents: { 
+        recommended: ['NaCl 0.9%'], 
+        notes: "NaCl 0.9% é diluente de eleição. EVITAR Ringer Lactato (reduz concentração efetiva). Estabilidade reduzida em soluções com dextrose."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilities: ["Ringer Lactato", "Dextrose", "Aminoglicosídeos"], 
+        ySite: ["Dobutamina", "Fentanil", "Norepinefrina"] 
+      },
+      adjustments: {
+        renal: "Considerar reduzir frequência em DRC importante",
+        hepatic: "Ajustar dose em hepatopatas graves"
+      },
+      monitoring: ["Função renal", "Sinais de infecção", "Cultura e antibiograma", "Resposta à terapia"],
+      goodPractice: [
+        "CRI é modalidade farmacodinamicamente superior para infecções graves",
+        "Bolus intermitente deve ser infundido lentamente (15-30 min)",
+        "Para sepse: considerar combinação com aminoglicosídeo ou fluoroquinolona",
+        "Monitorar resposta clínica e ajustar conforme cultura"
+      ],
+      contraindications: ["Hipersensibilidade a penicilinas"],
+      citations: [
+        "Plumb's Veterinary Drug Handbook, 10th Ed.", 
+        "Bulário ANVISA - Unasyn®",
+        "Textbook of Small Animal Emergency Medicine"
+      ]
+    }
+  },
+
+  {
+    id: 'amoxicillin-clavulanate',
+    name: 'Amoxicilina + Clavulanato (IV)',
+    category: 'Antimicrobianos',
+    isPowder: true,
+    preparationGuide: `<strong>Reconstituição do Frasco:</strong><br/>
+<ul class="list-disc list-inside mt-1 space-y-1">
+  <li><strong>Frasco 600mg:</strong> reconstituir com 10 mL de Água para Injeção → 50 mg/mL amoxicilina + 10 mg/mL clavulanato</li>
+  <li><strong>Frasco 1.2g:</strong> reconstituir com 20 mL de Água para Injeção → 50 mg/mL amoxicilina + 10 mg/mL clavulanato</li>
+</ul>
+<strong>Diluente para reconstituição:</strong> Água para Injeção Estéril<br/>
+<strong>Diluente para infusão:</strong> NaCl 0.9% (exclusivo)<br/>
+<strong>ALERTA:</strong> Clavulanato é instável em soluções com glicose, dextrano ou bicarbonato<br/>
+<strong>Estabilidade:</strong> Usar imediatamente após reconstituição. Máximo 4h após diluição`,
+    concentrations: [
+      { value: 50, unit: 'mg/mL', label: '50 mg/mL amoxicilina (pós-reconstituição)' }
+    ],
+    bolusDoses: [
+      { 
+        species: 'both', 
+        min: 20, max: 30, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 40,
+        useCase: 'Administração intermitente',
+        notes: 'Diluir em 50-100 mL NaCl 0.9%. Infundir em 30-40 min. NÃO administrar em bolus rápido.'
+      }
+    ],
+    info: {
+      indicationSummary: [
+        "Cistite simples",
+        "Piodermites superficiais não complicadas",
+        "Pneumonia adquirida na comunidade (pacientes estáveis)",
+        "Sepse neutropênica (tratamento ambulatorial)",
+        "Infecções do trato respiratório superior em gatos",
+        "Enterite por Clostridium perfringens"
+      ],
+      mechanism: "Beta-lactâmico + inibidor de beta-lactamase. Tempo-dependente. Clavulanato inibe beta-lactamases.",
+      dosesText: {
+        dog: { bolus: "20-30 mg/kg IV q8h (baseado na amoxicilina)" },
+        cat: { bolus: "20-30 mg/kg IV q8h (baseado na amoxicilina)" },
+        notes: "CRI NÃO recomendada - instabilidade crítica do clavulanato em solução. Para piodermite: 14-22 mg/kg PO q12h."
+      },
+      diluents: { 
+        recommended: ['NaCl 0.9%'], 
+        notes: "NaCl 0.9% é diluente EXCLUSIVO. INCOMPATÍVEL com glicose, dextrano, bicarbonato, produtos sanguíneos, emulsões lipídicas."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilities: ["Glicose", "Dextrano", "Bicarbonato", "Produtos sanguíneos", "Emulsões lipídicas", "Ringer Lactato"], 
+        ySite: [] 
+      },
+      adjustments: {
+        renal: "Ajustar dose em DRC",
+        hepatic: "Monitorar em hepatopatas"
+      },
+      monitoring: ["Função renal", "Sinais de infecção", "Cultura e antibiograma", "Resposta à terapia"],
+      goodPractice: [
+        "CRI é IMPRATICÁVEL devido à instabilidade do clavulanato",
+        "Sempre infundir lentamente (30-40 min)",
+        "Usar imediatamente após reconstituição",
+        "Indicado para pacientes estáveis (tratamento ambulatorial)"
+      ],
+      contraindications: ["Hipersensibilidade a penicilinas", "Uso concomitante com soluções incompatíveis"],
+      citations: [
+        "Plumb's Veterinary Drug Handbook, 10th Ed.", 
+        "Bulário ANVISA - Clavulin® IV",
+        "Textbook of Small Animal Emergency Medicine"
+      ]
+    }
+  },
+
+  {
+    id: 'cefalotin',
+    name: 'Cefalotina',
+    category: 'Antimicrobianos',
+    isPowder: true,
+    preparationGuide: `<strong>Reconstituição do Frasco:</strong><br/>
+<ul class="list-disc list-inside mt-1 space-y-1">
+  <li><strong>Frasco 1g:</strong> reconstituir com mínimo 10 mL de diluente → 100 mg/mL</li>
+</ul>
+<strong>Diluentes compatíveis:</strong> Água para Injeção, NaCl 0.9%, Glicose 5%<br/>
+<strong>Diluentes para infusão:</strong> NaCl 0.9%, Ringer Lactato, Glicose 5%`,
+    concentrations: [
+      { value: 100, unit: 'mg/mL', label: '100 mg/mL (pós-reconstituição)' }
+    ],
+    criDoses: [
+      { 
+        species: 'both', 
+        cri: { min: 60, max: 120, default: 90, unit: CriDoseUnit.mg_kg_day },
+        useCase: 'CRI para infecções estabelecidas',
+        notes: 'Dose de ataque: 22 mg/kg IV em 15-30 min. Manutenção: 60-120 mg/kg/dia em CRI. Superior para infecções profundas.'
+      }
+    ],
+    bolusDoses: [
+      { 
+        species: 'both', 
+        min: 20, max: 40, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 30,
+        useCase: 'Profilaxia cirúrgica e infecções leves',
+        notes: 'Pode ser administrado diretamente IV (3-5 min) ou diluído e infundido em 15-30 min.'
+      }
+    ],
+    info: {
+      indicationSummary: ["Profilaxia cirúrgica", "Infecções suscetíveis", "Piodermites profundas"],
+      mechanism: "Cefalosporina de primeira geração, bactericida, tempo-dependente. Maximiza T>MIC.",
+      dosesText: {
+        dog: { cri: "60-120 mg/kg/dia (CRI)", bolus: "20-40 mg/kg IV q6-8h" },
+        cat: { cri: "60-120 mg/kg/dia (CRI)", bolus: "20-40 mg/kg IV q6-8h" },
+        notes: "CRI superior para infecções estabelecidas. Bolus adequado para profilaxia cirúrgica."
+      },
+      diluents: { 
+        recommended: ['NaCl 0.9%', 'Ringer Lactato', 'Glicose 5%'], 
+        notes: "Compatível com múltiplos diluentes. Estável em soluções com dextrose."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilities: ["Aminoglicosídeos"], 
+        ySite: ["Dobutamina", "Fentanil", "Norepinefrina"] 
+      },
+      adjustments: {
+        renal: "Ajustar dose em DRC importante"
+      },
+      monitoring: ["Função renal", "Sinais de infecção", "Cultura e antibiograma"],
+      goodPractice: [
+        "CRI maximiza T>MIC para infecções estabelecidas",
+        "Bolus adequado para profilaxia cirúrgica",
+        "Monitorar função renal"
+      ],
+      contraindications: ["Hipersensibilidade a cefalosporinas"],
+      citations: ["Plumb's Veterinary Drug Handbook, 10th Ed.", "Bulário ANVISA - Keflin®"]
+    }
+  },
+
+  {
+    id: 'ceftriaxone',
+    name: 'Ceftriaxona',
+    category: 'Antimicrobianos',
+    isPowder: true,
+    preparationGuide: `<strong>ALERTA CRÍTICO:</strong> NUNCA usar com soluções contendo CÁLCIO<br/>
+<strong>Reconstituição do Frasco:</strong><br/>
+<ul class="list-disc list-inside mt-1 space-y-1">
+  <li><strong>Frasco 500mg:</strong> reconstituir com 5 mL de Água para Injeção → 100 mg/mL</li>
+  <li><strong>Frasco 1g:</strong> reconstituir com 10 mL de Água para Injeção → 100 mg/mL</li>
+</ul>
+<strong>Diluentes compatíveis:</strong> NaCl 0.9%, Glicose 5%, Glicose 10%, Água para Injeção<br/>
+<strong>INCOMPATÍVEL:</strong> Ringer Lactato, soluções com cálcio (precipitado fatal)<br/>
+<strong>Concentração para infusão:</strong> 10-40 mg/mL`,
+    concentrations: [
+      { value: 100, unit: 'mg/mL', label: '100 mg/mL (pós-reconstituição)' }
+    ],
+    criDoses: [
+      { 
+        species: 'both', 
+        cri: { min: 11, max: 11, default: 11, unit: CriDoseUnit.mg_kg_day },
+        useCase: 'CRI para infecções graves',
+        notes: 'Dose de ataque: 5.5 mg/kg IV em 30 min. Manutenção: 11 mg/kg/dia em CRI. Meia-vida longa permite bolus q24h.'
+      }
+    ],
+    bolusDoses: [
+      { 
+        species: 'both', 
+        min: 25, max: 50, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 60,
+        useCase: 'Administração intermitente',
+        notes: 'Infundir em 30-60 min. Meia-vida longa permite q12-24h. EVITAR soluções com cálcio.'
+      }
+    ],
+    info: {
+      indicationSummary: [
+        "Infecções adquiridas em ambiente hospitalar",
+        "Sepse com uso recente de antimicrobianos",
+        "Neutropenia febril com sepse",
+        "Pneumonia bacteriana grave (associada a Cefoxitina)",
+        "Meningite",
+        "Sepse grave"
+      ],
+      mechanism: "Cefalosporina de terceira geração, tempo-dependente, meia-vida longa. Maximiza T>MIC.",
+      dosesText: {
+        dog: { cri: "11 mg/kg/dia (CRI)", bolus: "25-50 mg/kg IV q12-24h" },
+        cat: { cri: "11 mg/kg/dia (CRI)", bolus: "25-50 mg/kg IV q12-24h" },
+        notes: "CRI para infecções graves. Bolus q24h eficaz para muitas infecções devido à meia-vida longa. Para pneumonia em filhotes: 22 mg/kg IV q6-8h."
+      },
+      diluents: { 
+        recommended: ['NaCl 0.9%', 'Glicose 5%', 'Glicose 10%'], 
+        notes: "INCOMPATÍVEL com Ringer Lactato e soluções contendo cálcio (precipitado fatal). Concentração para infusão: 10-40 mg/mL."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilities: ["Ringer Lactato", "Soluções com cálcio", "Aminoglicosídeos"], 
+        ySite: ["Dobutamina", "Fentanil"] 
+      },
+      adjustments: {
+        renal: "Ajustar dose em DRC grave"
+      },
+      monitoring: ["Função renal", "Sinais de infecção", "Cultura e antibiograma"],
+      goodPractice: [
+        "CRI para infecções graves (meningite, sepse)",
+        "Bolus q24h eficaz para infecções leves/moderadas",
+        "SEMPRE verificar compatibilidade com cálcio"
+      ],
+      contraindications: ["Hipersensibilidade a cefalosporinas", "Uso concomitante com soluções contendo cálcio"],
+      citations: ["Plumb's Veterinary Drug Handbook, 10th Ed.", "Bulário ANVISA - Rocefin®"]
+    }
+  },
+
+  {
+    id: 'vancomycin',
+    name: 'Vancomicina',
+    category: 'Antimicrobianos',
+    isPowder: true,
+    preparationGuide: `<strong>Reconstituição do Frasco:</strong><br/>
+<ul class="list-disc list-inside mt-1 space-y-1">
+  <li><strong>Frasco 500mg:</strong> reconstituir com 10 mL de Água para Injeção → 50 mg/mL</li>
+</ul>
+<strong>Diluição OBRIGATÓRIA:</strong> Após reconstituição, diluir para ≤5 mg/mL<br/>
+<strong>Diluentes compatíveis:</strong> NaCl 0.9%, Glicose 5%<br/>
+<strong>ALERTA:</strong> Infusão LENTA obrigatória (60-120 min) para evitar "Síndrome do Pescoço Vermelho"`,
+    concentrations: [
+      { value: 50, unit: 'mg/mL', label: '50 mg/mL (pós-reconstituição)' }
+    ],
+    criDoses: [
+      { 
+        species: 'both', 
+        cri: { min: 30, max: 40, default: 35, unit: CriDoseUnit.mg_kg_day },
+        useCase: 'CRI para infecções graves',
+        notes: 'Dose de ataque: 15 mg/kg IV em 60-90 min. Manutenção: 30-40 mg/kg/dia em CRI. Elimina risco de reações infusionais.'
+      }
+    ],
+    bolusDoses: [
+      { 
+        species: 'both', 
+        min: 15, max: 15, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 120,
+        useCase: 'Administração intermitente',
+        notes: 'CRÍTICO: Infundir em 60-120 min. Infusão rápida causa "Síndrome do Pescoço Vermelho" (prurido, eritema, hipotensão).'
+      }
+    ],
+    info: {
+      indicationSummary: ["Infecções por MRSA/MRSP", "Infecções Gram+ resistentes", "Endocardite"],
+      mechanism: "Glicopeptídeo que inibe síntese da parede celular. Tempo e concentração-dependente. Alvo: AUC24:CIM >400.",
+      dosesText: {
+        dog: { cri: "30-40 mg/kg/dia (CRI)", bolus: "15 mg/kg IV q8-12h" },
+        cat: { cri: "30-40 mg/kg/dia (CRI)", bolus: "15 mg/kg IV q8-12h" },
+        notes: "CRI é modalidade mais segura e farmacodinamicamente superior."
+      },
+      diluents: { 
+        recommended: ['NaCl 0.9%', 'Glicose 5%'], 
+        notes: "Diluição obrigatória para ≤5 mg/mL. Infusão LENTA (60-120 min) para evitar reações infusionais."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilities: ["Heparina", "Beta-lactâmicos"], 
+        ySite: ["Dobutamina", "Fentanil"] 
+      },
+      adjustments: {
+        renal: "Ajustar por níveis (nefro/ototóxica)",
+        hepatic: "Monitorar em hepatopatas"
+      },
+      monitoring: ["Níveis séricos", "Função renal", "Audição", "Sinais de infecção"],
+      goodPractice: [
+        "CRI elimina risco de reações infusionais",
+        "SEMPRE infundir lentamente (60-120 min)",
+        "Monitorar níveis séricos e função renal"
+      ],
+      contraindications: ["Hipersensibilidade", "Insuficiência renal grave sem ajuste de dose"],
+      citations: ["Plumb's Veterinary Drug Handbook, 10th Ed.", "Bulário ANVISA - Vancomicina"]
+    }
+  },
+
+  {
+    id: 'meropenem',
+    name: 'Meropenem',
+    category: 'Antimicrobianos',
+    isPowder: true,
+    preparationGuide: `<strong>Reconstituição do Frasco:</strong><br/>
+<ul class="list-disc list-inside mt-1 space-y-1">
+  <li><strong>Frasco 500mg:</strong> reconstituir com 10 mL de Água para Injeção → 50 mg/mL</li>
+  <li><strong>Frasco 1g:</strong> reconstituir com 20 mL de Água para Injeção → 50 mg/mL</li>
+</ul>
+<strong>Diluentes compatíveis:</strong> NaCl 0.9%, Glicose 5%<br/>
+<strong>Concentração para infusão:</strong> 1-20 mg/mL<br/>
+<strong>Uso restrito:</strong> Reservado para infecções multirresistentes`,
+    concentrations: [
+      { value: 50, unit: 'mg/mL', label: '50 mg/mL (pós-reconstituição)' }
+    ],
+    criDoses: [
+      { 
+        species: 'dog', 
+        cri: { min: 25, max: 50, default: 37.5, unit: CriDoseUnit.mg_kg_day },
+        useCase: 'CRI para infecções multirresistentes',
+        notes: 'Dose de ataque: 12-25 mg/kg IV em 30-60 min. Manutenção: 25-50 mg/kg/dia em CRI. Carbapenêmico tempo-dependente.'
+      },
+      { 
+        species: 'cat', 
+        cri: { min: 16, max: 24, default: 20, unit: CriDoseUnit.mg_kg_day },
+        useCase: 'CRI para infecções multirresistentes',
+        notes: 'Dose de ataque: 8-12 mg/kg IV em 30-60 min. Manutenção: 16-24 mg/kg/dia em CRI. Carbapenêmico tempo-dependente.'
+      }
+    ],
+    bolusDoses: [
+      { 
+        species: 'dog', 
+        min: 12, max: 25, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 60,
+        useCase: 'Administração intermitente',
+        notes: 'Infundir em 30-60 min. Uso restrito para infecções multirresistentes.'
+      },
+      { 
+        species: 'cat', 
+        min: 8, max: 12, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 60,
+        useCase: 'Administração intermitente',
+        notes: 'Infundir em 30-60 min. Uso restrito para infecções multirresistentes.'
+      }
+    ],
+    info: {
+      indicationSummary: ["Infecções multirresistentes", "Infecções ESBL", "Sepse grave"],
+      mechanism: "Carbapenêmico tempo-dependente, espectro ultralargo. Maximiza T>MIC. Reservado para infecções multirresistentes.",
+      dosesText: {
+        dog: { cri: "25-50 mg/kg/dia (CRI)", bolus: "12-25 mg/kg IV q8-12h" },
+        cat: { cri: "16-24 mg/kg/dia (CRI)", bolus: "8-12 mg/kg IV q12h" },
+        notes: "CRI é modalidade farmacodinamicamente superior. Uso restrito para infecções multirresistentes."
+      },
+      diluents: { 
+        recommended: ['NaCl 0.9%', 'Glicose 5%'], 
+        notes: "Concentração para infusão: 1-20 mg/mL. Estabilidade superior a outros carbapenêmicos."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilities: ["Aminoglicosídeos"], 
+        ySite: ["Dobutamina", "Fentanil"] 
+      },
+      adjustments: {
+        renal: "Ajustar dose em DRC",
+        hepatic: "Monitorar em hepatopatas"
+      },
+      monitoring: ["Função renal", "Sinais de infecção", "Cultura e antibiograma", "Desenvolvimento de resistência"],
+      goodPractice: [
+        "CRI é modalidade superior para infecções graves",
+        "Uso restrito para infecções multirresistentes",
+        "Monitorar desenvolvimento de resistência"
+      ],
+      contraindications: ["Hipersensibilidade a carbapenêmicos", "Uso empírico sem justificativa"],
+      citations: ["Plumb's Veterinary Drug Handbook, 10th Ed.", "Bulário ANVISA - Meronem®"]
+    }
+  },
+
+  {
+    id: 'enrofloxacin',
+    name: 'Enrofloxacina',
+    category: 'Antimicrobianos',
+    concentrations: [
+      { value: 50, unit: 'mg/mL', label: '5% (50 mg/mL)' },
+      { value: 100, unit: 'mg/mL', label: '10% (100 mg/mL)' }
+    ],
+    bolusDoses: [
+      { 
+        species: 'dog', 
+        min: 5, max: 20, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 60,
+        useCase: 'Administração intermitente',
+        notes: 'Diluir e infundir lentamente (30-60 min). Dose única diária. CRI é CONTRAINDICADA.'
+      },
+      { 
+        species: 'cat', 
+        min: 5, max: 5, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 60,
+        useCase: 'Administração intermitente',
+        notes: '5 mg/kg IV q24h. Infusão lenta obrigatória. Risco de degeneração retiniana em gatos.'
+      }
+    ],
+    info: {
+      indicationSummary: ["Infecções suscetíveis", "Infecções por Gram-negativos"],
+      mechanism: "Fluoroquinolona que inibe DNA girase bacteriana. Concentração-dependente. Alvo: Cmax 8-10x CIM ou AUC24:CIM >125.",
+      dosesText: {
+        dog: { bolus: "5-20 mg/kg IV q24h" },
+        cat: { bolus: "5 mg/kg IV q24h" },
+        notes: "CRI é ABSOLUTAMENTE CONTRAINDICADA. Fármaco concentração-dependente exige pico alto seguido de vale."
+      },
+      diluents: { 
+        recommended: ['NaCl 0.9%', 'Ringer Lactato'], 
+        notes: "Infusão lenta obrigatória (30-60 min). CRI é contraindicada (induz resistência bacteriana)."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilidades: ["Soluções alcalinas"], 
+        ySite: ["Dobutamina", "Fentanil"] 
+      },
+      adjustments: {
+        renal: "Ajustar dose em DRC grave",
+        hepatic: "Monitorar em hepatopatas"
+      },
+      monitoring: ["Função renal", "Sinais de infecção", "Visão (especialmente em gatos)"],
+      goodPractice: [
+        "CRI é CONTRAINDICADA (induz resistência bacteriana)",
+        "Sempre infundir lentamente (30-60 min)",
+        "Dose única diária para maximizar pico"
+      ],
+      contraindications: ["CRI", "Uso em gatos com risco de degeneração retiniana", "Infusão rápida"],
+      citations: ["Plumb's Veterinary Drug Handbook, 10th Ed.", "Bulários veterinários - Enrofloxacina", "Textbook of Small Animal Emergency Medicine"]
+    }
+  },
+
+  {
+    id: 'cefalexin',
+    name: 'Cefalexina',
+    category: 'Antimicrobianos',
+    concentrations: [
+      { value: 50, unit: 'mg/mL', label: '50 mg/mL (solução oral)' }
+    ],
+    bolusDoses: [
+      { 
+        species: 'both', 
+        min: 22, max: 22, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 0,
+        useCase: 'Administração oral',
+        notes: '22 mg/kg PO q12h para piodermite não complicada ou sepse neutropênica ambulatorial.'
+      }
+    ],
+    info: {
+      indicationSummary: [
+        "Cistite simples (primeira linha)",
+        "Piodermites superficiais",
+        "Sepse neutropênica (pacientes estáveis - ambulatorial)"
+      ],
+      mechanism: "Cefalosporina de primeira geração, bactericida, tempo-dependente. Maximiza T>MIC.",
+      dosesText: {
+        dog: { bolus: "22 mg/kg PO q12h" },
+        cat: { bolus: "22 mg/kg PO q12h" },
+        notes: "Terapia de primeira linha para infecções não complicadas em pacientes estáveis."
+      },
+      diluents: { 
+        recommended: ['Oral'], 
+        notes: "Administração oral. Não requer diluição para infusão."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilities: [], 
+        ySite: [] 
+      },
+      adjustments: {
+        renal: "Ajustar dose em DRC"
+      },
+      monitoring: ["Função renal", "Sinais de infecção", "Resposta à terapia"],
+      goodPractice: [
+        "Indicada para infecções não complicadas",
+        "Pacientes estáveis (tratamento ambulatorial)",
+        "Monitorar resposta clínica"
+      ],
+      contraindications: ["Hipersensibilidade a cefalosporinas"],
+      citations: ["Textbook of Small Animal Emergency Medicine"]
+    }
+  },
+
+  {
+    id: 'azithromycin',
+    name: 'Azitromicina',
+    category: 'Antimicrobianos',
+    concentrations: [
+      { value: 50, unit: 'mg/mL', label: '50 mg/mL (solução oral)' }
+    ],
+    bolusDoses: [
+      { 
+        species: 'both', 
+        min: 5, max: 10, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 0,
+        useCase: 'Administração oral',
+        notes: '5-10 mg/kg PO q24h para infecções respiratórias. Para pneumonia: 5-10 mg/kg PO q24h por 5 dias, depois q72h.'
+      }
+    ],
+    info: {
+      indicationSummary: [
+        "Infecções do trato respiratório superior felino",
+        "Pneumonia bacteriana"
+      ],
+      mechanism: "Macrolídeo que inibe síntese proteica bacteriana. Concentração-dependente.",
+      dosesText: {
+        dog: { bolus: "5-10 mg/kg PO q24h" },
+        cat: { bolus: "5-10 mg/kg PO q24h" },
+        notes: "Para pneumonia: 5-10 mg/kg PO q24h por 5 dias, depois q72h."
+      },
+      diluents: { 
+        recommended: ['Oral'], 
+        notes: "Administração oral. Não requer diluição para infusão."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilities: [], 
+        ySite: [] 
+      },
+      adjustments: {
+        hepatic: "Monitorar em hepatopatas"
+      },
+      monitoring: ["Função hepática", "Sinais de infecção", "Resposta à terapia"],
+      goodPractice: [
+        "Indicada para infecções respiratórias",
+        "Monitorar função hepática",
+        "Respeitar esquema de 5 dias para pneumonia"
+      ],
+      contraindications: ["Hipersensibilidade a macrolídeos"],
+      citations: ["Textbook of Small Animal Emergency Medicine"]
+    }
+  },
+
+  {
+    id: 'erythromycin',
+    name: 'Eritromicina',
+    category: 'Antimicrobianos',
+    concentrations: [
+      { value: 50, unit: 'mg/mL', label: '50 mg/mL (solução oral)' }
+    ],
+    bolusDoses: [
+      { 
+        species: 'both', 
+        min: 10, max: 15, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 0,
+        useCase: 'Administração oral',
+        notes: '10-15 mg/kg PO q8h para piodermite não complicada ou diarreia por Campylobacter.'
+      }
+    ],
+    info: {
+      indicationSummary: [
+        "Procinético (vômito e regurgitação)",
+        "Diarreia por Campylobacter",
+        "Piodermite não complicada"
+      ],
+      mechanism: "Macrolídeo que inibe síntese proteica bacteriana. Também tem efeito procinético.",
+      dosesText: {
+        dog: { bolus: "10-15 mg/kg PO q8h" },
+        cat: { bolus: "10-15 mg/kg PO q8h" },
+        notes: "Indicada para piodermite não complicada e diarreia por Campylobacter."
+      },
+      diluents: { 
+        recommended: ['Oral'], 
+        notes: "Administração oral. Não requer diluição para infusão."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilities: [], 
+        ySite: [] 
+      },
+      adjustments: {
+        hepatic: "Monitorar em hepatopatas"
+      },
+      monitoring: ["Função hepática", "Sinais de infecção", "Resposta à terapia"],
+      goodPractice: [
+        "Indicada para infecções não complicadas",
+        "Efeito procinético adicional",
+        "Monitorar função hepática"
+      ],
+      contraindications: ["Hipersensibilidade a macrolídeos"],
+      citations: ["Textbook of Small Animal Emergency Medicine"]
+    }
+  },
+
+  {
+    id: 'doxycycline',
+    name: 'Doxiciclina',
+    category: 'Antimicrobianos',
+    concentrations: [
+      { value: 50, unit: 'mg/mL', label: '50 mg/mL (solução oral/IV)' }
+    ],
+    bolusDoses: [
+      { 
+        species: 'both', 
+        min: 5, max: 10, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 0,
+        useCase: 'Administração oral/IV',
+        notes: '5-10 mg/kg PO/IV q12-24h. Para infecções respiratórias felinas: 5 mg/kg PO q12h ou 10 mg/kg PO q24h.'
+      }
+    ],
+    info: {
+      indicationSummary: [
+        "Infecções por Rickettsia (febre maculosa)",
+        "Bordetella bronchiseptica",
+        "Chlamydophila felis em gatos",
+        "Piodermite não complicada",
+        "Pneumonia em filhotes (infecção comunitária)"
+      ],
+      mechanism: "Tetraciclina que inibe síntese proteica bacteriana. Bacteriostática.",
+      dosesText: {
+        dog: { bolus: "5-10 mg/kg PO/IV q12-24h" },
+        cat: { bolus: "5-10 mg/kg PO/IV q12-24h" },
+        notes: "Para infecções respiratórias felinas: 5 mg/kg PO q12h ou 10 mg/kg PO q24h."
+      },
+      diluents: { 
+        recommended: ['Oral', 'NaCl 0.9%'], 
+        notes: "Administração oral ou IV. Para IV: diluir em NaCl 0.9%."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilities: ["Cálcio", "Ferro"], 
+        ySite: [] 
+      },
+      adjustments: {
+        hepatic: "Monitorar em hepatopatas",
+        pediatric: "Evitar em filhotes <8 semanas"
+      },
+      monitoring: ["Função hepática", "Sinais de infecção", "Resposta à terapia"],
+      goodPractice: [
+        "Evitar administração com cálcio ou ferro",
+        "Monitorar função hepática",
+        "Indicada para infecções por Rickettsia"
+      ],
+      contraindications: ["Hipersensibilidade a tetraciclinas", "Filhotes <8 semanas"],
+      citations: ["Textbook of Small Animal Emergency Medicine"]
+    }
+  },
+
+  {
+    id: 'amicacin',
+    name: 'Amicacina',
+    category: 'Antimicrobianos',
+    concentrations: [
+      { value: 50, unit: 'mg/mL', label: '50 mg/mL' }
+    ],
+    bolusDoses: [
+      { 
+        species: 'both', 
+        min: 15, max: 15, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 30,
+        useCase: 'Administração intermitente',
+        notes: '15 mg/kg IV q24h. Usar em combinação com penicilinas ou cefalosporinas para sepse grave.'
+      }
+    ],
+    info: {
+      indicationSummary: [
+        "Sepse grave e choque séptico (terapia combinada)",
+        "Neutropenia febril com sepse",
+        "Pneumonia em filhotes",
+        "Ampliar espectro contra Gram-negativos"
+      ],
+      mechanism: "Aminoglicosídeo que inibe síntese proteica bacteriana. Concentração-dependente.",
+      dosesText: {
+        dog: { bolus: "15 mg/kg IV q24h" },
+        cat: { bolus: "15 mg/kg IV q24h" },
+        notes: "Usar em combinação com penicilinas ou cefalosporinas. Monitorar função renal."
+      },
+      diluents: { 
+        recommended: ['NaCl 0.9%'], 
+        notes: "Diluir em NaCl 0.9%. Infundir lentamente (30 min)."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilities: ["Beta-lactâmicos"], 
+        ySite: ["Dobutamina", "Fentanil"] 
+      },
+      adjustments: {
+        renal: "Ajustar dose em DRC (nefrotóxico)",
+        geriatric: "Monitorar função renal rigorosamente"
+      },
+      monitoring: ["Função renal", "Audição", "Sinais de infecção", "Níveis séricos"],
+      goodPractice: [
+        "Sempre usar em combinação para sepse grave",
+        "Monitorar função renal rigorosamente",
+        "Infundir lentamente (30 min)",
+        "Considerar níveis séricos"
+      ],
+      contraindications: ["Insuficiência renal grave", "Hipersensibilidade a aminoglicosídeos"],
+      citations: ["Textbook of Small Animal Emergency Medicine"]
+    }
+  },
+
+  {
+    id: 'gentamicin',
+    name: 'Gentamicina',
+    category: 'Antimicrobianos',
+    concentrations: [
+      { value: 40, unit: 'mg/mL', label: '40 mg/mL' }
+    ],
+    bolusDoses: [
+      { 
+        species: 'both', 
+        min: 6, max: 8, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 30,
+        useCase: 'Administração intermitente',
+        notes: '8 mg/kg IV q24h para sepse neutropênica. 6 mg/kg IV q24h para pneumonia bacteriana grave.'
+      }
+    ],
+    info: {
+      indicationSummary: [
+        "Sepse neutropênica",
+        "Pneumonia bacteriana grave (inalatória)",
+        "Terapia combinada para sepse grave"
+      ],
+      mechanism: "Aminoglicosídeo que inibe síntese proteica bacteriana. Concentração-dependente.",
+      dosesText: {
+        dog: { bolus: "6-8 mg/kg IV q24h" },
+        cat: { bolus: "6-8 mg/kg IV q24h" },
+        notes: "8 mg/kg IV q24h para sepse neutropênica. 6 mg/kg IV q24h para pneumonia bacteriana grave."
+      },
+      diluents: { 
+        recommended: ['NaCl 0.9%'], 
+        notes: "Diluir em NaCl 0.9%. Infundir lentamente (30 min)."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilities: ["Beta-lactâmicos"], 
+        ySite: ["Dobutamina", "Fentanil"] 
+      },
+      adjustments: {
+        renal: "Ajustar dose em DRC (nefrotóxico)",
+        geriatric: "Monitorar função renal rigorosamente"
+      },
+      monitoring: ["Função renal", "Audição", "Sinais de infecção", "Níveis séricos"],
+      goodPractice: [
+        "Monitorar função renal rigorosamente",
+        "Infundir lentamente (30 min)",
+        "Considerar níveis séricos",
+        "Usar com cautela devido à nefrotoxicidade"
+      ],
+      contraindications: ["Insuficiência renal grave", "Hipersensibilidade a aminoglicosídeos"],
+      citations: ["Textbook of Small Animal Emergency Medicine"]
+    }
+  },
+
+  {
+    id: 'clindamycin',
+    name: 'Clindamicina',
+    category: 'Antimicrobianos',
+    concentrations: [
+      { value: 150, unit: 'mg/mL', label: '150 mg/mL' }
+    ],
+    bolusDoses: [
+      { 
+        species: 'both', 
+        min: 11, max: 20, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 30,
+        useCase: 'Administração intermitente',
+        notes: '12 mg/kg IV q8h para pneumonia bacteriana grave ou sepse. 11 mg/kg PO q24h para piodermite.'
+      }
+    ],
+    info: {
+      indicationSummary: [
+        "Infecções por Toxoplasma",
+        "Pneumonia bacteriana grave (associada a cefalosporina de 3ª geração)",
+        "Infecções de tecidos moles",
+        "Piodermites",
+        "Sepse (como alternativa)"
+      ],
+      mechanism: "Lincosamida que inibe síntese proteica bacteriana. Bacteriostática.",
+      dosesText: {
+        dog: { bolus: "11-20 mg/kg PO/IV q8-24h" },
+        cat: { bolus: "11-20 mg/kg PO/IV q8-24h" },
+        notes: "12 mg/kg IV q8h para pneumonia grave. 11 mg/kg PO q24h para piodermite. 12.5-20 mg/kg PO q12h para Toxoplasma."
+      },
+      diluents: { 
+        recommended: ['NaCl 0.9%'], 
+        notes: "Para IV: diluir em NaCl 0.9%. Infundir lentamente (30 min)."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilities: ["Aminoglicosídeos"], 
+        ySite: ["Dobutamina", "Fentanil"] 
+      },
+      adjustments: {
+        hepatic: "Monitorar em hepatopatas"
+      },
+      monitoring: ["Função hepática", "Sinais de infecção", "Resposta à terapia"],
+      goodPractice: [
+        "Indicada para infecções por Toxoplasma",
+        "Monitorar função hepática",
+        "Usar em combinação para pneumonia grave"
+      ],
+      contraindications: ["Hipersensibilidade a lincosamidas"],
+      citations: ["Textbook of Small Animal Emergency Medicine"]
+    }
+  },
+
+  {
+    id: 'metronidazole',
+    name: 'Metronidazol',
+    category: 'Antimicrobianos',
+    concentrations: [
+      { value: 5, unit: 'mg/mL', label: '5 mg/mL' }
+    ],
+    bolusDoses: [
+      { 
+        species: 'both', 
+        min: 7.5, max: 15, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 30,
+        useCase: 'Administração intermitente',
+        notes: '10 mg/kg PO/IV q12h por 5 dias para C. difficile. 7.5 mg/kg PO q12h para encefalopatia hepática.'
+      }
+    ],
+    info: {
+      indicationSummary: [
+        "Encefalopatia hepática",
+        "Diarreia por Clostridium difficile",
+        "Meningite bacteriana",
+        "Enterite por Clostridium perfringens",
+        "Sepse neutropênica"
+      ],
+      mechanism: "Nitroimidazol que inibe síntese de DNA bacteriano. Ativo contra anaeróbios.",
+      dosesText: {
+        dog: { bolus: "7.5-15 mg/kg PO/IV q12h" },
+        cat: { bolus: "7.5-15 mg/kg PO/IV q12h" },
+        notes: "10 mg/kg PO/IV q12h por 5 dias para C. difficile. 7.5 mg/kg PO q12h para encefalopatia hepática."
+      },
+      diluents: { 
+        recommended: ['NaCl 0.9%'], 
+        notes: "Para IV: diluir em NaCl 0.9%. Infundir lentamente (30 min)."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilities: ["Aminoglicosídeos"], 
+        ySite: ["Dobutamina", "Fentanil"] 
+      },
+      adjustments: {
+        hepatic: "Monitorar em hepatopatas",
+        renal: "Ajustar dose em DRC grave"
+      },
+      monitoring: ["Função hepática", "Função renal", "Sinais neurológicos", "Resposta à terapia"],
+      goodPractice: [
+        "Indicado para encefalopatia hepática",
+        "Monitorar função hepática e renal",
+        "Respeitar duração de 5 dias para C. difficile"
+      ],
+      contraindications: ["Hipersensibilidade a nitroimidazóis", "Primeiro trimestre de gestação"],
+      citations: ["Textbook of Small Animal Emergency Medicine"]
+    }
+  },
+
+  {
+    id: 'sulfamethoxazole-trimethoprim',
+    name: 'Sulfametoxazol + Trimetoprim (SMZ-TMP)',
+    category: 'Antimicrobianos',
+    concentrations: [
+      { value: 80, unit: 'mg/mL', label: '80 mg/mL SMZ + 16 mg/mL TMP' }
+    ],
+    bolusDoses: [
+      { 
+        species: 'both', 
+        min: 15, max: 30, unit: BolusDoseUnit.mg_kg, 
+        infusionTimeMin: 0,
+        useCase: 'Administração oral',
+        notes: '15 mg/kg PO q12h para cistite simples. 20-30 mg/kg PO q12-24h para piodermite.'
+      }
+    ],
+    info: {
+      indicationSummary: [
+        "Infecções por Toxoplasma e Neospora",
+        "Piodermites",
+        "Infecções do trato urinário",
+        "Infecções do trato respiratório superior felino"
+      ],
+      mechanism: "Sulfonamida + inibidor da diidrofolato redutase. Bacteriostática.",
+      dosesText: {
+        dog: { bolus: "15-30 mg/kg PO q12-24h" },
+        cat: { bolus: "15-30 mg/kg PO q12-24h" },
+        notes: "15 mg/kg PO q12h para cistite simples. 20-30 mg/kg PO q12-24h para piodermite. 15 mg/kg PO q12h para Toxoplasma."
+      },
+      diluents: { 
+        recommended: ['Oral'], 
+        notes: "Administração oral. Não requer diluição para infusão."
+      },
+      photoprotection: false,
+      compatibility: { 
+        incompatibilities: [], 
+        ySite: [] 
+      },
+      adjustments: {
+        renal: "Ajustar dose em DRC",
+        hepatic: "Monitorar em hepatopatas"
+      },
+      monitoring: ["Função renal", "Função hepática", "Sinais de infecção", "Resposta à terapia"],
+      goodPractice: [
+        "Indicada para infecções por Toxoplasma",
+        "Monitorar função renal e hepática",
+        "Hidratação adequada para evitar cristalúria"
+      ],
+      contraindications: ["Hipersensibilidade a sulfonamidas", "Insuficiência renal grave"],
+      citations: ["Textbook of Small Animal Emergency Medicine"]
+    }
+  },
+
   {
     id: 'lidocaine',
     name: 'Lidocaína',
