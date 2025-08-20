@@ -476,6 +476,15 @@ export const DRUGS: Drug[] = [
     concentrations: [{ value: 1, unit: 'mg/mL', label: '1 mg/mL' }],
     criDoses: [ { species: 'both', cri: { min: 0.05, max: 2, default: 0.2, unit: CriDoseUnit.mcg_kg_min } } ],
     specialWarnings: [WarningType.Photoprotection, WarningType.Vesicant],
+    preparationGuide: `Preparo (proteger da luz):<br/>
+<ul class="list-disc list-inside space-y-1">
+  <li>Preferir diluição em <strong>SG 5%</strong> (menor oxidação). <em>SF 0,9% aceitável conforme protocolo local.</em></li>
+  <li>Concentrações usuais: <strong>4 mg/250 mL (16 µg/mL)</strong> ou <strong>8 mg/250 mL (32 µg/mL)</strong>.</li>
+  <li>Cobrir <strong>bolsa e equipo</strong> com material opaco.</li>
+  <li>Usar <strong>linha dedicada</strong> e preferir <strong>cateter venoso central</strong>.</li>
+  <li><strong>Desmame progressivo</strong> para evitar hipotensão rebote.</li>
+</ul>
+<div class="mt-2 text-xs">Extravasamento: infiltrar <strong>fentolamina 5–10 mg</strong> em 10–15 mL de SF 0,9% ao redor da área.</div>`,
     info: {
         indicationSummary: ["Vasopressor de primeira escolha para o tratamento da hipotensão em choque séptico e outros choques distributivos."],
         mechanism: "Potente agonista α1-adrenérgico (vasoconstrição) com efeito β1 moderado (inotropismo).",
@@ -484,14 +493,20 @@ export const DRUGS: Drug[] = [
             cat: { cri: "0.05-2 µg/kg/min (titulável)" },
             notes: "Titular para atingir a meta de pressão arterial média (ex: PAM > 65-70 mmHg)."
         },
-        diluents: { recommended: ['SG 5%'], notes: "Diluir em soluções com dextrose (SG 5%) para reduzir oxidação e perda de potência. Evitar NaCl 0.9% isolado." },
+        diluents: { recommended: ['SG 5%'], notes: "Preferir SG 5% (menor oxidação). Evitar bicarbonato no Y-site. SF 0,9% pode ser usado conforme protocolo local." },
         photoprotection: true,
         compatibility: { incompatibilities: ["Bicarbonato", "Aminofilina", "Pantoprazol", "Insulina"], ySite: ["Dobutamina", "Dopamina", "Fentanil", "Vasopressina"] },
         adjustments: {
             sepsis: "Titular para atingir a meta de pressão arterial média. Reavaliar a perfusão (lactato, débito urinário) frequentemente."
         },
-        monitoring: ["Pressão arterial invasiva (obrigatório)", "ECG contínuo", "Lactato sérico", "Perfusão periférica"],
-        goodPractice: ["ALERTA VESICANTE. Administrar via cateter venoso central.", "Titular a dose lentamente para evitar hipertensão rebote.", "Não retirar abruptamente."],
+        monitoring: ["Pressão arterial invasiva (obrigatório)", "ECG contínuo", "Lactato sérico", "Perfusão periférica", "Débito urinário"],
+        goodPractice: [
+          "ALERTA VESICANTE: preferir acesso venoso central; monitorar local se periférico.",
+          "Proteger bolsa e equipo da luz durante a infusão.",
+          "Titular em incrementos a cada 5–10 min até atingir PAM alvo.",
+          "Extravasamento: infiltrar <strong>fentolamina 5–10 mg</strong> em 10–15 mL de SF 0,9% ao redor da área.",
+          "Desmame progressivo para evitar hipotensão rebote."
+        ],
         citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
     }
   },
@@ -710,8 +725,40 @@ export const DRUGS: Drug[] = [
     id: 'insulin-regular',
     name: 'Insulina Regular (Humulin R, Novolin R)',
     category: 'Endócrino',
+    preparationGuide: `Insulinoterapia em CAD/SHH:<br/>
+<strong>1) CRI (preferencial)</strong>
+<ul class="list-disc list-inside mt-1 space-y-1">
+  <li><em>CAD (Cetoacidose Diabética - complicação aguda do diabetes com cetonas elevadas):</em> diluir <strong>1,1–2,2 U/kg</strong> em <strong>250 mL</strong> de SF 0,9%.</li>
+  <li><em>SHH (Síndrome Hiperglicêmica Hiperosmolar - diabetes descompensado sem cetonas):</em> usar <strong>50% da dose</strong> (0,5–1,0 U/kg em 250 mL) para queda mais lenta.</li>
+  <li><em>Priming (saturação da linha):</em> passar e <strong>descartar 20–50 mL</strong> da linha (a insulina adere ao plástico do equipo).</li>
+  <li><em>Início:</em> 5–10 mL/h; meta: queda de <strong>50–75 mg/dL/h</strong>.</li>
+  <li><em>Monitorização:</em> glicemia a cada 1–2 h; K+, P, Na+ regulares.</li>
+  <li><em>Dextrose na manutenção:</em> a <strong>taxa total</strong> do fluido permanece igual; <strong>alterar apenas a composição</strong> da bolsa de manutenção (ex.: RL) para 2,5–5% conforme a glicemia.</li>
+</ul>
+<div class="mt-2">
+<table class="table-fixed text-xs border">
+  <thead><tr><th class="px-2 py-1 border">Glicemia (mg/dL)</th><th class="px-2 py-1 border">Taxa da solução de insulina</th><th class="px-2 py-1 border">Manutenção</th></tr></thead>
+  <tbody>
+    <tr><td class="px-2 py-1 border">&gt;250</td><td class="px-2 py-1 border">10 mL/h</td><td class="px-2 py-1 border">Solução base (ex: RL)</td></tr>
+    <tr><td class="px-2 py-1 border">200–250</td><td class="px-2 py-1 border">7 mL/h</td><td class="px-2 py-1 border">Adicionar <strong>Dextrose 2,5%</strong></td></tr>
+    <tr><td class="px-2 py-1 border">150–199</td><td class="px-2 py-1 border">5 mL/h</td><td class="px-2 py-1 border">Adicionar <strong>Dextrose 2,5%</strong></td></tr>
+    <tr><td class="px-2 py-1 border">100–149</td><td class="px-2 py-1 border">5 mL/h</td><td class="px-2 py-1 border">Adicionar <strong>Dextrose 5%</strong></td></tr>
+    <tr><td class="px-2 py-1 border">&lt;100</td><td class="px-2 py-1 border"><strong>Parar</strong></td><td class="px-2 py-1 border">Adicionar <strong>Dextrose 5%</strong></td></tr>
+  </tbody>
+</table>
+<div class="mt-1 italic text-xs">Cálculo rápido para enriquecer bolsa de 1000 mL com D50%: 2,5% → retirar 50 mL e adicionar 50 mL; 5% → retirar 100 mL e adicionar 100 mL. Fórmula: <em>C1×V1=C2×V2</em>.</div>
+</div>
+<br/>
+<strong>2) IM intermitente (alternativa)</strong>
+<ul class="list-disc list-inside mt-1 space-y-1">
+  <li><em>CAD:</em> 0,2–0,25 U/kg IM inicial; depois 0,1 U/kg IM a cada 2–4 h.</li>
+  <li><em>SHH:</em> 0,1 U/kg IM inicial; depois 0,05 U/kg IM a cada 2–4 h (estender para 4–6 h quando &lt; 300 mg/dL).</li>
+  <li>Meta: queda de 50–70 mg/dL/h; ajustar ±25%.</li>
+</ul>
+<div class="mt-2 text-xs"><strong>Transição</strong>: manter insulina regular até comer, hidratação adequada e resolução da CAD. Aplicar a primeira dose de ação longa <strong>30 min antes</strong> de interromper a CRI (ou na próxima IM prevista).</div>
+<div class="mt-2 text-xs">Pré-requisitos: volemia restaurada, K+ ≥ 3,5 mEq/L e monitorização intensiva.</div>`,
     concentrations: [{ value: 100, unit: 'U/mL', label: '100 U/mL' }],
-    criDoses: [{ species: 'both', cri: { min: 0.05, max: 0.1, default: 0.08, unit: CriDoseUnit.U_kg_h } }],
+    criDoses: [{ species: 'both', cri: { min: 0.05, max: 10, default: 0.08, unit: CriDoseUnit.U_kg_h } }],
     bolusDoses: [
       { species: 'both', min: 0.1, max: 0.25, unit: BolusDoseUnit.U_kg, notes: "Administrar apenas se Potássio > 3.5 mEq/L" }
     ],
@@ -719,10 +766,10 @@ export const DRUGS: Drug[] = [
         indicationSummary: ["Insulina de ação rápida para controle de hiperglicemia aguda, cetoacidose diabética e controle perioperatório."],
         mechanism: "Insulina de ação rápida que reduz a glicemia ao facilitar a captação de glicose pelos tecidos e inibir a produção hepática de glicose.",
         dosesText: {
-            dog: { cri: "0.05-0.1 U/kg/h", bolus: "0.1-0.25 U/kg IV" },
-            cat: { cri: "0.05-0.1 U/kg/h", bolus: "0.1-0.25 U/kg IV" }
+            dog: { cri: "0.05-10 U/kg/h (literatura indica até 2.2 U/kg/h para CAD/SHH)", bolus: "0.1-0.25 U/kg IV" },
+            cat: { cri: "0.05-10 U/kg/h (literatura indica até 2.2 U/kg/h para CAD/SHH)", bolus: "0.1-0.25 U/kg IV" }
         },
-        diluents: { recommended: ['NaCl 0.9%'], notes: "Diluir em NaCl 0.9% para CRI. Preparar bolsa de 250mL com dose calculada." },
+        diluents: { recommended: ['NaCl 0.9%'], notes: "CRI da insulina em SF 0,9%. <strong>A dextrose é adicionada à bolsa de manutenção</strong> (ex.: RL) para atingir 2,5–5%, sem alterar a taxa total. Fórmula: C1×V1=C2×V2 (usar D50%)." },
         photoprotection: false,
         compatibility: { incompatibilities: ["Bicarbonato", "Dopamina", "Furosemida"], ySite: ["Dobutamina", "Norepinefrina", "Fentanil"] },
         adjustments: {
@@ -730,10 +777,19 @@ export const DRUGS: Drug[] = [
             hepatic: "Monitorar de perto. A necessidade de insulina pode mudar.",
             pregnancy: "A necessidade de insulina pode variar. Monitoramento intensivo é necessário."
         },
-        monitoring: ["Curva glicêmica seriada", "Sinais de hipoglicemia", "Glicosúria", "Frutosamina (para avaliação a longo prazo)", "Peso corporal"],
-        goodPractice: ["Homogeneizar a suspensão rolando o frasco suavemente. Não agitar.", "Usar apenas seringas calibradas para U-40.", "A remissão diabética é uma possibilidade em gatos; monitorar de perto para evitar hipoglicemia."],
+        monitoring: ["Glicemia a cada 1–2 h (meta 50–75 mg/dL/h)", "Potássio (K+)", "Fósforo (P)", "Sódio (Na+)", "Hidratação e perfusão"],
+        goodPractice: [
+          "Realizar <strong>priming</strong> da linha e descartar 20–50 mL (adsorção).",
+          "Não interromper bruscamente a insulina quando a glicemia cair; <strong>adicionar dextrose</strong> à manutenção para prevenir hipoglicemia e manter a reversão da cetogênese.",
+          "Cálculo rápido para enriquecer bolsa de 1000 mL com D50%: 2,5% → 50 mL; 5% → 100 mL (retirar igual volume antes).",
+          "Pré-requisito: volemia restaurada e K+ ≥ 3,5 mEq/L (corrigindo)."
+        ],
         contraindications: ["Hipoglicemia"],
-        citations: ["Plumb's Veterinary Drug Handbook", "AAHA Diabetes Management Guidelines for Dogs and Cats"]
+        citations: [
+          "Koenig A. Complicated Diabetes Mellitus. In: Drobatz/Hopper/Rozanski/Silverstein. Textbook of Small Animal Emergency Medicine. 2019.",
+          "Nelson & Couto. Small Animal Internal Medicine. 6th ed. 2020.",
+          "Plumb's Veterinary Drug Handbook, 10th ed. 2023."
+        ]
     }
   },
   {
@@ -741,6 +797,7 @@ export const DRUGS: Drug[] = [
     name: 'Insulina NPH (Isofana)',
     category: 'Endócrino',
     concentrations: [{ value: 100, unit: 'U/mL', label: 'U-100 (100 U/mL)' }],
+    criDoses: [{ species: 'both', cri: { min: 0.05, max: 10, default: 0.08, unit: CriDoseUnit.U_kg_h } }],
     bolusDoses: [
       { species: 'dog', min: 0.25, max: 0.5, unit: BolusDoseUnit.U_kg, notes: "Dose inicial para MANEJO CRÔNICO via SUBCUTÂNEA (SC) a cada 12-24h. NÃO é um bólus IV. Ajustar conforme curva glicêmica." },
       { species: 'cat', min: 0.25, max: 0.5, unit: BolusDoseUnit.U_kg, notes: "Dose inicial para MANEJO CRÔNICO via SUBCUTÂNEA (SC) a cada 12h. Em gatos, a dosagem por peso é um ponto de partida, muitos iniciam com 1-2 U/gato. NÃO é um bólus IV. Ajustar conforme curva glicêmica." }
@@ -749,9 +806,9 @@ export const DRUGS: Drug[] = [
       indicationSummary: ["Insulina de ação intermediária para o tratamento de manutenção de Diabetes Mellitus em cães e gatos."],
       mechanism: "Facilita a captação de glicose pelas células, promove o armazenamento de glicogênio e inibe a produção hepática de glicose. A adição de protamina retarda sua absorção e prolonga a ação.",
       dosesText: {
-        dog: { cri: "Não aplicável", bolus: "0.25-0.5 U/kg SC q12-24h (dose inicial)" },
-        cat: { cri: "Não aplicável", bolus: "0.25-0.5 U/kg SC q12h (dose inicial, ou 1-2 U/gato)" },
-        notes: "Farmacocinética (início/pico/duração): Cães (0.5-3h / 2-10h / 6-24h), Gatos (0.5-3h / 2-8h / 4-12h). Ajuste fino é essencial e baseado em curvas glicêmicas."
+        dog: { cri: "0.05-10 U/kg/h (literatura indica até 2.2 U/kg/h para CAD/SHH)", bolus: "0.25-0.5 U/kg SC q12-24h (dose inicial)" },
+        cat: { cri: "0.05-10 U/kg/h (literatura indica até 2.2 U/kg/h para CAD/SHH)", bolus: "0.25-0.5 U/kg SC q12h (dose inicial, ou 1-2 U/gato)" },
+        notes: "Farmacocinética (início/pico/duração): Cães (0.5-3h / 2-10h / 6-24h), Gatos (0.5-3h / 2-8h / 4-12h). <strong>Transição da CRI</strong>: aplicar a primeira dose <strong>30 min antes</strong> de encerrar a CRI de insulina regular."
       },
       diluents: { recommended: [], notes: "Não diluir. Administrar conforme a concentração do frasco." },
       photoprotection: false,
@@ -764,7 +821,7 @@ export const DRUGS: Drug[] = [
           pregnancy: "A necessidade de insulina pode variar durante a gestação. Monitoramento intensivo é necessário."
       },
       monitoring: ["Curva glicêmica seriada", "Sinais clínicos de hipoglicemia (fraqueza, ataxia, convulsões)", "Glicosúria", "Consumo de água e apetite", "Peso corporal"],
-      goodPractice: ["Homogeneizar a suspensão rolando o frasco suavemente entre as mãos. Não agitar vigorosamente.", "Variar os locais de injeção subcutânea para evitar lipodistrofia.", "Educar o tutor sobre os sinais de hipoglicemia e como agir."],
+      goodPractice: ["Homogeneizar a suspensão rolando o frasco suavemente entre as mãos. Não agitar vigorosamente.", "Variar os locais de injeção subcutânea para evitar lipodistrofia.", "Educar o tutor sobre os sinais de hipoglicemia e como agir.", "Reavaliar e ajustar com base em curvas glicêmicas após a transição da CRI."],
       contraindications: ["Hipoglicemia"],
       citations: ["Plumb's Veterinary Drug Handbook", "Feldman and Nelson's Canine and Feline Endocrinology and Reproduction"]
     }
@@ -774,6 +831,7 @@ export const DRUGS: Drug[] = [
     name: 'Insulina PZI (Protamina Zinco)',
     category: 'Endócrino',
     concentrations: [{ value: 40, unit: 'U/mL', label: 'U-40 (40 U/mL)' }],
+    criDoses: [{ species: 'both', cri: { min: 0.05, max: 10, default: 0.08, unit: CriDoseUnit.U_kg_h } }],
     bolusDoses: [
       { species: 'dog', min: 0.25, max: 0.5, unit: BolusDoseUnit.U_kg, notes: "Dose inicial para MANEJO CRÔNICO via SUBCUTÂNEA (SC) a cada 12-24h. NÃO é um bólus IV. Ajustar conforme curva glicêmica." },
       { species: 'cat', min: 0.25, max: 0.5, unit: BolusDoseUnit.U_kg, notes: "Dose inicial para MANEJO CRÔNICO via SUBCUTÂNEA (SC) a cada 12h. Em gatos, a dose inicial comum é de 1-2 U/gato. NÃO é um bólus IV. Ajustar conforme curva glicêmica." }
@@ -782,9 +840,9 @@ export const DRUGS: Drug[] = [
       indicationSummary: ["Insulina de ação prolongada para o tratamento de manutenção de Diabetes Mellitus, especialmente popular em gatos."],
       mechanism: "Facilita a captação de glicose pelas células, promove o armazenamento de glicogênio e inibe a produção hepática de glicose. A adição de protamina e zinco em excesso prolonga significativamente sua absorção e duração.",
       dosesText: {
-        dog: { cri: "Não aplicável", bolus: "0.25-0.5 U/kg SC q12-24h (dose inicial)" },
-        cat: { cri: "Não aplicável", bolus: "1-2 U/gato SC q12h (dose inicial comum)" },
-        notes: "Estas são doses de manutenção para administração subcutânea. O ajuste fino é essencial e baseado em curvas glicêmicas. A dose de pico é tipicamente alcançada após vários dias de tratamento."
+        dog: { cri: "0.05-10 U/kg/h (literatura indica até 2.2 U/kg/h para CAD/SHH)", bolus: "0.25-0.5 U/kg SC q12-24h (dose inicial)" },
+        cat: { cri: "0.05-10 U/kg/h (literatura indica até 2.2 U/kg/h para CAD/SHH)", bolus: "1-2 U/gato SC q12h (dose inicial comum)" },
+        notes: "Estas são doses de manutenção para administração subcutânea. <strong>Administrar a primeira dose 30 min antes</strong> de encerrar a CRI de insulina regular. Ajuste fino baseado em curvas glicêmicas; pico após vários dias."
       },
       diluents: { recommended: [], notes: "Não diluir. Usar seringas U-40 específicas para esta concentração para evitar erros de dosagem." },
       photoprotection: false,
@@ -797,7 +855,7 @@ export const DRUGS: Drug[] = [
           pregnancy: "A necessidade de insulina pode variar. Monitoramento intensivo é necessário."
       },
       monitoring: ["Curva glicêmica seriada", "Sinais de hipoglicemia", "Glicosúria", "Frutosamina (para avaliação a longo prazo)", "Peso corporal"],
-      goodPractice: ["Homogeneizar a suspensão rolando o frasco suavemente. Não agitar.", "Usar apenas seringas calibradas para U-40.", "A remissão diabética é uma possibilidade em gatos; monitorar de perto para evitar hipoglicemia."],
+      goodPractice: ["Homogeneizar a suspensão rolando o frasco suavemente. Não agitar.", "Usar apenas seringas calibradas para U-40.", "A remissão diabética é uma possibilidade em gatos; monitorar de perto para evitar hipoglicemia.", "Transição organizada a partir da CRI de insulina regular."],
       contraindications: ["Hipoglicemia"],
       citations: ["Plumb's Veterinary Drug Handbook", "AAHA Diabetes Management Guidelines for Dogs and Cats"]
     }

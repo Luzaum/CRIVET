@@ -89,7 +89,7 @@ export const COMPREHENSIVE_DRUGS: Drug[] = [
       }
     ],
     specialWarnings: [WarningType.Photoprotection],
-    preparationGuide: 'Preparo da Noradrenalina:<br/>1. Usar D5W preferencialmente (reduz oxidação)<br/>2. SF 0.9% aceitável conforme protocolo local<br/>3. PROTEGER DA LUZ (cobrir bolsa/equipo)<br/>4. Usar linha dedicada se houver incompatibilidades<br/>5. Não retirar abruptamente (desmame progressivo)',
+    preparationGuide: 'Preparo da Noradrenalina:<br/>1. Preferir SG 5% (reduz oxidação); SF 0.9% aceitável conforme protocolo local<br/>2. Concentrações usuais: 4 mg/250 mL (16 µg/mL) ou 8 mg/250 mL (32 µg/mL)<br/>3. PROTEGER DA LUZ (cobrir bolsa/equipo)<br/>4. Linha dedicada e preferir acesso venoso central<br/>5. Desmame progressivo (evitar hipotensão rebote)<br/>Extravasamento: infiltrar fentolamina 5–10 mg em 10–15 mL SF 0.9% ao redor da área.',
     info: {
       indicationSummary: ['Choque distributivo', 'Hipotensão refratária'],
       mechanism: 'Vasoconstritor α1/β1 - aumenta PAM e contratilidade',
@@ -302,35 +302,7 @@ export const COMPREHENSIVE_DRUGS: Drug[] = [
     }
   },
 
-  // ENDÓCRINO/ELETRÓLITOS
-  {
-    id: 'insulin-regular',
-    name: 'Insulina Regular (DKA)',
-    category: 'Endócrino',
-    concentrations: [
-      { label: '2.2 U/250 mL (0.0088 U/mL)', value: 0.0088, unit: 'U/mL' }
-    ],
-    criDoses: [
-      {
-        species: 'both',
-        cri: { min: 0.05, default: 0.1, max: 0.1, unit: CriDoseUnit.U_kg_h },
-        useCase: 'Cetoacidose diabética',
-        notes: 'Alvo comum: 0.1 U/kg/h. PRIMAR e DESCARTAR 20-50 mL da linha (adsorção). Monitorar K+, P, Na+ e hidratação.'
-      }
-    ],
-    preparationGuide: 'Preparo da Insulina Regular para DKA:<br/>1. Adicionar 2.2 U/kg à bolsa de 240-250 mL SF 0.9%<br/>2. PRIMAR e DESCARTAR 20-50 mL da linha (adsorção)<br/>3. Início: 10 mL/h como ponto de partida<br/>4. Meta de queda glicêmica 50-100 mg/dL/h<br/>5. Usar linha exclusiva<br/>6. Monitorar K+, P, Na+ e hidratação',
-    info: {
-      indicationSummary: ['Cetoacidose diabética', 'Hiperglicemia severa'],
-      mechanism: 'Insulina de ação rápida',
-      dosesText: {
-        dog: { cri: '0.05-0.1 U/kg/h (ajustar conforme glicemia)' },
-        cat: { cri: '0.05-0.1 U/kg/h (ajustar conforme glicemia)' }
-      },
-      adjustments: {
-        renal: 'Monitorar K+ rigorosamente'
-      }
-    }
-  },
+
 
   // NMBAs
   {

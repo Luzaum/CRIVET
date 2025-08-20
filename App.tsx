@@ -104,55 +104,94 @@ const DrugAdditionalInfo: React.FC<{ drug: Drug }> = ({ drug }) => {
       {/* Fórmulas Universais */}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
         <h4 className="text-lg font-semibold text-blue-800 dark:text-blue-300 mb-3">🧮 Fórmulas Universais</h4>
-        <div className="space-y-3">
-          <div>
+        <div className="space-y-4">
+          <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
             <span className="font-semibold text-blue-800 dark:text-blue-300">Fórmula Universal:</span>
-            <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+            <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
               {EXPANDED_FORMULAS.universal}
             </div>
+            <div className="text-xs text-blue-600 dark:text-blue-300">
+              <strong>Explicação:</strong> Esta é a fórmula fundamental para calcular a taxa de infusão (mL/h) de qualquer medicamento em CRI. 
+              Multiplica a dose (por kg/min), o peso do paciente e 60 (para converter minutos em horas), depois divide pela concentração do medicamento.
+            </div>
           </div>
-          <div>
+          
+          <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
             <span className="font-semibold text-blue-800 dark:text-blue-300">Conversão Útil:</span>
-            <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+            <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
               {EXPANDED_FORMULAS.conversion}
             </div>
+            <div className="text-xs text-blue-600 dark:text-blue-300">
+              <strong>Explicação:</strong> Conversão rápida entre µg/kg/min e mg/kg/h. Multiplicar por 0.6 converte µg/kg/min para mg/kg/h. 
+              Útil para comparar doses de diferentes medicamentos ou protocolos.
+            </div>
           </div>
-          <div>
+          
+          <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
             <span className="font-semibold text-blue-800 dark:text-blue-300">Volume/Tempo Fixos:</span>
-            <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+            <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
               {EXPANDED_FORMULAS.volumeTime}
             </div>
+            <div className="text-xs text-blue-600 dark:text-blue-300">
+              <strong>Explicação:</strong> Para infusões com volume e tempo fixos, calcula a taxa (mL/h) dividindo volume pelo tempo. 
+              Para calcular mg a adicionar, multiplica a dose (mg/kg/h) pelo peso e pelo tempo de infusão.
+            </div>
           </div>
-          <div>
+          
+          <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
             <span className="font-semibold text-blue-800 dark:text-blue-300">Bólus para CRI:</span>
-            <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+            <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
               {EXPANDED_FORMULAS.bolusToCRI}
             </div>
-          </div>
-          <div>
-            <span className="font-semibold text-blue-800 dark:text-blue-300">CRI para Bólus:</span>
-            <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
-              {EXPANDED_FORMULAS.criToBolus}
+            <div className="text-xs text-blue-600 dark:text-blue-300">
+              <strong>Explicação:</strong> Converte dose de bólus para CRI equivalente. Multiplica a dose do bólus pela frequência diária 
+              e divide por 24 horas. Útil para manter efeito terapêutico contínuo.
             </div>
           </div>
+          
+          <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
+            <span className="font-semibold text-blue-800 dark:text-blue-300">CRI para Bólus:</span>
+            <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
+              {EXPANDED_FORMULAS.criToBolus}
+            </div>
+            <div className="text-xs text-blue-600 dark:text-blue-300">
+              <strong>Explicação:</strong> Converte CRI para dose de bólus equivalente. Multiplica a dose CRI por 24 horas e divide pela frequência desejada. 
+              Útil para calcular doses de carga ou conversão para administração intermitente.
+            </div>
+          </div>
+          
           {ADDITIONAL_FORMULAS && (
             <>
-              <div>
+              <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
                 <span className="font-semibold text-blue-800 dark:text-blue-300">TMIC:</span>
-                <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+                <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
                   {ADDITIONAL_FORMULAS.tmic}
                 </div>
-              </div>
-              <div>
-                <span className="font-semibold text-blue-800 dark:text-blue-300">Priming:</span>
-                <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
-                  {ADDITIONAL_FORMULAS.priming}
+                <div className="text-xs text-blue-600 dark:text-blue-300">
+                  <strong>Explicação:</strong> T&gt;MIC é o tempo que a concentração do antibiótico permanece acima da Concentração Mínima Inibitória (CMI) do patógeno. 
+                  Beta-lactâmicos são tempo-dependentes, precisando manter T&gt;MIC &gt; 40-50% do intervalo de dose para eficácia.
                 </div>
               </div>
-              <div>
+              
+              <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
+                <span className="font-semibold text-blue-800 dark:text-blue-300">Priming:</span>
+                <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
+                  {ADDITIONAL_FORMULAS.priming}
+                </div>
+                <div className="text-xs text-blue-600 dark:text-blue-300">
+                  <strong>Explicação:</strong> Insulina adere às superfícies plásticas. Descartar 20-50 mL da linha satura os sítios de adsorção, 
+                  garantindo que a dose calculada chegue ao paciente. Fundamental para precisão da insulinoterapia.
+                </div>
+              </div>
+              
+              <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
                 <span className="font-semibold text-blue-800 dark:text-blue-300">Stewardship:</span>
-                <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1">
+                <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
                   {ADDITIONAL_FORMULAS.stewardship}
+                </div>
+                <div className="text-xs text-blue-600 dark:text-blue-300">
+                  <strong>Explicação:</strong> Uso racional de antibióticos. Intermitente é padrão (10-60 min). Infusão estendida apenas para 
+                  beta-lactâmicos tempo-dependentes quando há justificativa T&gt;MIC e estabilidade confirmada.
                 </div>
               </div>
             </>
@@ -280,58 +319,7 @@ const DrugAdditionalInfo: React.FC<{ drug: Drug }> = ({ drug }) => {
         </div>
       )}
 
-      {/* Comorbidades/Estados */}
-      <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
-        <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-3">⚙️ Comorbidades/Estados</h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {Object.entries(COMORBIDITY_ADJUSTMENTS).slice(0, 4).map(([condition, adjustment]) => (
-            <div key={condition} className="border border-slate-200 dark:border-slate-700 rounded-lg p-3">
-              <h5 className="font-semibold text-slate-800 dark:text-slate-200 mb-2 capitalize">{condition}</h5>
-              <div className="text-sm text-slate-600 dark:text-slate-300 mb-2">
-                {adjustment.description}
-              </div>
-              <div className="text-xs text-slate-500 dark:text-slate-400">
-                <strong>Exemplos:</strong> {adjustment.examples.join(', ')}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Explicações "?" (Tooltips) */}
-      <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
-        <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-3">❓ Explicações "?" (Tooltips)</h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {Object.entries({...TOOLTIPS, ...ADDITIONAL_TOOLTIPS}).slice(0, 4).map(([key, explanation]) => (
-            <div key={key} className="border border-slate-200 dark:border-slate-700 rounded-lg p-3">
-              <h5 className="font-semibold text-slate-800 dark:text-slate-200 mb-2 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</h5>
-              <div className="text-sm text-slate-600 dark:text-slate-300">
-                {explanation}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Checklists */}
-      <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
-        <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-3">✅ Checklists</h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {Object.entries({...CHECKLISTS, ...ADDITIONAL_CHECKLISTS}).slice(0, 3).map(([phase, items]) => (
-            <div key={phase} className="border border-slate-200 dark:border-slate-700 rounded-lg p-3">
-              <h5 className="font-semibold text-slate-800 dark:text-slate-200 mb-2 capitalize">{phase}</h5>
-              <div className="space-y-1">
-                {items.slice(0, 3).map((item, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <span className="text-green-600 mt-1">□</span>
-                    <span className="text-sm text-slate-600 dark:text-slate-300">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };
@@ -910,6 +898,22 @@ export default function App() {
                 default:
                     return { error: 'Unidade de dose (U) não suportada para este cálculo.', generalWarnings, notesAndWarnings };
             }
+            
+            // Alerta específico para insulinas quando dose > 2.2 U/kg/h
+            if ((selectedDrug.id === 'insulin-regular' || selectedDrug.id === 'insulina-nph' || selectedDrug.id === 'insulina-pzi') && doseInUKgH > 2.2) {
+                const insulinName = selectedDrug.id === 'insulin-regular' ? 'Regular' : 
+                                  selectedDrug.id === 'insulina-nph' ? 'NPH' : 'PZI';
+                
+                notes.push({
+                    text: `<strong>⚠️ Dose Elevada de Insulina ${insulinName}</strong><br/>
+                    A dose selecionada (${doseInUKgH.toFixed(2)} U/kg/h) excede o limite recomendado pela literatura (2.2 U/kg/h) para CAD/SHH.<br/>
+                    <strong>Uso acima de 2.2 U/kg/h é de responsabilidade exclusiva do médico veterinário.</strong><br/>
+                    Considere reavaliar a indicação e monitorizar rigorosamente o paciente.`,
+                    type: 'warning',
+                    icon: <AlertTriangleIcon className="w-5 h-5"/>
+                });
+            }
+            
             const totalUnitsPerHour = doseInUKgH * patient.weight;
             const totalUnitsForDuration = totalUnitsPerHour * infusionDuration;
             drugVolumeMl = totalUnitsForDuration / selectedConcentration.value;

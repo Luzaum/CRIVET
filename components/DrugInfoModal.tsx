@@ -27,12 +27,12 @@ const InfoSection: React.FC<{ title: string; children: React.ReactNode; icon: Re
     </div>
 );
 
-const AdjustmentPill: React.FC<{ label: string; text: string | undefined; className?: string }> = ({ label, text, className = 'bg-slate-50 border-slate-200' }) => {
+const AdjustmentPill: React.FC<{ label: string; text: string | undefined; className?: string }> = ({ label, text, className = 'bg-slate-50 border-slate-200 dark:bg-slate-800/60 dark:border-slate-600' }) => {
     if (!text) return null;
     return (
         <div className={`p-3 rounded-lg border ${className}`}>
-            <h6 className="font-semibold text-slate-800">{label}</h6>
-            <p className="mt-1 text-slate-600" dangerouslySetInnerHTML={{ __html: text }}></p>
+            <h6 className="font-semibold text-slate-800 dark:text-slate-100">{label}</h6>
+            <p className="mt-1 text-slate-700 dark:text-slate-200" dangerouslySetInnerHTML={{ __html: text }}></p>
         </div>
     );
 };
@@ -61,8 +61,11 @@ export const DrugInfoModal: React.FC<{ drug: Drug; onClose: () => void }> = ({ d
                 
                 {drug.preparationGuide && (
                     <InfoSection title="Instruções de Preparo" icon={<BeakerIcon className="w-5 h-5" />}>
-                        <div className="prose prose-sm max-w-none bg-amber-50 border border-amber-200 p-3 rounded-md">
-                            <div className="text-slate-800 dark:text-amber-100" dangerouslySetInnerHTML={{ __html: drug.preparationGuide }} />
+                        <div className="prose prose-sm max-w-none bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-3 rounded-md">
+                            <div 
+                                className="text-slate-800 dark:text-amber-100 [&_table]:border-slate-300 dark:[&_table]:border-slate-600 [&_th]:bg-slate-100 dark:[&_th]:bg-slate-700 [&_th]:text-slate-800 dark:[&_th]:text-slate-200 [&_td]:border-slate-200 dark:[&_td]:border-slate-600 [&_strong]:text-slate-900 dark:[&_strong]:text-amber-200 [&_em]:text-slate-700 dark:[&_em]:text-amber-300 [&_ol]:text-slate-800 dark:[&_ol]:text-amber-100 [&_ul]:text-slate-800 dark:[&_ul]:text-amber-100 [&_li]:text-slate-800 dark:[&_li]:text-amber-100" 
+                                dangerouslySetInnerHTML={{ __html: drug.preparationGuide }} 
+                            />
                         </div>
                     </InfoSection>
                 )}
@@ -114,8 +117,8 @@ export const DrugInfoModal: React.FC<{ drug: Drug; onClose: () => void }> = ({ d
 
                 <InfoSection title="Ajustes e Alertas" icon={<AlertTriangleIcon className="w-5 h-5"/>}>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <AdjustmentPill label="Doença Renal" text={info.adjustments.renal} className="bg-orange-50 border-orange-200"/>
-                        <AdjustmentPill label="Doença Hepática" text={info.adjustments.hepatic} className="bg-orange-50 border-orange-200"/>
+                        <AdjustmentPill label="Doença Renal" text={info.adjustments.renal} className="bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-700"/>
+                        <AdjustmentPill label="Doença Hepática" text={info.adjustments.hepatic} className="bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-700"/>
                         <AdjustmentPill label="Cardiopatias" text={info.adjustments.cardiac} />
                         <AdjustmentPill label="Paciente Neurológico" text={info.adjustments.neuro} />
                         <AdjustmentPill label="Paciente Pediátrico" text={info.adjustments.pediatric} />
@@ -123,7 +126,7 @@ export const DrugInfoModal: React.FC<{ drug: Drug; onClose: () => void }> = ({ d
                         <AdjustmentPill label="Gestante/Lactante" text={info.adjustments.pregnancy} />
                         <AdjustmentPill label="Sepse" text={info.adjustments.sepsis} />
                      </div>
-                     {info.contraindications?.length > 0 && <p className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg"><strong className="font-semibold text-red-700">Contraindicações principais:</strong> {info.contraindications.join(', ')}</p>}
+                     {info.contraindications?.length > 0 && <p className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg"><strong className="font-semibold text-red-700 dark:text-red-200">Contraindicações principais:</strong> {info.contraindications.join(', ')}</p>}
                 </InfoSection>
 
                  <InfoSection title="Monitorização e Boas Práticas" icon={<ActivityIcon className="w-5 h-5"/>}>
