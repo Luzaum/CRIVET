@@ -1,5 +1,17 @@
 
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+
+// Fix temporário para Material-UI v7 + React 19
+if (typeof window !== 'undefined') {
+    // Polyfill para resolver erro de palette
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+        if (args[0]?.includes?.('gx_no_16 is not present in staticLoadtimePalette')) {
+            return; // Suprime este erro específico
+        }
+        originalConsoleError.apply(console, args);
+    };
+}
 // Material UI (Google Material Design)
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -15,6 +27,13 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import TextField from '@mui/material/TextField';
 import { Species, PatientState, Patient, Drug, CriDose, BolusDose, DrugConcentration, CriDoseUnit, BolusDoseUnit, Vehicle, WarningType, FluidType } from './types';
+import { NumberFieldBR } from './components/inputs/NumberFieldBR';
+import { calculateCRI, calculateBolus } from './utils/calculations';
+import { classifyCriDose, classifyBolusDose } from './utils/rangeClassifier';
+// import { getCompatibilityLevel } from './utils/compatibility'; // Removido - não existe mais
+import { RangeAlert } from './components/alerts/RangeAlert';
+import { SourcesFootnote } from './components/alerts/SourcesFootnote';
+import { CalculationSteps } from './components/CalculationSteps';
 import { 
   CONSOLIDATED_DRUGS, 
   COMPATIBILITY_MATRIX, 
@@ -35,6 +54,10 @@ import {
 import { SyringeIcon, BagIcon, AlertTriangleIcon, EyeOffIcon, BeakerIcon, QuestionMarkCircleIcon, InfoIcon, ActivityIcon } from './components/icons';
 import { DrugInfoModal } from './components/DrugInfoModal';
 import { CompatibilityGuide } from './components/CompatibilityGuide';
+import { CompatibilityAlertBar } from './components/CompatibilityAlertBar';
+import { checkCompatibility } from './utils/compatibility';
+import { warningsFor } from './utils/warnings';
+import { ConcentrationSelect } from './components/ConcentrationSelect';
 
 const DrugAdditionalInfo: React.FC<{ drug: Drug }> = ({ drug }) => {
   // Encontrar informações de compatibilidade para o medicamento
@@ -389,28 +412,32 @@ const PatientSelector: React.FC<{ patient: Patient; setPatient: React.Dispatch<R
             <div>
                 <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Espécie</label>
                 <div className="grid grid-cols-2 gap-3">
-                    <button onClick={() => setPatient(p => ({ ...p, species: Species.Dog }))}
-                        className={`flex flex-col items-center gap-2 p-3 border-2 rounded-lg transition-all duration-200 ${patient.species === Species.Dog ? 'border-blue-700 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300' : 'border-slate-200 dark:border-slate-700 hover:border-blue-400 text-slate-700 dark:text-slate-300'}`}>
+                    <button onClick={() => setPatient(p => ({ ...p, species: Species.Canine }))}
+                        className={`flex flex-col items-center gap-2 p-3 border-2 rounded-lg transition-all duration-200 ${patient.species === Species.Canine ? 'border-blue-700 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300' : 'border-slate-200 dark:border-slate-700 hover:border-blue-400 text-slate-700 dark:text-slate-300'}`}>
                         <span className="text-3xl">🐶</span>
-                        <span className="font-medium">{Species.Dog}</span>
+                        <span className="font-medium">Cão</span>
                     </button>
-                    <button onClick={() => setPatient(p => ({ ...p, species: Species.Cat }))}
-                        className={`flex flex-col items-center gap-2 p-3 border-2 rounded-lg transition-all duration-200 ${patient.species === Species.Cat ? 'border-blue-700 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300' : 'border-slate-200 dark:border-slate-700 hover:border-blue-400 text-slate-700 dark:text-slate-300'}`}>
+                    <button onClick={() => setPatient(p => ({ ...p, species: Species.Feline }))}
+                        className={`flex flex-col items-center gap-2 p-3 border-2 rounded-lg transition-all duration-200 ${patient.species === Species.Feline ? 'border-blue-700 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300' : 'border-slate-200 dark:border-slate-700 hover:border-blue-400 text-slate-700 dark:text-slate-300'}`}>
                         <span className="text-3xl">🐱</span>
-                        <span className="font-medium">{Species.Cat}</span>
+                        <span className="font-medium">Gato</span>
                     </button>
                 </div>
             </div>
 
             <div>
-                <label htmlFor="weight" className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Peso do Paciente (kg)</label>
-                <div className="relative">
-                    <input type="number" id="weight" value={patient.weight || ''} onChange={e => setPatient(p => ({ ...p, weight: parseFloat(e.target.value) }))}
-                        className="w-full p-3 border bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-700 focus:border-blue-700 no-spinner"
-                        placeholder="Ex: 15.5"
-                    />
-                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">kg</span>
-                </div>
+                <label htmlFor="weight" className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">
+                    Peso do Paciente
+                </label>
+                <NumberFieldBR
+                    id="weight"
+                    value={Number.isFinite(patient.weight) ? patient.weight : null}
+                    onChange={(v) => setPatient(p => ({ ...p, weight: v ?? 0 }))}
+                    suffix="kg"
+                    decimals={2}
+                    min={0.1}
+                    max={120}
+                />
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -477,9 +504,9 @@ const DrugSelector: React.FC<{ patient: Patient; onSelect: (drug: Drug) => void 
     const filteredDrugs = useMemo(() => {
         return CONSOLIDATED_DRUGS.filter(drug => {
             if (drug.isCombo) {
-                return drug.comboDetails?.targetSpecies === (patient.species === Species.Dog ? 'dog' : 'cat');
+                return drug.comboDetails?.targetSpecies === (patient.species === Species.Canine ? 'dog' : 'cat');
             }
-            const speciesFilter = (patient.species === Species.Dog ? 'dog' : 'cat');
+            const speciesFilter = (patient.species === Species.Canine ? 'dog' : 'cat');
             const hasCriDose = drug.criDoses?.some(d => d.species === 'both' || d.species === speciesFilter);
             const hasBolusDose = drug.bolusDoses?.some(d => d.species === 'both' || d.species === speciesFilter);
             return hasCriDose || hasBolusDose;
@@ -600,7 +627,7 @@ export default function App() {
         try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch {}
     }, [isDark]);
 
-    const [patient, setPatient] = useState<Patient>({ species: Species.Dog, state: PatientState.Adult, weight: 0, hepaticDisease: false, renalDisease: false, cardiacDisease: false, septicShock: false, neuroDisease: false, pregnant: false, lactating: false });
+    const [patient, setPatient] = useState<Patient>({ species: Species.Canine, state: PatientState.Adult, weight: 0, hepaticDisease: false, renalDisease: false, cardiacDisease: false, septicShock: false, neuroDisease: false, pregnant: false, lactating: false });
     const [selectedDrug, setSelectedDrug] = useState<Drug | null>(null);
     const [selectedCriDose, setSelectedCriDose] = useState<CriDose | null>(null);
     const [selectedConcentration, setSelectedConcentration] = useState<DrugConcentration | null>(null);
@@ -663,7 +690,7 @@ export default function App() {
             return;
         }
 
-        const speciesKey = patient.species === Species.Dog ? 'dog' : 'cat';
+        const speciesKey = patient.species === Species.Canine ? 'dog' : 'cat';
         const appropriateCriDose = drug.criDoses?.find(d => d.species === speciesKey) 
                              || drug.criDoses?.find(d => d.species === 'both');
         
@@ -712,6 +739,48 @@ export default function App() {
         };
     }, [selectedCriDose, doseAdjustment]);
     
+    // New CRI calc (puro + memo)
+    const criResult = React.useMemo(() => {
+        try {
+            if (!selectedDrug || !selectedConcentration || !patient?.weight) return null;
+
+            // Mapeie o enum para a chave usada pelo engine (se seu enum já for string "mcg_kg_min", perfeito)
+            const unitKey = selectedCriDose?.cri?.unit ?? customCriUnit; // caia para custom se necessário
+
+            return calculateCRI({
+                dose: { value: criDose, unit: unitKey as any }, // 'mcg_kg_min' | 'mg_kg_h' | etc.
+                weightKg: patient.weight,
+                stock: {
+                    value: selectedConcentration.value,
+                    unit: selectedConcentration.unit as any, // 'mg/mL' | 'mcg/mL' | 'μg/mL'
+                },
+                vehicle: { type: vehicle.type, volume: vehicle.volume },
+                durationHours: infusionDuration,
+                // If você já tem "desiredRate", pode passar aqui como override:
+                // infusionRateMlPerHour: desiredRate ?? undefined,
+            });
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
+    }, [
+        selectedDrug,
+        selectedConcentration,
+        patient?.weight,
+        criDose,
+        customCriUnit,
+        selectedCriDose,
+        vehicle.type,
+        vehicle.volume,
+        infusionDuration,
+    ]);
+
+    // Classificação de faixa para CRI
+    const criRange = React.useMemo(() => {
+        if (!selectedDrug || !criDose) return null
+        return classifyCriDose(selectedDrug as any, criDose, customCriUnit as any)
+    }, [selectedDrug, criDose, customCriUnit])
+
     const criCalculation = useMemo(() => {
         if (!selectedDrug || !patient.weight || patient.weight <= 0) return null;
 
@@ -988,7 +1057,7 @@ export default function App() {
     const bagVolumes = [250, 500, 1000];
     const fluidTypes: FluidType[] = ['NaCl 0.9%', 'Ringer Lactato', 'SG 5%'];
     
-    const speciesKey = patient.species === Species.Dog ? 'dog' : 'cat';
+    const speciesKey = patient.species === Species.Canine ? 'dog' : 'cat';
     const hasCri = selectedDrug?.criDoses?.some(d => d.species === 'both' || d.species === speciesKey);
     const hasBolus = selectedDrug?.bolusDoses?.some(d => d.species === 'both' || d.species === speciesKey);
 
@@ -1117,6 +1186,7 @@ export default function App() {
                            <div className="space-y-6">
                             
                             <div className="space-y-3">
+                                {/* COMENTADO PARA BISECT - BLOCO 1
                                 {selectedDrug.isCombo && selectedDrug.comboDetails && (
                                   <div className="space-y-3">
                                     <p className="text-sm text-slate-700 dark:text-slate-200">{selectedDrug.comboDetails.description}</p>
@@ -1143,6 +1213,16 @@ export default function App() {
                                   </div>
                                 )}
                                 {criCalculation?.generalWarnings?.map((w, i) => <WarningComponent key={i} {...w} />)}
+                                
+                                {/* Avisos de comorbidades */}
+                                {selectedDrug && warningsFor(patient, selectedDrug.id).map((warning, i) => (
+                                    <WarningComponent 
+                                        key={`comorbidity-${i}`} 
+                                        text={warning} 
+                                        type="warning" 
+                                        icon={<AlertTriangleIcon className="w-5 h-5"/>} 
+                                    />
+                                ))}
                             </div>
 
                              {selectedDrug.preparationGuide && (
@@ -1192,15 +1272,13 @@ export default function App() {
                                                 disabled={adjustedCriRange.min === adjustedCriRange.max}
                                             />
                                         </div>
-                                        <p className="text-xs text-slate-500 mt-1">Faixa ajustada recomendada: {adjustedCriRange.min.toFixed(2)} - {adjustedCriRange.max.toFixed(2)} {selectedCriDose.cri.unit}</p>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-slate-600 mb-2">Apresentação</label>
-                                             <select value={selectedConcentration.label} onChange={(e) => setSelectedConcentration(selectedDrug.concentrations.find(c => c.label === e.target.value) || null)} className="w-full p-2 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200">
-                                                {selectedDrug.concentrations.map(c => <option key={c.label} value={c.label}>{c.label}</option>)}
-                                            </select>
-                                        </div>
+                                        <ConcentrationSelect
+                                          drug={selectedDrug}
+                                          selected={selectedConcentration}
+                                          onChange={setSelectedConcentration}
+                                        />
                                         <div>
                                             <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Indicação Principal</label>
                                              <p className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-md min-h-[42px] flex items-center text-sm">{selectedCriDose.useCase || selectedDrug.info?.indicationSummary[0] || 'Geral'}</p>
@@ -1208,26 +1286,47 @@ export default function App() {
                                     </div>
                                     </>
                                 )}
-                                {(!selectedDrug.isCombo && !selectedCriDose && selectedConcentration) && (
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-slate-600 mb-2">Dose de CRI (customizada)</label>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
-                                                <select value={customCriUnit} onChange={(e) => setCustomCriUnit(e.target.value as CriDoseUnit)} className="w-full p-2 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200">
-                                                    {Object.values(CriDoseUnit).map(u => <option key={u} value={u}>{u}</option>)}
-                                                </select>
-                                                <input type="number" value={criDose || ''} onChange={e => setCriDose(parseFloat(e.target.value) || 0)} className="w-full p-2 border bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 border-slate-300 dark:border-slate-700 rounded-md no-spinner" placeholder="Ex: 10" />
-                                                <div className="text-xs text-slate-500 dark:text-slate-400">Sem protocolo oficial neste app. Use com cautela e monitoração.</div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-slate-600 mb-2">Apresentação</label>
-                                            <select value={selectedConcentration.label} onChange={(e) => setSelectedConcentration(selectedDrug.concentrations.find(c => c.label === e.target.value) || null)} className="w-full p-2 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200">
-                                                {selectedDrug.concentrations.map(c => <option key={c.label} value={c.label}>{c.label}</option>)}
-                                            </select>
-                                        </div>
+                                {/* === APRESENTAÇÃO + UNIDADE CRI (INÍCIO) === */}
+                                {selectedDrug && !selectedDrug.isCombo && (
+                                  <div className="grid gap-4 md:grid-cols-2">
+                                    {/* Apresentação (Concentração do frasco) */}
+                                    <ConcentrationSelect
+                                      drug={selectedDrug}
+                                      selected={selectedConcentration}
+                                      onChange={setSelectedConcentration}
+                                    />
+
+                                    {/* Unidade da dose (CRI) */}
+                                    <div>
+                                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">
+                                        Unidade da dose (CRI)
+                                      </label>
+
+                                      <div className="flex flex-wrap gap-2">
+                                        {(['mcg/kg/min', 'mcg/kg/h', 'mg/kg/h'] as const).map((u) => (
+                                          <button
+                                            key={u}
+                                            type="button"
+                                            onClick={() => setCustomCriUnit(u)}
+                                            className={`px-3 py-1.5 rounded-md border transition
+                                              ${customCriUnit === u
+                                                ? 'border-blue-700 bg-blue-700 text-white'
+                                                : 'border-slate-300 text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800'}`}
+                                            aria-pressed={customCriUnit === u}
+                                          >
+                                            {u}
+                                            {selectedDrug?.cri?.preferredUnit === u && (
+                                              <span className="ml-2 rounded-full px-2 py-0.5 text-[10px] bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                                                mais usada
+                                              </span>
+                                            )}
+                                          </button>
+                                        ))}
+                                      </div>
                                     </div>
+                                  </div>
                                 )}
+                                {/* === APRESENTAÇÃO + UNIDADE CRI (FIM) === */}
                                 
                                 <div>
                                     <div className="flex items-center gap-1.5 text-sm font-medium text-slate-600 mb-2">
@@ -1286,6 +1385,23 @@ export default function App() {
                                             <div className="grid grid-cols-3 gap-2">
                                                 {fluidTypes.map(f => <button key={f} onClick={() => setVehicle(prev => ({...prev, type:'bag', fluid: f, volume: prev.type==='bag' ? prev.volume : 500 }))} className={`p-2 border rounded-md text-sm transition-colors ${vehicle.type === 'bag' && vehicle.fluid === f ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-slate-800 dark:bg-slate-900 dark:text-slate-200 hover:bg-blue-100 dark:hover:bg-slate-800 border-slate-300 dark:border-slate-700'}`}>{f}</button>)}
                                             </div>
+                                            
+                                            {/* Alerta de compatibilidade */}
+                                            {selectedDrug && vehicle.fluid && (() => {
+                                                const selectedFluid = vehicle.fluid === 'NaCl 0.9%' ? 'sf' : 
+                                                                     vehicle.fluid === 'Ringer Lactato' ? 'rl' : 
+                                                                     vehicle.fluid === 'SG 5%' ? 'd5' : 'sf';
+                                                const compat = checkCompatibility(selectedFluid, selectedDrug.info?.compatibility || {});
+                                                return (
+                                                    <div className="mt-3">
+                                                        <CompatibilityAlertBar
+                                                            level={compat.level}
+                                                            message={compat.message}
+                                                            reason={compat.reason}
+                                                        />
+                                                    </div>
+                                                );
+                                            })()}
                                         </div>
                                     )}
                                 </div>
@@ -1362,6 +1478,10 @@ export default function App() {
                                         </div>
                                     ) : null}
 
+                                    {/* Passos de cálculo e fontes */}
+                                    <CalculationSteps steps={criResult?.steps} />
+                                    <SourcesFootnote drug={selectedDrug} />
+
                                 </div>
                             )}
 
@@ -1400,7 +1520,7 @@ const BolusCalculator: React.FC<{
 
     const appropriateBolusDose = useMemo(() => {
         if (!drug.bolusDoses) return null;
-        const speciesKey = patient.species === Species.Dog ? 'dog' : 'cat';
+        const speciesKey = patient.species === Species.Canine ? 'dog' : 'cat';
         return drug.bolusDoses.find(d => d.species === speciesKey) 
             || drug.bolusDoses.find(d => d.species === 'both');
     }, [drug, patient.species]);
@@ -1423,6 +1543,39 @@ const BolusCalculator: React.FC<{
             setBolusInfusionTime(appropriateBolusDose.infusionTimeMin);
         }
     }, [appropriateBolusDose]); // Removed adjustedBolusRange from deps to avoid re-triggering on every adjustment change
+
+    const bolusResult = React.useMemo(() => {
+        try {
+            if (!drug || !concentration || !patient?.weight) return null;
+
+            return calculateBolus({
+                dose: { value: bolusDoseValue, unit: appropriateBolusDose.unit as any }, // 'mg_kg' | 'mcg_kg'
+                weightKg: patient.weight,
+                stock: {
+                    value: concentration.value,
+                    unit: concentration.unit as any,
+                },
+                // Se o usuário escolhe diluir (ex.: 10 mL para lento), passe:
+                // finalVolumeMl: slowAdminVolume ?? undefined,
+            });
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
+    }, [
+        drug,
+        concentration,
+        patient?.weight,
+        bolusDoseValue,
+        appropriateBolusDose?.unit,
+        // slowAdminVolume,
+    ]);
+
+    // Classificação de faixa para Bólus
+    const bolusRange = React.useMemo(() => {
+        if (!drug || !bolusDoseValue) return null
+        return classifyBolusDose(drug as any, bolusDoseValue, appropriateBolusDose.unit as any)
+    }, [drug, bolusDoseValue, appropriateBolusDose?.unit])
 
     const bolusCalculation = useMemo(() => {
         if (!appropriateBolusDose || !concentration || !patient.weight || patient.weight <= 0 || bolusDoseValue <= 0) {
@@ -1497,20 +1650,34 @@ const BolusCalculator: React.FC<{
     return (
         <div className="space-y-6">
             <div>
-                <label className="block text-sm font-medium text-slate-600 mb-2">Dose de Bólus ({appropriateBolusDose.unit})</label>
+                <label className="block text-sm font-medium text-slate-600 mb-2">
+                    Dose de Bólus ({appropriateBolusDose.unit})
+                </label>
                 <div className="flex items-center gap-2">
-                    <input type="range" min={adjustedBolusRange.min} max={adjustedBolusRange.max} step={(adjustedBolusRange.max - adjustedBolusRange.min) / 100 || 0.01} value={bolusDoseValue}
+                    <input
+                        type="range"
+                        min={adjustedBolusRange.min}
+                        max={adjustedBolusRange.max}
+                        step={0.05}
+                        value={bolusDoseValue}
                         onChange={e => setBolusDoseValue(parseFloat(e.target.value))}
                         className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
                         disabled={adjustedBolusRange.min === adjustedBolusRange.max}
                     />
-                    <input type="number" value={bolusDoseValue.toFixed(3)}
-                        onChange={e => setBolusDoseValue(parseFloat(e.target.value))}
-                        className="w-24 p-2 border bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-md text-center no-spinner text-slate-900 dark:text-slate-200"
-                        disabled={adjustedBolusRange.min === adjustedBolusRange.max}
+                    <NumberFieldBR
+                        id="bolus-dose"
+                        value={Number.isFinite(bolusDoseValue) ? bolusDoseValue : null}
+                        onChange={(v) => setBolusDoseValue(v ?? 0)}
+                        suffix={appropriateBolusDose.unit}
+                        decimals={3}
+                        // min={adjustedBolusRange.min} max={adjustedBolusRange.max} // (opcional para aviso)
                     />
                 </div>
-                <p className="text-xs text-slate-500 mt-1">Faixa ajustada recomendada: {adjustedBolusRange.min.toFixed(2)} - {adjustedBolusRange.max.toFixed(2)} {appropriateBolusDose.unit}</p>
+                {bolusRange && (
+                    <div className="mt-2">
+                        <RangeAlert level={bolusRange.level} text={bolusRange.message} />
+                    </div>
+                )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -1574,6 +1741,10 @@ const BolusCalculator: React.FC<{
                             )}
                         </div>
                     )}
+
+                    {/* Passos de cálculo e fontes */}
+                    <CalculationSteps isBolus steps={bolusResult?.steps} />
+                    <SourcesFootnote drug={drug} />
                 </div>
             )}
         </div>

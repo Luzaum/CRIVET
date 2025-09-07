@@ -1,14 +1,6 @@
 
-export enum Species {
-  Dog = 'Cão',
-  Cat = 'Gato',
-}
-
-export enum PatientState {
-  Young = 'Filhote',
-  Adult = 'Adulto',
-  Senior = 'Idoso',
-}
+// Re-export dos novos enums
+export { Species, PatientState } from './types/enums';
 
 export interface Patient {
   species: Species;
@@ -79,11 +71,12 @@ export enum WarningType {
 export interface DrugInfo {
     indicationSummary: string[];
     dosesText: {
-        dog: { cri: string; bolus?: string };
-        cat: { cri: string; bolus?: string };
+        dog: { cri?: string; bolus?: string };
+        cat: { cri?: string; bolus?: string };
         notes?: string;
     };
     mechanism?: string;
+    preferredUnit?: string;
     diluents: {
         recommended: FluidType[];
         notes?: string;
@@ -92,6 +85,9 @@ export interface DrugInfo {
         incompatibilities?: string[];
         ySite?: string[];
         notes?: string;
+        preferred?: string;
+        compatible?: string[];
+        avoid?: string[];
     };
     photoprotection: boolean;
     adjustments: {
@@ -142,7 +138,7 @@ export interface ComboDetails {
     notes?: string;
 }
 
-export type FluidType = 'NaCl 0.9%' | 'Ringer Lactato' | 'SG 5%';
+export type FluidType = 'NaCl 0.9%' | 'Ringer Lactato' | 'SG 5%' | 'Glicose 5%' | 'Glicose 10%' | 'Oral';
 
 export type Vehicle = 
   | { type: 'syringe'; volume: number }

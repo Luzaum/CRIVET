@@ -1,3 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Claro: fundo claro, UI azul-escuro CRI-VET */
+    --background: 0 0% 100%;
+    --foreground: 220 26% 14%; /* cinza-azulado escuro */
+    --muted: 217 33% 96%;
+    --muted-foreground: 218 15% 42%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 26% 14%;
+    --border: 218 24% 90%;
+    --input: 218 24% 90%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 26% 14%;
+    --primary: 222 85% 31%;        /* azul escuro */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 216 34% 94%;
+    --secondary-foreground: 222 30% 20%;
+    --accent: 215 92% 60%;         /* azul claro para detalhes */
+    --accent-foreground: 222 47% 12%;
+    --destructive: 0 75% 45%;
+    --destructive-foreground: 210 40% 98%;
+    --ring: 222 85% 31%;
+    --radius: 0.5rem;
+  }
+
+  :root[class~="dark"] {
+    /* Escuro: fundo escuro, UI azul-clara */
+    --background: 224 71% 6%;
+    --foreground: 215 32% 92%;
+    --muted: 223 36% 14%;
+    --muted-foreground: 215 18% 68%;
+    --accent: 217 92% 75%;        /* azul claro */
+    --accent-foreground: 224 71% 6%;
+    --popover: 224 71% 6%;
+    --popover-foreground: 215 32% 92%;
+    --border: 220 24% 22%;
+    --input: 220 24% 22%;
+    --card: 224 71% 6%;
+    --card-foreground: 215 32% 92%;
+    --primary: 217 92% 75%;
+    --primary-foreground: 224 71% 6%;
+    --secondary: 220 24% 18%;
+    --secondary-foreground: 215 32% 92%;
+    --destructive: 0 75% 45%;
+    --destructive-foreground: 210 40% 98%;
+    --ring: 217 92% 75%;
+    --radius: 0.5rem;
+  }
+}
+
 /* Untitled UI-ish tokens and dark mode helpers */
 :root {
   color-scheme: light dark;
