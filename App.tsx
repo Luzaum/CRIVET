@@ -28,6 +28,8 @@ import TextField from '@mui/material/TextField';
 import { Species, PatientState, Patient, Drug, CriDose, BolusDose, DrugConcentration, CriDoseUnit, BolusDoseUnit, Vehicle, WarningType, FluidType } from './types';
 import { NumberFieldBR } from './components/inputs/NumberFieldBR';
 import { classifyCriDose, classifyBolusDose } from './utils/rangeClassifier';
+import { DoseCRICard, RecRange, formatDoseLocale, parseDoseLocale, clamp } from './components/DoseSelector';
+import { convertDose, convertRange, buildAbs, type DoseUnit } from './utils/doseUnits';
 // import { getCompatibilityLevel } from './utils/compatibility'; // Removido - não existe mais
 import { RangeAlert } from './components/alerts/RangeAlert';
 import { SourcesFootnote } from './components/alerts/SourcesFootnote';
@@ -521,6 +523,7 @@ export default function App() {
     const [calculationMode, setCalculationMode] = useState<'cri' | 'bolus'>('cri');
 
     const [criDose, setCriDose] = useState(0);
+    const [criDoseText, setCriDoseText] = useState(formatDoseLocale(0));
     const [vehicle, setVehicle] = useState<Vehicle>({ type: 'syringe', volume: 60 });
     const [infusionDuration, setInfusionDuration] = useState(12);
     
@@ -529,6 +532,9 @@ export default function App() {
     const [showCompatibilityGuide, setShowCompatibilityGuide] = useState(false);
     const [infoModalDrug, setInfoModalDrug] = useState<Drug | null>(null);
     const [customCriUnit, setCustomCriUnit] = useState<DrugUnit>('mcg/kg/min');
+    
+    // Referência para a unidade anterior (para conversão)
+    const unitRef = useRef<DoseUnit>(customCriUnit as DoseUnit);
 
     const doseAdjustment = useMemo(() => {
         if (!selectedDrug || selectedDrug.isCombo) {
@@ -617,6 +623,32 @@ export default function App() {
             setCriDose(0);
         }
     }, [selectedCriDose, doseAdjustment]);
+
+    // Sincroniza o texto formatado com a dose
+    useEffect(() => {
+        setCriDoseText(formatDoseLocale(criDose));
+    }, [criDose]);
+
+    // Conversão de unidade mantendo equivalência farmacológica
+    useEffect(() => {
+        if (unitRef.current !== customCriUnit) {
+            setCriDose((prev) => convertDose(prev, unitRef.current, customCriUnit as DoseUnit));
+            unitRef.current = customCriUnit as DoseUnit;
+        }
+    }, [customCriUnit]);
+
+    // Função para lidar com mudanças no input de dose
+    const handleDoseInputChange = (text: string) => {
+        setCriDoseText(text);
+        const parsed = parseDoseLocale(text);
+        
+        // Obter faixa recomendada e calcular range absoluto
+        const r = getRangeForUnit(selectedDrug as any, customCriUnit);
+        const rec = r.min === 0 && r.max === 0 ? { min: 0, max: 0 } : r;
+        const abs = buildAbs(rec);
+        
+        setCriDose(clamp(parsed, abs.min, abs.max));
+    };
     
     const adjustedCriRange = useMemo(() => {
         if (!selectedCriDose) return null;
@@ -923,62 +955,65 @@ export default function App() {
                                       unit={customCriUnit}
                                       onChange={(u) => setCustomCriUnit(u)}
                                     />
+                                    
+                                    {/* Campo Dose (CRI) com two-way binding */}
                                     <div className="mt-3">
                                       <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">
                                         Dose (CRI)
                                       </label>
-                                      {(() => {
-                                        const r = getRangeForUnit(selectedDrug as any, customCriUnit);
-                                        const step = r.max > 10 ? 0.1 : r.max > 1 ? 0.01 : 0.001;
-                                        
-                                        // Se não há faixa definida, não mostra o slider
-                                        if (r.min === 0 && r.max === 0) {
-                                          return (
-                                            <div className="space-y-3">
-                                              <NumberFieldBR
-                                                value={Number.isFinite(criDose) ? criDose : null}
-                                                onChange={(v) => setCriDose(v ?? 0)}
-                                                decimals={3}
-                                                className="w-full"
-                                              />
-                                              <div className="text-xs text-muted-foreground">
-                                                Faixa não definida para esta unidade
-                                              </div>
-                                            </div>
-                                          );
-                                        }
-                                        
-                                        return (
-                                          <div className="space-y-3">
-                                            <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
-                                              <input
-                                                type="range"
-                                                min={r.min}
-                                                max={r.max}
-                                                step={step}
-                                                value={Math.max(r.min, Math.min(r.max, criDose))}
-                                                onChange={(e) => setCriDose(parseFloat(e.target.value) || r.min)}
-                                                className="md:col-span-4 w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer slider"
-                                                style={{
-                                                  background: `linear-gradient(to right, #1e40af 0%, #1e40af ${((Math.max(r.min, Math.min(r.max, criDose)) - r.min) / (r.max - r.min)) * 100}%, #e2e8f0 ${((Math.max(r.min, Math.min(r.max, criDose)) - r.min) / (r.max - r.min)) * 100}%, #e2e8f0 100%)`
-                                                }}
-                                              />
-                                              <NumberFieldBR
-                                                value={Number.isFinite(criDose) ? criDose : null}
-                                                onChange={(v) => setCriDose(v ?? r.min)}
-                                                decimals={3}
-                                                className="md:col-span-2"
-                                              />
-                                            </div>
-                                            <div className="flex justify-between text-xs text-muted-foreground">
-                                              <span>{r.min} {customCriUnit}</span>
-                                              <span className="font-medium">Faixa do fármaco</span>
-                                              <span>{r.max} {customCriUnit}</span>
-                                            </div>
-                                          </div>
-                                        );
-                                      })()}
+                                      <input
+                                        value={criDoseText}
+                                        onChange={(e) => handleDoseInputChange(e.target.value)}
+                                        inputMode="decimal"
+                                        className="w-full p-2 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200"
+                                        placeholder="0"
+                                      />
                                     </div>
+
+                                    {/* DoseCRICard integrado */}
+                                    {(() => {
+                                      // 1) Backend manda a faixa numa unidade canônica (mg/kg/h)
+                                      const guidelineRecBaseMgPerKgPerH: Record<string, RecRange | null> = {
+                                        ketamine: { min: 1, max: 3 }, // EXEMPLO - ajuste conforme seus dados
+                                        morphine: { min: 0.1, max: 0.3 },
+                                        fentanyl: { min: 0.002, max: 0.01 },
+                                        lidocaine: { min: 0.5, max: 2 },
+                                        // Adicione outras drogas conforme necessário
+                                      };
+                                      
+                                      // 2) Obter faixa base e converter para unidade atual
+                                      const unit: DoseUnit = customCriUnit as DoseUnit;
+                                      const drugId = selectedDrug?.id || '';
+                                      const baseRec = guidelineRecBaseMgPerKgPerH[drugId];
+                                      
+                                      // Se não houver faixa, passe {0,0}; se houver, CONVERTA:
+                                      const rec = baseRec ? convertRange(baseRec, "mg/kg/h", unit) : { min: 0, max: 0 };
+                                      
+                                      // 3) Range absoluto coerente (2x o máximo recomendado)
+                                      const abs = buildAbs(rec);
+                                      
+                                      // 4) Presets na mesma unidade (exemplo)
+                                      const presets = unit === "mcg/kg/min" ? [16.67, 33.33, 50, 66.67, 83.33] : 
+                                                     unit === "mg/kg/h" ? [1, 1.5, 2, 2.5, 3] :
+                                                     unit === "mcg/kg/h" ? [1000, 1500, 2000, 2500, 3000] : undefined;
+
+                                      return (
+                                        <DoseCRICard
+                                          title="Seletor de Dose"
+                                          unit={unit}
+                                          dose={criDose}
+                                          onDoseChange={setCriDose}
+                                          rec={rec}        // ← JÁ CONVERTIDA P/ A UNIDADE ATUAL
+                                          abs={abs}        // ← COERENTE (ex.: 2× o topo recomendado)
+                                          presets={presets} // presets NA MESMA UNIDADE
+                                          onStatusChange={(status) => {
+                                            // opcional: enviar telemetria/validar formulário
+                                            // status = "low" | "in" | "high"
+                                            console.log(`Dose status: ${status}`);
+                                          }}
+                                        />
+                                      );
+                                    })()}
                                   </div>
                                 )}
                                 

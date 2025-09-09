@@ -29,25 +29,27 @@ export function DoseUnitSelector({
 }) {
   const preferred = (drug?.cri?.preferredUnit ?? "mcg/kg/min") as DrugUnit;
   return (
-    <div className="flex flex-wrap gap-2 items-center">
+    <div className="flex justify-center gap-1 items-center w-full">
       {UNITS.map((u) => (
         <button
           key={u}
           type="button"
           onClick={() => onChange(u)}
           className={cn(
-            "px-3 py-1.5 rounded-md border text-sm transition",
+            "flex-1 px-2 py-1.5 rounded-md border text-sm transition text-center",
             unit === u
-              ? "bg-primary text-primary-foreground"
-              : "bg-secondary hover:bg-accent"
+              ? "bg-primary text-primary-foreground border-primary"
+              : "bg-secondary hover:bg-accent border-border"
           )}
         >
-          {u}
-          {u === preferred && (
-            <Badge variant="secondary" className="ml-2 text-[10px]">
-              unidade recomendada
-            </Badge>
-          )}
+          <div className="flex flex-col items-center gap-1">
+            <span>{u}</span>
+            {u === preferred && (
+              <Badge variant="secondary" className="text-[9px] px-1 py-0">
+                unidade recomendada
+              </Badge>
+            )}
+          </div>
         </button>
       ))}
     </div>
