@@ -1,0 +1,14 @@
+[33m66e03f7[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfix/rollback-ui-CRIVET[m[33m, [m[1;32mfix/revert-broken-ui[m[33m)[m HEAD@{Sat Sep 6 02:20:34 2025}: checkout: moving from fix/revert-broken-ui to fix/rollback-ui-CRIVET
+[33m66e03f7[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfix/rollback-ui-CRIVET[m[33m, [m[1;32mfix/revert-broken-ui[m[33m)[m HEAD@{Sat Sep 6 02:12:08 2025}: commit: Revert UI breakage; restore entrypoint, favicon, and background layering
+[33m89d4504[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{Sat Sep 6 02:07:38 2025}: reset: moving to origin/main
+[33m89d4504[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{Sat Sep 6 02:07:27 2025}: reset: moving to HEAD
+[33m89d4504[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{Sat Sep 6 02:07:22 2025}: checkout: moving from main to fix/revert-broken-ui
+[33m89d4504[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{Wed Aug 20 19:11:36 2025}: commit: 5
+[33m20bddd3[m HEAD@{Tue Aug 19 23:00:41 2025}: commit: 33
+[33m63db711[m HEAD@{Tue Aug 12 00:24:31 2025}: commit: dfgdfg
+[33mc2a4f44[m HEAD@{Tue Aug 12 00:01:04 2025}: commit: j
+[33m6964f0d[m HEAD@{Mon Aug 11 22:45:41 2025}: commit: fv
+[33m67143c3[m HEAD@{Mon Aug 11 22:13:15 2025}: commit: Update drugs.ts
+[33m37f1f76[m HEAD@{Mon Aug 11 21:52:22 2025}: commit: aaa
+[33m3dec642[m HEAD@{Mon Aug 11 21:40:16 2025}: commit: 443
+[33m9188ac4[m HEAD@{Mon Aug 11 20:42:04 2025}: commit (initial): Initial commit

@@ -3,6 +3,92 @@ import { Drug, CriDoseUnit, BolusDoseUnit, WarningType, FluidType } from '../typ
 export const DRUGS: Drug[] = [
   // --- Analgésicos e Anestésicos ---
   {
+    id: 'lidocaina',
+    name: 'Lidocaína',
+    category: 'Analgésicos e Anestésicos',
+    concentrations: [{ value: 20, unit: 'mg/mL', label: '2% (20 mg/mL)' }],
+    cri: {
+      preferredUnit: 'mcg/kg/min',
+      ranges: [
+        { unit: 'mcg/kg/min', min: 25, max: 80 },
+        { unit: 'mcg/kg/h',   min: 1500, max: 4800 },
+        { unit: 'mg/kg/h',    min: 1.5,  max: 4.8 },
+      ],
+      compatibility: {
+        preferred: 'rl',
+        compatible: ['sf','d5'],
+        avoid: ['d25'],
+        notes: '⚠️ Não usar formulações com epinefrina IV.'
+      }
+    },
+    bolus: {
+      allowed: true,
+      ranges: [
+        { unit: 'mg/kg',  min: 1, max: 2 },
+        { unit: 'mcg/kg', min: 1000, max: 2000 }
+      ],
+      notes: 'Administrar lentamente; dose cumulativa até 8 mg/kg.'
+    },
+    cautions: [{ level: 'caution', text: 'Monitorar ECG durante administração.' }],
+    references: [
+      { source: "Plumb's Veterinary Drug Handbook", pages: "10ª ed., 756–760" },
+      { source: "BSAVA Small Animal Formulary A (10ª)", pages: "Lidocaína" }
+    ],
+    monograph: {
+      mechanism:
+        "Anestésico local tipo amida e antiarrítmico Classe IB. Bloqueia canais de sódio dependentes de voltagem (anestesia local). Sistêmica: liga-se a canais de Na+ inativados em tecido ventricular isquêmico/taquiárdico, encurtando potencial de ação e período refratário. Em doses subanestésicas possui efeitos anti-inflamatórios e antinociceptivos.",
+      indications:
+        "CÃES E GATOS — Anestesia local/regional (bloqueios, infiltrativa, epidural, dessensibilização de laringe em gatos). Arritmias ventriculares em cães (CVPs, TV). Analgesia sistêmica em CRI no trans/pós-operatório (reduz MAC de inalatórios e uso de opioides).",
+      contraindications:
+        "Evitar em gatos sensíveis ou com doença cardíaca/convulsões sem monitorização rigorosa. NÃO utilizar formulações com epinefrina por via IV. Cautela em doença hepática (metabolização) e insuficiência cardíaca; ajustar dose em insuficiência renal quando houver comorbidades associadas.",
+      criNotes:
+        "Doses (cães – analgesia): 25–80 mcg/kg/min OU 1500–4800 mcg/kg/h OU 1,5–4,8 mg/kg/h. Unidade mais usada: mcg/kg/min (titulável finamente). Manter 24–72 h conforme resposta e monitorização.",
+      bolusNotes:
+        "Antiarrítmico/analgesia: 1–2 mg/kg IV lento; pode repetir até dose cumulativa de 8 mg/kg. Equivalente: 1000–2000 mcg/kg.",
+      dilution:
+        "CRI: compatível com RL, SF 0,9% e Glicose 5%. Ex.: calcular dose (mg/kg/h) × peso × 24 h → volume (mL) = dose total (mg) / concentração (mg/mL); adicionar à bolsa do paciente. Bólus: costuma-se usar Lidocaína 2% sem conservantes, IV lento.",
+      compatibility:
+        "Compatível: RL (preferido), SF 0,9%, G5%. Incompatível com formulações que contenham epinefrina para uso IV (risco de arritmias ventriculares).",
+      presentations:
+        "Xylestesin® 2% (20 mg/mL, sem vasoconstritor); genéricos 2% (20 mg/mL); Xylestesin® 2% com epinefrina — uso exclusivamente local (NÃO USAR IV).",
+      alerts:
+        "🚨 NUNCA usar apresentações com epinefrina IV. Monitorar ECG, pressão e estado neurológico. Suspender se sinais de toxicidade (convulsões, depressão miocárdica).",
+      references:
+        "Plumb's Veterinary Drug Handbook (10ª), BSAVA Small Animal Formulary (Parte A, 10ª), Textbook of Small Animal Emergency Medicine (Drobatz et al.), Small Animal Clinical Pharmacology and Therapeutics (2ª)."
+    },
+    criDoses: [
+      { species: 'dog', cri: { min: 25, max: 80, default: 40, unit: CriDoseUnit.mcg_kg_min } },
+      { species: 'cat', cri: { min: 15, max: 50, default: 25, unit: CriDoseUnit.mcg_kg_min } },
+    ],
+    bolusDoses: [
+      { species: 'dog', min: 1, max: 2, unit: BolusDoseUnit.mg_kg },
+      { species: 'cat', min: 0.5, max: 1, unit: BolusDoseUnit.mg_kg },
+    ],
+    info: {
+      indicationSummary: ["Analgesia sistêmica multimodal (CRI)", "Tratamento de taquiarritmias ventriculares (em cães)", "Anestesia local/epidural/bloqueios regionais"],
+      mechanism: "Bloqueio de canais de sódio dependentes de voltagem (anestésico local, analgesia). Antiarrítmico classe IB — encurta potencial de ação em tecido ventricular isquêmico. Efeito anti-inflamatório e modulação de dor neuropática em doses subanestésicas.",
+      preferredUnit: "mcg/kg/min",
+      dosesText: {
+        dog: { cri: "25–80 μg/kg/min", bolus: "1–2 mg/kg IV" },
+        cat: { cri: "15–50 μg/kg/min", bolus: "0.5–1 mg/kg IV" },
+        notes: "CRI pode ser mantida por 24–72 h conforme resposta. Compatível com RL (preferido), SF 0,9% e G5%. Gatos são mais sensíveis aos efeitos sistêmicos."
+      },
+      diluents: { recommended: ['Ringer Lactato', 'NaCl 0.9%', 'SG 5%'] },
+      photoprotection: false,
+      compatibility: { ySite: ["Fentanil", "Midazolam", "Cetamina", "Propofol", "Metadona"] },
+      adjustments: {
+        hepatic: "Lidocaína é metabolizada no fígado → risco de acumulação/toxicidade. Reduzir dose em 25-50% em hepatopatas.",
+        pediatric: "Filhotes podem ter metabolismo hepático imaturo; usar com cautela.",
+        geriatric: "Idosos podem ter clearance reduzido; titular com cuidado.",
+        cardiac: "Evitar em bloqueios de condução não monitorados; titular lentamente. Monitorar ECG."
+      },
+      monitoring: ["ECG (especialmente em doses antiarrítmicas)", "Sinais de toxicidade (convulsões, depressão)", "Pressão arterial", "Frequência cardíaca"],
+      goodPractice: ["Administrar lentamente IV para bólus", "Dose cumulativa máxima ~8 mg/kg", "Não usar formulações com epinefrina por via IV (risco de arritmias)", "CRI pode ser mantida por 24–72 h"],
+      contraindications: ["❌ Não usar apresentações com epinefrina por via IV", "Evitar em bloqueios AV significativos sem monitoração"],
+      citations: ["Plumb's Veterinary Drug Handbook, 10th ed.", "BSAVA Small Animal Formulary, Part A (10th ed.)", "Textbook of Small Animal Emergency Medicine (Drobatz et al.)", "Small Animal Clinical Pharmacology and Therapeutics (2nd ed.)"]
+    }
+  },
+  {
     id: 'fentanyl',
     name: 'Fentanil',
     category: 'Analgésicos e Anestésicos',
@@ -226,29 +312,131 @@ export const DRUGS: Drug[] = [
     id: 'ketamine',
     name: 'Cetamina',
     category: 'Analgésicos e Anestésicos',
-    concentrations: [{ value: 100, unit: 'mg/mL', label: '100 mg/mL' }],
-    criDoses: [{ species: 'both', cri: { min: 2, max: 20, default: 10, unit: CriDoseUnit.mcg_kg_min }, recommendedBagInfusionTime: 24 }],
-    bolusDoses: [
-      { species: 'both', min: 0.25, max: 0.5, unit: BolusDoseUnit.mg_kg },
+    concentrations: [
+      { value: 50, unit: 'mg/mL', label: 'Cetamin® 50 mg/mL' },
+      { value: 100, unit: 'mg/mL', label: 'Cetamin® 100 mg/mL' },
+      { value: 100, unit: 'mg/mL', label: 'Dopalen® 100 mg/mL' },
+      { value: 100, unit: 'mg/mL', label: 'Vetanarcol® 100 mg/mL' }
     ],
+    criDoses: [
+      { 
+        species: 'both', 
+        cri: { min: 2, max: 10, default: 5, unit: CriDoseUnit.mcg_kg_min },
+        useCase: 'Analgesia trans e pós-operatória',
+        notes: 'Dose mais comum: 2-10 mcg/kg/min. Unidade mcg/kg/min é mais prática para titulação em bombas de infusão.'
+      },
+      { 
+        species: 'both', 
+        cri: { min: 120, max: 600, default: 300, unit: CriDoseUnit.mcg_kg_h },
+        useCase: 'Analgesia contínua',
+        notes: 'Equivalente: 120-600 mcg/kg/h'
+      },
+      { 
+        species: 'both', 
+        cri: { min: 0.12, max: 0.6, default: 0.3, unit: CriDoseUnit.mg_kg_h },
+        useCase: 'Analgesia contínua',
+        notes: 'Equivalente: 0.12-0.6 mg/kg/h'
+      }
+    ],
+    bolusDoses: [
+      { 
+        species: 'both', 
+        min: 0.25, max: 1, unit: BolusDoseUnit.mg_kg,
+        useCase: 'Indução anestésica, sedação química',
+        notes: 'Administrar lentamente. Dose cumulativa pode chegar a 1 mg/kg.'
+      },
+      { 
+        species: 'both', 
+        min: 250, max: 1000, unit: BolusDoseUnit.mcg_kg,
+        useCase: 'Indução anestésica, sedação química',
+        notes: 'Equivalente: 250-1000 mcg/kg'
+      }
+    ],
+    preparationGuide: `Preparo para CRI (Taxa de 1 mL/kg/hora):<br/>
+<table class="w-full border-collapse border border-slate-300 mt-2">
+  <thead>
+    <tr class="bg-slate-100 dark:bg-slate-800">
+      <th class="border border-slate-300 p-2 text-left">Volume da Bolsa</th>
+      <th class="border border-slate-300 p-2 text-left">Cetamina (100mg/mL)</th>
+      <th class="border border-slate-300 p-2 text-left">Concentração Final</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="border border-slate-300 p-2">250 mL</td>
+      <td class="border border-slate-300 p-2">1,2 mL</td>
+      <td class="border border-slate-300 p-2">0,48 mg/mL</td>
+    </tr>
+    <tr>
+      <td class="border border-slate-300 p-2">500 mL</td>
+      <td class="border border-slate-300 p-2">2,4 mL</td>
+      <td class="border border-slate-300 p-2">0,48 mg/mL</td>
+    </tr>
+    <tr>
+      <td class="border border-slate-300 p-2">1000 mL</td>
+      <td class="border border-slate-300 p-2">4,8 mL</td>
+      <td class="border border-slate-300 p-2">0,48 mg/mL</td>
+    </tr>
+  </tbody>
+</table>
+<strong>Diluição para Bolus:</strong> 1:1 ou 1:2 com solução salina estéril para facilitar administração lenta.`,
     info: {
-        indicationSummary: ["Analgésico dissociativo (antagonista NMDA) para analgesia somática, prevenção do 'wind-up' e da tolerância a opioides. Componente chave da analgesia multimodal (MLK/FLK)."],
+        indicationSummary: [
+          "Anestésico dissociativo - antagonista não competitivo dos receptores NMDA",
+          "Analgesia somática e prevenção da hiperalgesia e sensibilização central",
+          "Componente essencial da analgesia multimodal (MLK/FLK)",
+          "Sedação química para procedimentos diagnósticos"
+        ],
+        mechanism: "Antagonismo não competitivo dos receptores N-metil-D-aspartato (NMDA) no SNC. Causa desconexão funcional entre sistema límbico e reticular, resultando em catalepsia, amnésia e analgesia. Bloqueio dos receptores NMDA é crucial para modulação da dor crônica e hiperalgesia.",
         dosesText: {
-            dog: { cri: "10-20 µg/kg/min (0.6-1.2 mg/kg/h)", bolus: "0.25-0.5 mg/kg IV" },
-            cat: { cri: "2-5 µg/kg/min (0.12-0.3 mg/kg/h)", bolus: "0.25-0.5 mg/kg IV" }
+            dog: { 
+              cri: "2-10 mcg/kg/min (mais comum) OU 120-600 mcg/kg/h OU 0.12-0.6 mg/kg/h", 
+              bolus: "0.25-1 mg/kg IV lento (250-1000 mcg/kg)" 
+            },
+            cat: { 
+              cri: "2-10 mcg/kg/min (mais comum) OU 120-600 mcg/kg/h OU 0.12-0.6 mg/kg/h", 
+              bolus: "0.25-1 mg/kg IV lento (250-1000 mcg/kg)" 
+            },
+            notes: "Unidade mcg/kg/min é mais prática para titulação em bombas de infusão. CRI pode ser mantida por 12-24h no pós-operatório."
         },
-        diluents: { recommended: ['NaCl 0.9%', 'SG 5%', 'Ringer Lactato'] },
+        diluents: { 
+          recommended: ['NaCl 0.9%', 'SG 5%', 'Ringer Lactato'],
+          notes: "Compatível com RL, SF 0,9% e Glicose 5%. Para bolus: diluir 1:1 ou 1:2 com solução salina."
+        },
         photoprotection: false,
-        compatibility: { incompatibilities: ["Barbitúricos", "Diazepam (pode precipitar)"], ySite: ["Morfina", "Fentanil", "Lidocaína"] },
+        compatibility: { 
+          incompatibilities: ["Barbitúricos", "Diazepam (pode precipitar na mesma seringa)"], 
+          ySite: ["Morfina", "Fentanil", "Lidocaína", "Midazolam"] 
+        },
         adjustments: {
             renal: "Metabólitos são excretados pelos rins. Reduzir dose em 25-50% em insuficiência renal.",
             cardiac: "Aumenta FC e PA. Usar com cautela em cardiomiopatia hipertrófica ou doença cardíaca severa.",
             neuro: "Usar com cautela em pacientes com aumento da pressão intracraniana.",
+            pediatric: "Maior sensibilidade em filhotes. Iniciar com doses menores.",
+            geriatric: "Idosos podem ter maior sensibilidade. Titular cuidadosamente."
         },
-        monitoring: ["Frequência cardíaca", "Pressão arterial", "Qualidade da recuperação (pode causar disforia)"],
-        goodPractice: ["Sempre usada em combinação com opioides e/ou lidocaína (MLK/FLK) para analgesia multimodal e para mitigar efeitos disfóricos."],
-        contraindications: ["Cardiomiopatia hipertrófica obstrutiva (CMHo)", "Hipertensão sistêmica grave não controlada."],
-        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
+        monitoring: [
+          "Frequência cardíaca e pressão arterial",
+          "Qualidade da recuperação (pode causar disforia)",
+          "Nível de consciência e reflexos",
+          "Função respiratória"
+        ],
+        goodPractice: [
+          "Sempre usar em combinação com opioides e/ou lidocaína (MLK/FLK) para analgesia multimodal",
+          "Mitigar efeitos disfóricos com benzodiazepínicos",
+          "Combinação com relaxante muscular essencial para evitar rigidez muscular",
+          "Titular conforme necessidade analgésica do paciente"
+        ],
+        contraindications: [
+          "Cardiomiopatia hipertrófica obstrutiva (CMHo)",
+          "Hipertensão sistêmica grave não controlada",
+          "Aumento da pressão intracraniana"
+        ],
+        citations: [
+          "Plumb's Veterinary Drug Handbook, 10th Ed. (páginas 717-721)",
+          "BSAVA Small Animal Formulary, Part A, Canine and Feline, 10th Ed.",
+          "Small Animal Clinical Pharmacology and Therapeutics, 2nd Ed."
+        ]
     }
   },
 
@@ -713,7 +901,7 @@ export const DRUGS: Drug[] = [
       },
       photoprotection: false,
       compatibility: { 
-        incompatibilidades: ["Soluções alcalinas"], 
+        incompatibilities: ["Soluções alcalinas"], 
         ySite: ["Dobutamina", "Fentanil"] 
       },
       adjustments: {
@@ -1217,6 +1405,39 @@ export const DRUGS: Drug[] = [
     bolusDoses: [
       { species: 'dog', min: 1, max: 2, unit: BolusDoseUnit.mg_kg, notes: "Dose de ataque antiarrítmica. Administrar em alíquotas de 0.5 mg/kg até o efeito (máx 8 mg/kg total)." },
       { species: 'cat', min: 0.25, max: 0.75, unit: BolusDoseUnit.mg_kg, infusionTimeMin: 5, notes: "Risco de toxicidade neurológica e cardiovascular. Administrar muito lentamente." },
+    ],
+    cri: {
+      preferredUnit: 'mcg/kg/min',
+      ranges: [
+        { unit: 'mcg/kg/min', min: 25, max: 80, typical: 50 },
+        { unit: 'mg/kg/h', min: 1.5, max: 4.8, typical: 3.0 },
+        { unit: 'mcg/kg/h', min: 1500, max: 4800, typical: 3000 },
+      ],
+      titrationNotes: 'Analgesia sistêmica e arritmias; titular ao efeito.',
+      compatibility: {
+        preferred: 'rl',
+        compatible: ['sf', 'd5'],
+        avoid: ['d25'],
+        notes: 'Não usar formulações com epinefrina IV.',
+      },
+    },
+    bolus: {
+      allowed: true,
+      ranges: [
+        { unit: 'mg/kg', min: 1, max: 2, typical: 1.5 },
+        { unit: 'mcg/kg', min: 1000, max: 2000, typical: 1500 },
+      ],
+      notes: 'Administrar lentamente; dose cumulativa máx. 8 mg/kg.',
+    },
+    cautions: [
+      { level: 'caution', text: 'Monitorar ECG; NÃO usar com epinefrina IV.' },
+    ],
+    mechanism: 'Bloqueio de canais de sódio (Classe IB).',
+    indications: 'Analgesia sistêmica, arritmias ventriculares, anestesia local.',
+    contraindications: 'Bradicardia grave, bloqueios AV de alto grau, insuf. hepática grave.',
+    references: [
+      { source: "Plumb's Veterinary Drug Handbook", pages: '756–760' },
+      { source: 'BSAVA Small Animal Formulary (10ª ed.)' },
     ],
     info: {
         indicationSummary: ["Antiarrítmico (Classe IB) para taquicardias ventriculares, e analgesia sistêmica em cães."],
@@ -1901,6 +2122,48 @@ export const DRUGS: Drug[] = [
         monitoring: ["ECG se houver risco de arritmia"],
         goodPractice: ["Administrar bolus IV lentamente (2-5 minutos) para evitar hipotensão e tontura."],
         citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
+    }
+  },
+  {
+    id: 'lidocaina',
+    name: 'Lidocaína',
+    category: 'Analgésicos e Anestésicos',
+    concentrations: [{ value: 20, unit: 'mg/mL', label: '2% (20 mg/mL)' }],
+    criDoses: [
+      { species: 'dog', cri: { min: 25, max: 80, default: 40, unit: CriDoseUnit.mcg_kg_min } },
+      { species: 'cat', cri: { min: 20, max: 50, default: 30, unit: CriDoseUnit.mcg_kg_min } },
+    ],
+    bolusDoses: [
+      { species: 'dog', min: 1, max: 2, unit: BolusDoseUnit.mg_kg },
+      { species: 'cat', min: 0.5, max: 1, unit: BolusDoseUnit.mg_kg },
+    ],
+    info: {
+      indicationSummary: ["Analgesia sistêmica multimodal (CRI)", "Tratamento de taquiarritmias ventriculares (em cães)", "Anestesia local/epidural/bloqueios regionais"],
+      mechanism: "Bloqueio de canais de sódio dependentes de voltagem (anestésico local, analgesia). Antiarrítmico classe IB — encurta potencial de ação em tecido ventricular isquêmico. Efeito anti-inflamatório e modulação de dor neuropática em doses subanestésicas.",
+      dosesText: {
+        dog: { cri: "25–80 μg/kg/min", bolus: "1–2 mg/kg IV" },
+        cat: { cri: "20–50 μg/kg/min", bolus: "0.5–1 mg/kg IV" },
+        notes: "CRI pode ser mantida por 24–72 h conforme resposta. Compatível com RL (preferido), SF 0,9% e G5%."
+      },
+      diluents: { recommended: ['Ringer Lactato', 'NaCl 0.9%', 'SG 5%'] },
+      photoprotection: false,
+      compatibility: { 
+        ySite: ["Fentanil", "Midazolam", "Cetamina", "Propofol"],
+        preferred: 'rl',
+        compatible: ['sf', 'd5'],
+        avoid: [],
+        notes: 'Não utilizar formulações com epinefrina por via IV (risco de arritmias).'
+      },
+      adjustments: {
+        hepatic: "Lidocaína é metabolizada no fígado → risco de acumulação/toxicidade. Reduzir dose em 25-50%.",
+        pediatric: "Filhotes podem ter metabolização hepática reduzida; iniciar com doses mais baixas.",
+        geriatric: "Idosos podem ter clearance hepático reduzido; titular com cautela.",
+        cardiac: "Evitar em bloqueios de condução não monitorados; titular lentamente. Monitorar ECG."
+      },
+      monitoring: ["ECG", "Frequência cardíaca", "Pressão arterial", "Sinais de toxicidade (convulsões, depressão)"],
+      goodPractice: ["Administrar bolus IV lentamente (2-5 minutos)", "CRI pode ser mantida por 24–72 h conforme resposta", "Não usar apresentações com epinefrina por via IV"],
+      contraindications: ["Bloqueios AV significativos sem monitoração", "Hipersensibilidade conhecida", "❌ Não usar apresentações com epinefrina por via IV"],
+      citations: ["Plumb's Veterinary Drug Handbook, 10th ed.", "BSAVA Small Animal Formulary, Part A (10th ed.)", "Textbook of Small Animal Emergency Medicine (Drobatz et al.)", "Small Animal Clinical Pharmacology and Therapeutics (2nd ed.)"]
     }
   },
 ];

@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calculadora de CRI Veterinária</title>
     <script>
+      (function () {
+        try {
+          const key = 'cri-vet-theme';
+          const stored = localStorage.getItem(key) || 'system';
+          const mq = window.matchMedia('(prefers-color-scheme: dark)');
+          const effective = stored === 'dark' || (stored === 'system' && mq.matches) ? 'dark' : 'light';
+          const root = document.documentElement;
+          root.setAttribute('data-theme', effective);
+          // Tailwind dark: também responde a .dark
+          if (effective === 'dark') root.classList.add('dark'); else root.classList.remove('dark');
+        } catch {}
+      })();
+    </script>
+    <script>
       window.tailwind = {
         config: {
           darkMode: 'class'

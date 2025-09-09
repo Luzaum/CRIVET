@@ -1,0 +1,78 @@
+{
+  "id": "lidocaina-indicacoes",
+  "name": "Lidocaína\n\nINDICAÇÕES",
+  "classes": [
+    "anesthetics"
+  ],
+  "concentrations": [
+    {
+      "label": "20 mg/mL",
+      "value": 20,
+      "unit": "mg/mL"
+    }
+  ],
+  "criDoses": [
+    {
+      "species": "both",
+      "cri": {
+        "unit": "mcg/kg/min",
+        "min": 25,
+        "max": 75
+      }
+    },
+    {
+      "species": "both",
+      "cri": {
+        "unit": "mg/kg/h",
+        "min": 1.5,
+        "max": 4.5
+      }
+    },
+    {
+      "species": "both",
+      "cri": {
+        "unit": "mcg/kg/min",
+        "min": 10,
+        "max": 40
+      }
+    },
+    {
+      "species": "both",
+      "cri": {
+        "unit": "mg/kg/h",
+        "min": 0.6,
+        "max": 2.4
+      }
+    }
+  ],
+  "bolusDoses": [
+    {
+      "species": "both",
+      "unit": "mg/kg",
+      "min": 2,
+      "max": 4
+    },
+    {
+      "species": "both",
+      "unit": "mg/kg",
+      "min": 0.5,
+      "max": 1
+    }
+  ],
+  "compatibility": {
+    "preferred": "Ringer Lactato",
+    "compatible": [
+      "Ringer Lactato"
+    ],
+    "avoid": [],
+    "notes": "- Preferido: NaCl 0.9%\n- Compatível: Ringer Lactato\n- Evitar: Dextrose 5% (pode precipitar)"
+  },
+  "references": [
+    {
+      "source": "- Plumb's Veterinary Drug Handbook, 9th Edition"
+    },
+    {
+      "source": "- BSAVA Small Animal Formulary, 10th Edition"
+    }
+  ]
+}
