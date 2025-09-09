@@ -1,44 +1,29 @@
-export type Fluid = 'rl' | 'sf' | 'd25' | 'd5';
+import type { Drug, Fluid } from "../types/drugs";
 
-export type CompatibilityLevel = 'success' | 'warning' | 'danger';
-
-export function checkCompatibility(
-  selectedFluid: Fluid,
-  opts: {
-    preferred?: Fluid;
-    compatible?: Fluid[];
-    avoid?: Fluid[];
-    notes?: string;
-  },
-): { level: CompatibilityLevel; message: string; reason: string } {
-  if (!opts) {
-    return { level: 'warning', message: 'Compatibilidade desconhecida', reason: 'Sem dados para este fármaco.' };
-  }
-  if (opts.avoid?.includes(selectedFluid)) {
+export type CompatLevel = "success" | "warning" | "danger";
+export function checkCompatibility(drug: Drug | null, fluid: Fluid | null) {
+  if (!drug || !fluid) return { level: "warning" as CompatLevel, reason: "Selecione um fluido." };
+  const c = drug.cri?.compatibility;
+  if (!c) return { level: "warning" as CompatLevel, reason: "Dados de compatibilidade não informados." };
+  if (c.avoid?.includes(fluid)) {
     return {
-      level: 'danger',
-      message: '🚨 Fluido incompatível',
-      reason: 'Incompatibilidade declarada para este fluido. ' + (opts.notes || ''),
+      level: "danger" as CompatLevel,
+      reason:
+        c.notes ||
+        "Incompatível: risco de precipitação/pH/osmolaridade ou interação ativa. Troque o diluente."
     };
   }
-  if (opts.preferred === selectedFluid) {
+  if (c.preferred === fluid) {
+    return { level: "success" as CompatLevel, reason: "100% compatível. Fluido preferido para estabilidade." };
+  }
+  if (c.compatible?.includes(fluid)) {
     return {
-      level: 'success',
-      message: 'Compatível (preferido)',
-      reason: 'Fluido recomendado para estabilidade e pH/osmolaridade adequados.',
+      level: "warning" as CompatLevel,
+      reason: "Parcialmente compatível: estabilidade depende de concentração/tempo/luz. Verifique rótulo."
     };
   }
-  if (opts.compatible?.includes(selectedFluid)) {
-    return {
-      level: 'warning',
-      message: 'Parcialmente compatível',
-      reason: 'Compatível, porém não é o fluido preferido. ' + (opts.notes || ''),
-    };
-  }
-  // sem match explícito
   return {
-    level: 'warning',
-    message: 'Compatibilidade não verificada',
-    reason: 'Não há registro específico para este fluido. Use com cautela.',
+    level: "warning" as CompatLevel,
+    reason: "Compatibilidade não especificada; use com cautela."
   };
 }

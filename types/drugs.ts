@@ -109,6 +109,22 @@ export interface Reference {
 }
 
 /**
+ * Monografia completa do medicamento (bulário)
+ */
+export interface DrugMonograph {
+  mechanism?: string;
+  indications?: string;
+  contraindications?: string;
+  criNotes?: string;
+  bolusNotes?: string;
+  dilution?: string;
+  compatibility?: string;
+  presentations?: string;
+  alerts?: string;
+  references?: string;
+}
+
+/**
  * Modelo principal de medicamento
  */
 export interface Drug {
@@ -121,6 +137,7 @@ export interface Drug {
   bolus?: BolusInfo;
   cautions?: Caution[];
   references?: Reference[];
+  monograph?: DrugMonograph;      // Monografia completa (bulário)
   
   // Campos legados para compatibilidade (serão removidos gradualmente)
   category?: string;

@@ -389,3 +389,4 @@ export const IMPROVED_DRUGS: Drug[] = [
     }
   }
 ];
+

@@ -3,53 +3,139 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* Claro: fundo claro, UI azul-escuro CRI-VET */
-    --background: 0 0% 100%;
-    --foreground: 220 26% 14%; /* cinza-azulado escuro */
-    --muted: 217 33% 96%;
-    --muted-foreground: 218 15% 42%;
+  /* Tema CLARO */
+  :root[data-theme="light"] {
+    /* UI azul escura + fundo claro (AA) */
+    --background: 210 40% 98%;
+    --foreground: 222 47% 16%;
+
+    --muted: 216 34% 96%;
+    --muted-foreground: 215 16% 35%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 220 26% 14%;
-    --border: 218 24% 90%;
-    --input: 218 24% 90%;
+    --popover-foreground: 222 47% 16%;
+
+    --border: 214 25% 88%;
+    --input: 214 25% 88%;
+
     --card: 0 0% 100%;
-    --card-foreground: 220 26% 14%;
-    --primary: 222 85% 31%;        /* azul escuro */
+    --card-foreground: 222 47% 16%;
+
+    --primary: 220 75% 32%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 216 34% 94%;
-    --secondary-foreground: 222 30% 20%;
-    --accent: 215 92% 60%;         /* azul claro para detalhes */
-    --accent-foreground: 222 47% 12%;
-    --destructive: 0 75% 45%;
+
+    --secondary: 216 34% 96%;
+    --secondary-foreground: 222 47% 16%;
+
+    --accent: 216 34% 96%;
+    --accent-foreground: 222 47% 16%;
+
+    --destructive: 0 100% 50%;
     --destructive-foreground: 210 40% 98%;
-    --ring: 222 85% 31%;
+
+    --ring: 220 75% 32%;
     --radius: 0.5rem;
+
+    color-scheme: light;
   }
 
-  :root[class~="dark"] {
-    /* Escuro: fundo escuro, UI azul-clara */
-    --background: 224 71% 6%;
-    --foreground: 215 32% 92%;
-    --muted: 223 36% 14%;
-    --muted-foreground: 215 18% 68%;
-    --accent: 217 92% 75%;        /* azul claro */
-    --accent-foreground: 224 71% 6%;
-    --popover: 224 71% 6%;
-    --popover-foreground: 215 32% 92%;
-    --border: 220 24% 22%;
-    --input: 220 24% 22%;
-    --card: 224 71% 6%;
-    --card-foreground: 215 32% 92%;
-    --primary: 217 92% 75%;
-    --primary-foreground: 224 71% 6%;
-    --secondary: 220 24% 18%;
-    --secondary-foreground: 215 32% 92%;
-    --destructive: 0 75% 45%;
+  /* Tema ESCURO */
+  :root[data-theme="dark"] {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+
+    --muted: 223 47% 11%;
+    --muted-foreground: 215 16% 56.9%;
+
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
-    --ring: 217 92% 75%;
+
+    --ring: 216 34% 17%;
     --radius: 0.5rem;
+
+    color-scheme: dark;
   }
+
+  /* Fallback: se alguém ainda usar .dark/.light, mantém compatibilidade */
+  :root.light { 
+    --background: 210 40% 98%;
+    --foreground: 222 47% 16%;
+    --muted: 216 34% 96%;
+    --muted-foreground: 215 16% 35%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 16%;
+    --border: 214 25% 88%;
+    --input: 214 25% 88%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 16%;
+    --primary: 220 75% 32%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 216 34% 96%;
+    --secondary-foreground: 222 47% 16%;
+    --accent: 216 34% 96%;
+    --accent-foreground: 222 47% 16%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+    --ring: 220 75% 32%;
+    --radius: 0.5rem;
+    color-scheme: light;
+  }
+  :root.dark  { 
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+    --muted: 223 47% 11%;
+    --muted-foreground: 215 16% 56.9%;
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --ring: 216 34% 17%;
+    --radius: 0.5rem;
+    color-scheme: dark;
+  }
+
+  * { border-color: hsl(var(--border)); }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+
+/* util para efeito "glass" da calculadora */
+.glass {
+  background: linear-gradient(180deg, hsl(var(--card)/0.66), hsl(var(--card)/0.5));
+  backdrop-filter: saturate(140%) blur(12px);
+  box-shadow: 0 8px 28px hsl(215 25% 20% / 0.15);
 }
 
 /* Untitled UI-ish tokens and dark mode helpers */
@@ -308,6 +394,68 @@ label, .form-label {
 
 .focus\:border-blue-700:focus {
   border-color: rgb(var(--ui-primary));
+}
+
+/* Popovers/Tooltips no claro ficavam com contraste ruim */
+.radix-tooltip-content,
+[data-radix-popper-content-wrapper] .bg-popover {
+  background-color: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  box-shadow: 0 10px 30px rgba(16,33,70,.12);
+  z-index: 60;
+}
+
+/* Estilos para o slider de dose */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #1e40af;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-webkit-slider-thumb:hover {
+  background: #1d4ed8;
+  transform: scale(1.1);
+}
+
+.slider::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #1e40af;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-thumb:hover {
+  background: #1d4ed8;
+  transform: scale(1.1);
+}
+
+/* Tema escuro para o slider */
+[data-theme="dark"] .slider::-webkit-slider-thumb {
+  background: #3b82f6;
+  border-color: #1e293b;
+}
+
+[data-theme="dark"] .slider::-webkit-slider-thumb:hover {
+  background: #60a5fa;
+}
+
+[data-theme="dark"] .slider::-moz-range-thumb {
+  background: #3b82f6;
+  border-color: #1e293b;
+}
+
+[data-theme="dark"] .slider::-moz-range-thumb:hover {
+  background: #60a5fa;
 }
 
 

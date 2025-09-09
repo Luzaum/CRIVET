@@ -46,9 +46,11 @@ export enum WarningLevel {
 }
 
 export enum PatientState {
-  Young = 'young',
-  Adult = 'adult',
-  Senior = 'senior',
+  Young = 'Filhote',
+  Adult = 'Adulto',
+  Senior = 'Idoso',
+  Pregnant = 'Gestante',
+  Lactating = 'Lactante',
 }
 
 export enum AdministrationType {

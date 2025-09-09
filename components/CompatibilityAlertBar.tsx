@@ -41,3 +41,4 @@ export const CompatibilityAlertBar: React.FC<CompatibilityAlertBarProps> = ({
     </div>
   );
 };
+

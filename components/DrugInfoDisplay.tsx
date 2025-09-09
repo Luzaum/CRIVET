@@ -460,3 +460,4 @@ export const DrugInfoDisplay: React.FC<DrugInfoDisplayProps> = ({ drug, info }) 
     </Box>
   );
 };
+

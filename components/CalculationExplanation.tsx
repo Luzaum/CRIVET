@@ -178,3 +178,4 @@ export const CalculationExplanation: React.FC<CalculationExplanationProps> = ({
     </Card>
   );
 };
+

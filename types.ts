@@ -11,8 +11,6 @@ export interface Patient {
   cardiacDisease?: boolean;
   septicShock?: boolean;
   neuroDisease?: boolean;
-  pregnant?: boolean;
-  lactating?: boolean;
 }
 
 export enum CriDoseUnit {
@@ -119,6 +117,26 @@ export interface Drug {
   comboDetails?: ComboDetails;
   specialWarnings?: WarningType[];
   info?: DrugInfo;
+  // Campos adicionais para compatibilidade
+  cri?: any;
+  bolus?: any;
+  cautions?: any[];
+  references?: any[];
+  mechanism?: string;
+  indications?: string;
+  contraindications?: string;
+  monograph?: {
+    mechanism?: string;
+    indications?: string;
+    contraindications?: string;
+    criNotes?: string;
+    bolusNotes?: string;
+    dilution?: string;
+    compatibility?: string;
+    presentations?: string;
+    alerts?: string;
+    references?: string;
+  };
 }
 
 export interface ComboDetails {

@@ -17,7 +17,21 @@ const formatBR = (n: number, d = 2) =>
   n.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
 
 const parseBR = (s: string): number | null => {
-  const clean = s.replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
+  // Remove espaços
+  let clean = s.replace(/\s/g, '');
+  
+  // Se contém ponto e vírgula, trata como separador de milhares + decimal
+  if (clean.includes('.') && clean.includes(',')) {
+    clean = clean.replace(/\./g, '').replace(',', '.');
+  }
+  // Se contém apenas ponto, trata como decimal (converte para vírgula)
+  else if (clean.includes('.') && !clean.includes(',')) {
+    clean = clean.replace('.', ',');
+  }
+  
+  // Converte vírgula para ponto para o JavaScript
+  clean = clean.replace(',', '.');
+  
   if (clean === '' || clean === '-' || clean === 'NaN') return null;
   const n = Number(clean);
   return Number.isFinite(n) ? n : null;

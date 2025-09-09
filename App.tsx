@@ -1,5 +1,6 @@
 
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { useTheme } from './components/theme/ThemeProvider';
 
 // Fix temporário para Material-UI v7 + React 19
 if (typeof window !== 'undefined') {
@@ -18,8 +19,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Switch from '@mui/material/Switch';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
@@ -28,12 +27,10 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import TextField from '@mui/material/TextField';
 import { Species, PatientState, Patient, Drug, CriDose, BolusDose, DrugConcentration, CriDoseUnit, BolusDoseUnit, Vehicle, WarningType, FluidType } from './types';
 import { NumberFieldBR } from './components/inputs/NumberFieldBR';
-import { calculateCRI, calculateBolus } from './utils/calculations';
 import { classifyCriDose, classifyBolusDose } from './utils/rangeClassifier';
 // import { getCompatibilityLevel } from './utils/compatibility'; // Removido - não existe mais
 import { RangeAlert } from './components/alerts/RangeAlert';
 import { SourcesFootnote } from './components/alerts/SourcesFootnote';
-import { CalculationSteps } from './components/CalculationSteps';
 import { 
   CONSOLIDATED_DRUGS, 
   COMPATIBILITY_MATRIX, 
@@ -58,6 +55,22 @@ import { CompatibilityAlertBar } from './components/CompatibilityAlertBar';
 import { checkCompatibility } from './utils/compatibility';
 import { warningsFor } from './utils/warnings';
 import { ConcentrationSelect } from './components/ConcentrationSelect';
+import { calculateCRI, calculateBolus, checkCompatibility as checkFluidCompatibility, CriUnit, BolusUnit } from './utils/engine';
+import { CalculationSteps } from './components/CalculationSteps';
+import { ResultsCard } from './components/ResultsCard';
+import { DoseUnitSelector, getRangeForUnit } from './components/dosing/DoseUnitSelector';
+import type { DrugUnit } from './context/DrugContext';
+
+function comorbidityWarnings(patient: Patient, drug: Drug | null): string[] {
+  const w: string[] = [];
+  if (!drug) return w;
+  if (patient.renalDisease) w.push("Risco Renal: ajuste 25–50% (metabólitos renais).");
+  if (patient.hepaticDisease) w.push("Risco Hepático: reduzir dose; monitorar sedação/ECG.");
+  if (patient.cardiacDisease) w.push("Risco Cardíaco: administrar lentamente; monitorar PA/ECG.");
+  if (patient.septicShock) w.push("Choque Séptico: titule com cautela; priorize hemodinâmica.");
+  if (patient.neuroDisease) w.push("Neurológico: risco de tremores/convulsão em altas doses.");
+  return w;
+}
 
 const DrugAdditionalInfo: React.FC<{ drug: Drug }> = ({ drug }) => {
   // Encontrar informações de compatibilidade para o medicamento
@@ -124,117 +137,7 @@ const DrugAdditionalInfo: React.FC<{ drug: Drug }> = ({ drug }) => {
         </div>
       )}
 
-      {/* Fórmulas Universais */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-        <h4 className="text-lg font-semibold text-blue-800 dark:text-blue-300 mb-3">🧮 Fórmulas Universais</h4>
-        <div className="space-y-4">
-          <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
-            <span className="font-semibold text-blue-800 dark:text-blue-300">Fórmula Universal:</span>
-            <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
-              {EXPANDED_FORMULAS.universal}
-            </div>
-            <div className="text-xs text-blue-600 dark:text-blue-300">
-              <strong>Explicação:</strong> Esta é a fórmula fundamental para calcular a taxa de infusão (mL/h) de qualquer medicamento em CRI. 
-              Multiplica a dose (por kg/min), o peso do paciente e 60 (para converter minutos em horas), depois divide pela concentração do medicamento.
-            </div>
-          </div>
-          
-          <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
-            <span className="font-semibold text-blue-800 dark:text-blue-300">Conversão Útil:</span>
-            <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
-              {EXPANDED_FORMULAS.conversion}
-            </div>
-            <div className="text-xs text-blue-600 dark:text-blue-300">
-              <strong>Explicação:</strong> Conversão rápida entre µg/kg/min e mg/kg/h. Multiplicar por 0.6 converte µg/kg/min para mg/kg/h. 
-              Útil para comparar doses de diferentes medicamentos ou protocolos.
-            </div>
-          </div>
-          
-          <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
-            <span className="font-semibold text-blue-800 dark:text-blue-300">Volume/Tempo Fixos:</span>
-            <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
-              {EXPANDED_FORMULAS.volumeTime}
-            </div>
-            <div className="text-xs text-blue-600 dark:text-blue-300">
-              <strong>Explicação:</strong> Para infusões com volume e tempo fixos, calcula a taxa (mL/h) dividindo volume pelo tempo. 
-              Para calcular mg a adicionar, multiplica a dose (mg/kg/h) pelo peso e pelo tempo de infusão.
-            </div>
-          </div>
-          
-          <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
-            <span className="font-semibold text-blue-800 dark:text-blue-300">Bólus para CRI:</span>
-            <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
-              {EXPANDED_FORMULAS.bolusToCRI}
-            </div>
-            <div className="text-xs text-blue-600 dark:text-blue-300">
-              <strong>Explicação:</strong> Converte dose de bólus para CRI equivalente. Multiplica a dose do bólus pela frequência diária 
-              e divide por 24 horas. Útil para manter efeito terapêutico contínuo.
-            </div>
-          </div>
-          
-          <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
-            <span className="font-semibold text-blue-800 dark:text-blue-300">CRI para Bólus:</span>
-            <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
-              {EXPANDED_FORMULAS.criToBolus}
-            </div>
-            <div className="text-xs text-blue-600 dark:text-blue-300">
-              <strong>Explicação:</strong> Converte CRI para dose de bólus equivalente. Multiplica a dose CRI por 24 horas e divide pela frequência desejada. 
-              Útil para calcular doses de carga ou conversão para administração intermitente.
-            </div>
-          </div>
-          
-          {ADDITIONAL_FORMULAS && (
-            <>
-              <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
-                <span className="font-semibold text-blue-800 dark:text-blue-300">TMIC:</span>
-                <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
-                  {ADDITIONAL_FORMULAS.tmic}
-                </div>
-                <div className="text-xs text-blue-600 dark:text-blue-300">
-                  <strong>Explicação:</strong> T&gt;MIC é o tempo que a concentração do antibiótico permanece acima da Concentração Mínima Inibitória (CMI) do patógeno. 
-                  Beta-lactâmicos são tempo-dependentes, precisando manter T&gt;MIC &gt; 40-50% do intervalo de dose para eficácia.
-                </div>
-              </div>
-              
-              <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
-                <span className="font-semibold text-blue-800 dark:text-blue-300">Priming:</span>
-                <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
-                  {ADDITIONAL_FORMULAS.priming}
-                </div>
-                <div className="text-xs text-blue-600 dark:text-blue-300">
-                  <strong>Explicação:</strong> Insulina adere às superfícies plásticas. Descartar 20-50 mL da linha satura os sítios de adsorção, 
-                  garantindo que a dose calculada chegue ao paciente. Fundamental para precisão da insulinoterapia.
-                </div>
-              </div>
-              
-              <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-3">
-                <span className="font-semibold text-blue-800 dark:text-blue-300">Stewardship:</span>
-                <div className="font-mono text-sm text-blue-700 dark:text-blue-200 mt-1 mb-2">
-                  {ADDITIONAL_FORMULAS.stewardship}
-                </div>
-                <div className="text-xs text-blue-600 dark:text-blue-300">
-                  <strong>Explicação:</strong> Uso racional de antibióticos. Intermitente é padrão (10-60 min). Infusão estendida apenas para 
-                  beta-lactâmicos tempo-dependentes quando há justificativa T&gt;MIC e estabilidade confirmada.
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Exemplos Rápidos */}
-      <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
-        <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-3">📝 Exemplos Rápidos</h4>
-        <div className="space-y-3">
-          {[...EXAMPLES, ...EXPANDED_EXAMPLES, ...ADDITIONAL_EXAMPLES].slice(0, 3).map((example, index) => (
-            <div key={index} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-3">
-              <h5 className="font-semibold text-slate-800 dark:text-slate-200">{example.title}</h5>
-              <div className="text-sm text-slate-600 dark:text-slate-300 mt-1">{example.description}</div>
-              <div className="font-mono text-sm text-blue-600 dark:text-blue-300 mt-2">{example.calculation}</div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* REMOVIDO: bloco de fórmulas universais/quick examples no final da página */}
 
       {/* Boas Práticas */}
       <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
@@ -435,8 +338,6 @@ const PatientSelector: React.FC<{ patient: Patient; setPatient: React.Dispatch<R
                     onChange={(v) => setPatient(p => ({ ...p, weight: v ?? 0 }))}
                     suffix="kg"
                     decimals={2}
-                    min={0.1}
-                    max={120}
                 />
             </div>
             
@@ -484,14 +385,6 @@ const PatientSelector: React.FC<{ patient: Patient; setPatient: React.Dispatch<R
                          <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
                            <input type="checkbox" name="neuroDisease" checked={!!patient.neuroDisease} onChange={handleComorbidityChange} className="h-4 w-4 rounded border-gray-300 dark:border-slate-600 text-blue-700 focus:ring-blue-700" />
                            Neurológico
-                         </label>
-                         <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-                           <input type="checkbox" name="pregnant" checked={!!patient.pregnant} onChange={handleComorbidityChange} className="h-4 w-4 rounded border-gray-300 dark:border-slate-600 text-blue-700 focus:ring-blue-700" />
-                           Gestante
-                         </label>
-                         <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-                           <input type="checkbox" name="lactating" checked={!!patient.lactating} onChange={handleComorbidityChange} className="h-4 w-4 rounded border-gray-300 dark:border-slate-600 text-blue-700 focus:ring-blue-700" />
-                           Lactante
                          </label>
                     </div>
                 </div>
@@ -618,16 +511,10 @@ const WarningComponent: React.FC<{ text: string, type: 'critical' | 'warning' | 
 }
 
 export default function App() {
-    const [isDark, setIsDark] = useState<boolean>(() => {
-        try { return localStorage.getItem('theme') === 'dark'; } catch { return false; }
-    });
-    useEffect(() => {
-        const root = document.documentElement;
-        if (isDark) root.classList.add('dark'); else root.classList.remove('dark');
-        try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch {}
-    }, [isDark]);
+    const { theme: currentTheme } = useTheme();
+    const isDark = currentTheme === 'dark' || (currentTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-    const [patient, setPatient] = useState<Patient>({ species: Species.Canine, state: PatientState.Adult, weight: 0, hepaticDisease: false, renalDisease: false, cardiacDisease: false, septicShock: false, neuroDisease: false, pregnant: false, lactating: false });
+    const [patient, setPatient] = useState<Patient>({ species: Species.Canine, state: PatientState.Adult, weight: 0, hepaticDisease: false, renalDisease: false, cardiacDisease: false, septicShock: false, neuroDisease: false });
     const [selectedDrug, setSelectedDrug] = useState<Drug | null>(null);
     const [selectedCriDose, setSelectedCriDose] = useState<CriDose | null>(null);
     const [selectedConcentration, setSelectedConcentration] = useState<DrugConcentration | null>(null);
@@ -641,7 +528,7 @@ export default function App() {
     const [showRateGuideModal, setShowRateGuideModal] = useState(false);
     const [showCompatibilityGuide, setShowCompatibilityGuide] = useState(false);
     const [infoModalDrug, setInfoModalDrug] = useState<Drug | null>(null);
-    const [customCriUnit, setCustomCriUnit] = useState<CriDoseUnit>(CriDoseUnit.mcg_kg_min);
+    const [customCriUnit, setCustomCriUnit] = useState<DrugUnit>('mcg/kg/min');
 
     const doseAdjustment = useMemo(() => {
         if (!selectedDrug || selectedDrug.isCombo) {
@@ -657,7 +544,7 @@ export default function App() {
         const hasSepsis = patient.septicShock && !!selectedDrug.info?.adjustments.sepsis;
         const hasComorbidityRisk = hasHepaticRisk || hasRenalRisk;
 
-        if (patient.state === PatientState.Young || patient.state === PatientState.Senior) {
+        if (patient.state === PatientState.Young || patient.state === PatientState.Senior || patient.state === PatientState.Pregnant || patient.state === PatientState.Lactating) {
             factor -= 0.25;
             hasAgeAdjustment = true;
         }
@@ -748,16 +635,13 @@ export default function App() {
             const unitKey = selectedCriDose?.cri?.unit ?? customCriUnit; // caia para custom se necessário
 
             return calculateCRI({
-                dose: { value: criDose, unit: unitKey as any }, // 'mcg_kg_min' | 'mg_kg_h' | etc.
+                doseValue: criDose,
+                doseUnit: unitKey as any,
                 weightKg: patient.weight,
-                stock: {
-                    value: selectedConcentration.value,
-                    unit: selectedConcentration.unit as any, // 'mg/mL' | 'mcg/mL' | 'μg/mL'
-                },
-                vehicle: { type: vehicle.type, volume: vehicle.volume },
-                durationHours: infusionDuration,
-                // If você já tem "desiredRate", pode passar aqui como override:
-                // infusionRateMlPerHour: desiredRate ?? undefined,
+                rateMlH: 10,
+                vialConcMgMl: selectedConcentration.value,
+                vehicleVolumeMl: vehicle.volume,
+                durationH: infusionDuration,
             });
         } catch (e) {
             console.error(e);
@@ -782,276 +666,39 @@ export default function App() {
     }, [selectedDrug, criDose, customCriUnit])
 
     const criCalculation = useMemo(() => {
-        if (!selectedDrug || !patient.weight || patient.weight <= 0) return null;
+        const steps: string[] = [];
+        if (!selectedDrug || !patient?.weight || !selectedConcentration) {
+            return { ready: false, steps, results: null };
+        }
+        
+        // 1) Dose → mg/kg/h
+        const toMgKgH = (unit: string, v: number) => {
+            if (unit === "mcg/kg/min") return (v * 60) / 1000;
+            if (unit === "mcg/kg/h") return v / 1000;
+            return v; // mg/kg/h
+        };
+        const doseMgKgH = toMgKgH(customCriUnit, criDose);
+        steps.push(`Convertendo dose: ${criDose} ${customCriUnit} → ${doseMgKgH.toFixed(3)} mg/kg/h`);
 
-        const generalWarnings: {text: string, type: 'critical'|'warning'|'info', icon: React.ReactNode}[] = [];
-        
-        if (selectedDrug.specialWarnings?.includes(WarningType.VentilatorySupport)) generalWarnings.push({text: `<b>${WarningType.VentilatorySupport}</b>: A ventilação mecânica com pressão positiva é <b>obrigatória</b>.`, type: 'critical', icon: <AlertTriangleIcon className="w-5 h-5"/>});
-        if (selectedDrug.specialWarnings?.includes(WarningType.Vesicant)) generalWarnings.push({text: `<b>${WarningType.Vesicant}</b>: Risco de dano tecidual grave em caso de extravasamento. Use acesso venoso central seguro.`, type: 'warning', icon: <AlertTriangleIcon className="w-5 h-5"/>});
-        if (selectedDrug.specialWarnings?.includes(WarningType.Photoprotection)) generalWarnings.push({text: `<b>${WarningType.Photoprotection}</b>: Proteja a linha de infusão e a bolsa/seringa da luz.`, type: 'info', icon: <EyeOffIcon className="w-5 h-5"/>});
-        if (selectedCriDose?.extrapolated) generalWarnings.push({text: `<b>Dose Extrapolada</b>: Este protocolo é extrapolado da medicina humana. Use com cautela e monitorização intensiva.`, type: 'info', icon: <BeakerIcon className="w-5 h-5"/>});
-        if (selectedCriDose?.notes) generalWarnings.push({text: selectedCriDose.notes, type: 'warning', icon: <AlertTriangleIcon className="w-5 h-5"/>});
-        
-        if (selectedDrug.isCombo && selectedDrug.comboDetails) {
-            if (selectedDrug.comboDetails.notes) generalWarnings.push({text: selectedDrug.comboDetails.notes, type: 'info', icon: <InfoIcon className="w-5 h-5"/>});
+        // 2) mg/h
+        const mgPerH = doseMgKgH * patient.weight;
+        steps.push(`mg/h = ${doseMgKgH.toFixed(3)} × ${patient.weight} kg = ${mgPerH.toFixed(3)} mg/h`);
 
-             if (!infusionDuration || infusionDuration <= 0) {
-                return { generalWarnings, isCombo: true, notesAndWarnings: { messages: [], showComorbidityOverride: false } };
-            }
-    
-            const ingredientCalculations = [];
-            let totalDrugVolumeMl = 0;
-            const comboNotes: {text: string, type: 'critical'|'warning'|'info', icon: React.ReactNode}[] = [];
-            let hasAnyComorbidityRisk = false;
+        // 3) mL/h pela concentração
+        const concMgMl = selectedConcentration.value ?? 0;
+        const mlPerH = concMgMl > 0 ? mgPerH / concMgMl : 0;
+        steps.push(`mL/h = ${mgPerH.toFixed(3)} ÷ ${concMgMl} mg/mL = ${mlPerH.toFixed(3)} mL/h`);
 
-            for (const ingredient of selectedDrug.comboDetails.ingredients) {
-                const drugDef = CONSOLIDATED_DRUGS.find(d => d.id === ingredient.drugId);
-                if (!drugDef) continue;
-        
-                let ingredientFactor = 1.0;
-                if (patient.state === PatientState.Young || patient.state === PatientState.Senior) {
-                    ingredientFactor -= 0.25;
-                }
+        // 4) Para veículo/tempo
+        const totalMl = mlPerH * infusionDuration;
+        steps.push(`Volume total = ${mlPerH.toFixed(3)} × ${infusionDuration} h = ${totalMl.toFixed(2)} mL`);
 
-                const hasHepaticRisk = patient.hepaticDisease && !!drugDef.info?.adjustments.hepatic;
-                const hasRenalRisk = patient.renalDisease && !!drugDef.info?.adjustments.renal;
-                
-                if (hasHepaticRisk || hasRenalRisk) {
-                    hasAnyComorbidityRisk = true;
-                    if (!overrideComorbidityDoseReduction) {
-                         if (hasHepaticRisk) ingredientFactor -= 0.25;
-                         if (hasRenalRisk) ingredientFactor -= 0.25;
-                        comboNotes.push({
-                            text: `A dose de <strong>${drugDef.name}</strong> foi reduzida devido ao risco ${hasHepaticRisk && hasRenalRisk ? 'hepático e renal' : hasHepaticRisk ? 'hepático' : 'renal'}.`,
-                            type: 'warning',
-                            icon: <AlertTriangleIcon className="w-5 h-5"/>
-                        });
-                    }
-                }
-                ingredientFactor = Math.max(0.1, ingredientFactor);
-        
-                const adjustedDose = ingredient.dose * ingredientFactor;
-        
-                let doseInMcgKgH = 0;
-                switch (ingredient.unit) {
-                    case CriDoseUnit.mcg_kg_min: doseInMcgKgH = adjustedDose * 60; break;
-                    case CriDoseUnit.mcg_kg_h: doseInMcgKgH = adjustedDose; break;
-                    case CriDoseUnit.mg_kg_min: doseInMcgKgH = adjustedDose * 1000 * 60; break;
-                    case CriDoseUnit.mg_kg_h: doseInMcgKgH = adjustedDose * 1000; break;
-                    case CriDoseUnit.mg_kg_day: doseInMcgKgH = (adjustedDose * 1000) / 24; break;
-                }
-        
-                const totalMcgPerHour = doseInMcgKgH * patient.weight;
-                const drugConcentration = drugDef.concentrations[0]; 
-                const drugConcentrationMcgPerMl = drugConcentration.unit === 'mg/mL' ? drugConcentration.value * 1000 : drugConcentration.unit === 'μg/mL' ? drugConcentration.value : drugConcentration.value * 1000; // handle U/mL later
-                const totalMcgForDuration = totalMcgPerHour * infusionDuration;
-                const drugVolumeMl = totalMcgForDuration / drugConcentrationMcgPerMl;
-        
-                totalDrugVolumeMl += drugVolumeMl;
-                ingredientCalculations.push({
-                    name: drugDef.name,
-                    volume: drugVolumeMl,
-                    concentrationLabel: drugConcentration.label
-                });
-            }
-            
-            const diluentVolume = vehicle.volume - totalDrugVolumeMl;
-            const finalRate = vehicle.volume / infusionDuration;
-            
-            if (overrideComorbidityDoseReduction && hasAnyComorbidityRisk) {
-                comboNotes.push({
-                    text: `O ajuste automático de dose para comorbidade foi <strong>ignorado por sua solicitação</strong>. As doses padrão estão em uso. Monitore com atenção.`,
-                    type: 'critical',
-                    icon: <AlertTriangleIcon className="w-5 h-5"/>
-                });
-            }
-
-            if (diluentVolume < 0) {
                  return {
-                    isCombo: true,
-                    error: `O volume total dos fármacos (${totalDrugVolumeMl.toFixed(2)} mL) excede o volume do veículo (${vehicle.volume} mL). Considere usar um veículo maior ou aumentar o tempo de infusão.`,
-                    generalWarnings,
-                    notesAndWarnings: { messages: comboNotes, showComorbidityOverride: hasAnyComorbidityRisk }
-                }
-            }
-
-            const instructions = ingredientCalculations.map(ic => `<li>Adicione <strong>${ic.volume.toFixed(2)} mL</strong> de ${ic.name} (${ic.concentrationLabel})</li>`);
-            instructions.push(`<li>Adicione <strong>${diluentVolume.toFixed(2)} mL</strong> de diluente para completar o volume.</li>`);
-
-             return {
-                isCombo: true,
-                comboResult: {
-                    instructions,
-                    finalRate: finalRate.toFixed(2),
-                },
-                generalWarnings,
-                notesAndWarnings: { messages: comboNotes, showComorbidityOverride: hasAnyComorbidityRisk },
-             }
-        }
-        
-        const notes: {text: string, type: 'critical'|'warning'|'info', icon: React.ReactNode}[] = [];
-
-        if (doseAdjustment.hasAgeAdjustment) {
-            notes.push({ text: `A dose sugerida foi <strong>reduzida em 25%</strong> devido à idade do paciente (${patient.state}). Consulte as diretrizes específicas do fármaco para mais detalhes.`, type: 'info', icon: <InfoIcon className="w-5 h-5"/>});
-        }
-        
-        const hasHepaticRisk = patient.hepaticDisease && !!selectedDrug.info?.adjustments.hepatic;
-        const hasRenalRisk = patient.renalDisease && !!selectedDrug.info?.adjustments.renal;
-        const hasCardiacRisk = patient.cardiacDisease && !!selectedDrug.info?.adjustments.cardiac;
-        const hasSepsis = patient.septicShock && !!selectedDrug.info?.adjustments.sepsis;
-
-        if (doseAdjustment.hasComorbidityAdjustment) {
-            if (overrideComorbidityDoseReduction) {
-                const comorbidityTypes = [
-                    hasHepaticRisk ? 'hepática' : null,
-                    hasRenalRisk ? 'renal' : null,
-                    hasCardiacRisk ? 'cardíaca' : null,
-                    hasSepsis ? 'séptico' : null,
-                ].filter(Boolean).join(' e ');
-                
-                notes.push({ 
-                    text: `O ajuste automático de dose para a comorbidade ${comorbidityTypes} foi <strong>ignorado por sua solicitação</strong>. A dose padrão está em uso. Monitore o paciente com atenção redobrada.`, 
-                    type: 'critical', 
-                    icon: <AlertTriangleIcon className="w-5 h-5"/> 
-                });
-            } else {
-                let reductionPercent = 0;
-                const reasons = [];
-
-                if (hasHepaticRisk) {
-                    reductionPercent += 25;
-                    reasons.push(`<li><strong>Risco Hepático:</strong> ${selectedDrug.info?.adjustments.hepatic || ''}</li>`);
-                }
-                if (hasRenalRisk) {
-                    reductionPercent += 25;
-                    reasons.push(`<li><strong>Risco Renal:</strong> ${selectedDrug.info?.adjustments.renal || ''}</li>`);
-                }
-                if (hasCardiacRisk) {
-                    reductionPercent += 10;
-                    reasons.push(`<li><strong>Risco Cardíaco:</strong> ${selectedDrug.info?.adjustments.cardiac || ''}</li>`);
-                }
-                if (hasSepsis) {
-                    reductionPercent += 10;
-                    reasons.push(`<li><strong>Paciente Séptico:</strong> ${selectedDrug.info?.adjustments.sepsis || ''}</li>`);
-                }
-                
-                const warningText = `A dose sugerida foi <strong>reduzida em ${reductionPercent}%</strong> devido ao(s) seguinte(s) risco(s):<ul class="list-disc list-inside mt-2 space-y-1">${reasons.join('')}</ul>`;
-                
-                notes.push({
-                    text: warningText,
-                    type: 'warning',
-                    icon: <AlertTriangleIcon className="w-5 h-5"/>
-                });
-            }
-        }
-        
-        const notesAndWarnings = {
-            messages: notes,
-            showComorbidityOverride: doseAdjustment.hasComorbidityAdjustment
-        }
-
-        if (!selectedCriDose || !selectedConcentration || criDose <= 0 || !infusionDuration || infusionDuration <= 0) return { generalWarnings, notesAndWarnings };
-        
-        let drugVolumeMl: number;
-        const doseValue = criDose;
-
-        if (selectedConcentration.unit === 'U/mL') {
-            let doseInUKgH = 0;
-            switch (selectedCriDose.cri.unit) {
-                case CriDoseUnit.U_kg_h: 
-                    doseInUKgH = doseValue; 
-                    break;
-                case CriDoseUnit.mU_kg_min: 
-                    doseInUKgH = (doseValue / 1000) * 60; 
-                    break;
-                default:
-                    return { error: 'Unidade de dose (U) não suportada para este cálculo.', generalWarnings, notesAndWarnings };
-            }
-            
-            // Alerta específico para insulinas quando dose > 2.2 U/kg/h
-            if ((selectedDrug.id === 'insulin-regular' || selectedDrug.id === 'insulina-nph' || selectedDrug.id === 'insulina-pzi') && doseInUKgH > 2.2) {
-                const insulinName = selectedDrug.id === 'insulin-regular' ? 'Regular' : 
-                                  selectedDrug.id === 'insulina-nph' ? 'NPH' : 'PZI';
-                
-                notes.push({
-                    text: `<strong>⚠️ Dose Elevada de Insulina ${insulinName}</strong><br/>
-                    A dose selecionada (${doseInUKgH.toFixed(2)} U/kg/h) excede o limite recomendado pela literatura (2.2 U/kg/h) para CAD/SHH.<br/>
-                    <strong>Uso acima de 2.2 U/kg/h é de responsabilidade exclusiva do médico veterinário.</strong><br/>
-                    Considere reavaliar a indicação e monitorizar rigorosamente o paciente.`,
-                    type: 'warning',
-                    icon: <AlertTriangleIcon className="w-5 h-5"/>
-                });
-            }
-            
-            const totalUnitsPerHour = doseInUKgH * patient.weight;
-            const totalUnitsForDuration = totalUnitsPerHour * infusionDuration;
-            drugVolumeMl = totalUnitsForDuration / selectedConcentration.value;
-        } else {
-            let doseInMcgKgH = 0;
-            switch (selectedCriDose.cri.unit) {
-                case CriDoseUnit.mcg_kg_min: doseInMcgKgH = doseValue * 60; break;
-                case CriDoseUnit.mcg_kg_h: doseInMcgKgH = doseValue; break;
-                case CriDoseUnit.mg_kg_min: doseInMcgKgH = doseValue * 1000 * 60; break;
-                case CriDoseUnit.mg_kg_h: doseInMcgKgH = doseValue * 1000; break;
-                case CriDoseUnit.mg_kg_day: doseInMcgKgH = (doseValue * 1000) / 24; break;
-                default:
-                    return { error: 'Unidade de dose (massa) não suportada para este cálculo.', generalWarnings, notesAndWarnings };
-            }
-
-            const totalMcgPerHour = doseInMcgKgH * patient.weight;
-            
-            let drugConcentrationMcgPerMl = 0;
-            if (selectedConcentration.unit === 'mg/mL') {
-                drugConcentrationMcgPerMl = selectedConcentration.value * 1000;
-            } else if (selectedConcentration.unit === 'μg/mL') {
-                drugConcentrationMcgPerMl = selectedConcentration.value;
-            } else {
-                return { error: `Unidade de concentração (${selectedConcentration.unit}) não suportada.`, generalWarnings, notesAndWarnings };
-            }
-
-            if(drugConcentrationMcgPerMl === 0) {
-                 return { error: 'Concentração do fármaco não pode ser zero.', generalWarnings, notesAndWarnings };
-            }
-
-            const totalMcgForDuration = totalMcgPerHour * infusionDuration;
-            drugVolumeMl = totalMcgForDuration / drugConcentrationMcgPerMl;
-        }
-
-        const finalRate = vehicle.volume / infusionDuration;
-        
-        let result: any = {};
-        let message = "";
-
-        if (vehicle.type === 'bag') {
-            if (finalRate > 10 * patient.weight && finalRate > 150) { 
-                 generalWarnings.push({text: `<b>Taxa de Infusão Elevada</b>: A taxa calculada de ${finalRate.toFixed(1)} mL/h é alta para manutenção. Verifique o peso do paciente e o tempo de infusão.`, type: 'warning', icon: <AlertTriangleIcon className="w-5 h-5"/>});
-            }
-            message = `Remova <strong>${drugVolumeMl.toFixed(2)} mL</strong> do fluido da bolsa e adicione <strong>${drugVolumeMl.toFixed(2)} mL</strong> de ${selectedDrug.name}. Infundir a <strong>${finalRate.toFixed(2)} mL/h</strong>.`
-        }
-
-        if (vehicle.type === 'syringe') {
-            const diluentVolume = vehicle.volume - drugVolumeMl;
-            if (diluentVolume < 0) {
-                 result = { error: `O volume do fármaco (${drugVolumeMl.toFixed(2)} mL) excede o volume da seringa (${vehicle.volume} mL). Considere usar uma seringa maior, aumentar o tempo de infusão ou usar uma concentração de fármaco maior se disponível.` };
-            } else {
-                message = `Adicione <strong>${drugVolumeMl.toFixed(2)} mL</strong> de ${selectedDrug.name} e <strong>${(vehicle.volume - drugVolumeMl).toFixed(2)} mL</strong> de diluente a uma seringa de ${vehicle.volume} mL. Infundir a <strong>${finalRate.toFixed(2)} mL/h</strong>.`
-            }
-        }
-        
-        if (drugVolumeMl > vehicle.volume && vehicle.type === 'bag') {
-             result = { error: `O volume do fármaco (${drugVolumeMl.toFixed(2)} mL) excede o volume do veículo (${vehicle.volume} mL). Considere aumentar o tempo de infusão, usar um veículo maior, ou uma concentração de fármaco maior se disponível.` };
-        } else if (!result.error) {
-            result = {
-                drugVolume: drugVolumeMl.toFixed(2),
-                diluentVolume: (vehicle.volume - drugVolumeMl).toFixed(2),
-                finalRate: finalRate.toFixed(2),
-                message: message
-            };
-        }
-        
-        return { ...result, generalWarnings, notesAndWarnings };
-
-    }, [selectedDrug, patient, selectedCriDose, selectedConcentration, criDose, vehicle, infusionDuration, doseAdjustment, overrideComorbidityDoseReduction]);
+            ready: true,
+            steps,
+            results: { mlPerH, totalMl }
+        };
+    }, [selectedDrug, patient.weight, selectedConcentration, customCriUnit, criDose, infusionDuration]);
 
     const syringeVolumes = [10, 20, 60];
     const bagVolumes = [250, 500, 1000];
@@ -1147,10 +794,11 @@ export default function App() {
                 >
                   🧪 Compatibilidade
                 </button>
-                <FormControlLabel
-                  control={<Switch checked={isDark} onChange={(e) => setIsDark(e.target.checked)} />}
-                  label={isDark ? 'Escuro' : 'Claro'}
-                />
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    {currentTheme === 'light' ? 'Claro' : currentTheme === 'dark' ? 'Escuro' : 'Sistema'}
+                  </span>
+                </div>
               </Toolbar>
             </AppBar>
 
@@ -1225,20 +873,6 @@ export default function App() {
                                 ))}
                             </div>
 
-                             {selectedDrug.preparationGuide && (
-                                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-400">
-                                    <div className="flex">
-                                        <div className="flex-shrink-0">
-                                            <BeakerIcon className="h-6 w-6 text-amber-500" aria-hidden="true" />
-                                        </div>
-                                        <div className="ml-3">
-                                            <h3 className="text-base font-medium text-amber-800 dark:text-amber-400">Instruções de Preparo</h3>
-                                            <div className="mt-2 text-sm text-amber-700 dark:text-amber-300"
-                                                 dangerouslySetInnerHTML={{ __html: selectedDrug.preparationGuide }}/>
-                                        </div>
-                                    </div>
-                                </div>
-                             )}
 
                             {(hasCri || hasBolus) && !selectedDrug.isCombo && (
                                 <ToggleButtonGroup
@@ -1256,77 +890,97 @@ export default function App() {
                             
                             {calculationMode === 'cri' && (hasCri || selectedDrug.isCombo) && (
                                 <div className="space-y-6">
-                                {(!selectedDrug.isCombo && selectedCriDose && selectedConcentration && adjustedCriRange) && (
-                                    <>
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Dose de CRI ({selectedCriDose.cri.unit})</label>
-                                        <div className="flex items-center gap-2">
-                                            <input type="range" min={adjustedCriRange.min} max={adjustedCriRange.max} step={(adjustedCriRange.max - adjustedCriRange.min) / 100 || 0.01} value={criDose}
-                                                onChange={e => setCriDose(parseFloat(e.target.value))}
-                                                className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                                                disabled={adjustedCriRange.min === adjustedCriRange.max}
-                                            />
-                                            <input type="number" value={criDose.toFixed(selectedCriDose.cri.unit === CriDoseUnit.mU_kg_min ? 3 : 2)}
-                                                onChange={e => setCriDose(parseFloat(e.target.value))}
-                                                className="w-24 p-2 border bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 border-slate-300 dark:border-slate-700 rounded-md text-center no-spinner"
-                                                disabled={adjustedCriRange.min === adjustedCriRange.max}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <ConcentrationSelect
-                                          drug={selectedDrug}
-                                          selected={selectedConcentration}
-                                          onChange={setSelectedConcentration}
-                                        />
-                                        <div>
-                                            <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Indicação Principal</label>
-                                             <p className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-md min-h-[42px] flex items-center text-sm">{selectedCriDose.useCase || selectedDrug.info?.indicationSummary[0] || 'Geral'}</p>
-                                        </div>
-                                    </div>
-                                    </>
-                                )}
-                                {/* === APRESENTAÇÃO + UNIDADE CRI (INÍCIO) === */}
+                                {/* Apresentação única */}
                                 {selectedDrug && !selectedDrug.isCombo && (
-                                  <div className="grid gap-4 md:grid-cols-2">
-                                    {/* Apresentação (Concentração do frasco) */}
-                                    <ConcentrationSelect
-                                      drug={selectedDrug}
-                                      selected={selectedConcentration}
-                                      onChange={setSelectedConcentration}
-                                    />
-
-                                    {/* Unidade da dose (CRI) */}
                                     <div>
-                                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">
-                                        Unidade da dose (CRI)
-                                      </label>
+                                    <label className="block text-sm font-medium text-slate-600 mb-2">Apresentação</label>
+                                    <select
+                                      value={selectedConcentration?.label || ""}
+                                      onChange={(e) =>
+                                        setSelectedConcentration(
+                                          selectedDrug?.concentrations?.find((c) => c.label === e.target.value) || null
+                                        )
+                                      }
+                                      className="w-full p-2 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200"
+                                    >
+                                      {(selectedDrug?.concentrations || []).map((c) => (
+                                        <option key={c.label} value={c.label}>
+                                          {c.label}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                )}
 
-                                      <div className="flex flex-wrap gap-2">
-                                        {(['mcg/kg/min', 'mcg/kg/h', 'mg/kg/h'] as const).map((u) => (
-                                          <button
-                                            key={u}
-                                            type="button"
-                                            onClick={() => setCustomCriUnit(u)}
-                                            className={`px-3 py-1.5 rounded-md border transition
-                                              ${customCriUnit === u
-                                                ? 'border-blue-700 bg-blue-700 text-white'
-                                                : 'border-slate-300 text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800'}`}
-                                            aria-pressed={customCriUnit === u}
-                                          >
-                                            {u}
-                                            {selectedDrug?.cri?.preferredUnit === u && (
-                                              <span className="ml-2 rounded-full px-2 py-0.5 text-[10px] bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                                                mais usada
-                                              </span>
-                                            )}
-                                          </button>
-                                        ))}
-                                      </div>
+                                {/* Unidade + Dose (CRI) */}
+                                {selectedDrug && !selectedDrug.isCombo && selectedConcentration && (
+                                  <div className="space-y-3">
+                                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-300">
+                                      Unidade da dose (CRI)
+                                    </label>
+                                    <DoseUnitSelector
+                                      drug={selectedDrug as any}
+                                      unit={customCriUnit}
+                                      onChange={(u) => setCustomCriUnit(u)}
+                                    />
+                                    <div className="mt-3">
+                                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">
+                                        Dose (CRI)
+                                      </label>
+                                      {(() => {
+                                        const r = getRangeForUnit(selectedDrug as any, customCriUnit);
+                                        const step = r.max > 10 ? 0.1 : r.max > 1 ? 0.01 : 0.001;
+                                        
+                                        // Se não há faixa definida, não mostra o slider
+                                        if (r.min === 0 && r.max === 0) {
+                                          return (
+                                            <div className="space-y-3">
+                                              <NumberFieldBR
+                                                value={Number.isFinite(criDose) ? criDose : null}
+                                                onChange={(v) => setCriDose(v ?? 0)}
+                                                decimals={3}
+                                                className="w-full"
+                                              />
+                                              <div className="text-xs text-muted-foreground">
+                                                Faixa não definida para esta unidade
+                                              </div>
+                                            </div>
+                                          );
+                                        }
+                                        
+                                        return (
+                                          <div className="space-y-3">
+                                            <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
+                                              <input
+                                                type="range"
+                                                min={r.min}
+                                                max={r.max}
+                                                step={step}
+                                                value={Math.max(r.min, Math.min(r.max, criDose))}
+                                                onChange={(e) => setCriDose(parseFloat(e.target.value) || r.min)}
+                                                className="md:col-span-4 w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer slider"
+                                                style={{
+                                                  background: `linear-gradient(to right, #1e40af 0%, #1e40af ${((Math.max(r.min, Math.min(r.max, criDose)) - r.min) / (r.max - r.min)) * 100}%, #e2e8f0 ${((Math.max(r.min, Math.min(r.max, criDose)) - r.min) / (r.max - r.min)) * 100}%, #e2e8f0 100%)`
+                                                }}
+                                              />
+                                              <NumberFieldBR
+                                                value={Number.isFinite(criDose) ? criDose : null}
+                                                onChange={(v) => setCriDose(v ?? r.min)}
+                                                decimals={3}
+                                                className="md:col-span-2"
+                                              />
+                                            </div>
+                                            <div className="flex justify-between text-xs text-muted-foreground">
+                                              <span>{r.min} {customCriUnit}</span>
+                                              <span className="font-medium">Faixa do fármaco</span>
+                                              <span>{r.max} {customCriUnit}</span>
+                                            </div>
+                                          </div>
+                                        );
+                                      })()}
                                     </div>
                                   </div>
                                 )}
-                                {/* === APRESENTAÇÃO + UNIDADE CRI (FIM) === */}
                                 
                                 <div>
                                     <div className="flex items-center gap-1.5 text-sm font-medium text-slate-600 mb-2">
@@ -1379,6 +1033,22 @@ export default function App() {
                                              <TextField id="infusionDuration" type="number" value={infusionDuration || ''} onChange={e => setInfusionDuration(parseFloat(e.target.value) || 0)} fullWidth size="small" label="Tempo (h)" />
                                         </div>
                                     </div>
+                                    
+                                    {/* Instruções de Preparo */}
+                                    {selectedDrug.preparationGuide && (
+                                        <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-400">
+                                            <div className="flex justify-center items-center">
+                                                <div className="flex-shrink-0">
+                                                    <BeakerIcon className="h-6 w-6 text-amber-500" aria-hidden="true" />
+                                                </div>
+                                                <div className="ml-3 text-center">
+                                                    <h3 className="text-base font-medium text-amber-800 dark:text-amber-400">Instruções de Preparo</h3>
+                                                    <div className="mt-2 text-sm text-amber-700 dark:text-amber-300"
+                                                         dangerouslySetInnerHTML={{ __html: selectedDrug.preparationGuide }}/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                     {vehicle.type === 'bag' && (
                                         <div>
                                             <label className="block text-sm font-medium text-slate-600 mb-2">Tipo de Fluido</label>
@@ -1387,17 +1057,19 @@ export default function App() {
                                             </div>
                                             
                                             {/* Alerta de compatibilidade */}
-                                            {selectedDrug && vehicle.fluid && (() => {
-                                                const selectedFluid = vehicle.fluid === 'NaCl 0.9%' ? 'sf' : 
-                                                                     vehicle.fluid === 'Ringer Lactato' ? 'rl' : 
-                                                                     vehicle.fluid === 'SG 5%' ? 'd5' : 'sf';
-                                                const compat = checkCompatibility(selectedFluid, selectedDrug.info?.compatibility || {});
+                                            {(() => {
+                                              const comp = checkCompatibility(selectedDrug as any, (vehicle as any).fluid);
+                                              const titles = {
+                                                success: "Compatível ✅",
+                                                warning: "Parcialmente compatível ⚠️",
+                                                danger: "🚨 Incompatível"
+                                              } as const;
                                                 return (
                                                     <div className="mt-3">
                                                         <CompatibilityAlertBar
-                                                            level={compat.level}
-                                                            message={compat.message}
-                                                            reason={compat.reason}
+                                                    level={comp.level}
+                                                    message={titles[comp.level]}
+                                                    reason={comp.reason}
                                                         />
                                                     </div>
                                                 );
@@ -1405,6 +1077,48 @@ export default function App() {
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Cálculo e resultados usando o motor */}
+                                {selectedDrug && !selectedDrug.isCombo && selectedConcentration && criDose && patient?.weight && (() => {
+                                  const range = (selectedDrug as any).cri?.ranges?.find((r: any) => r.unit === customCriUnit);
+                                  if (!range) return null;
+
+                                  const calc = calculateCRI({
+                                    doseValue: criDose,
+                                    doseUnit: customCriUnit as CriUnit,
+                                    weightKg: patient.weight,
+                                    rateMlH: 10, // taxa padrão
+                                    vialConcMgMl: selectedConcentration.value,
+                                    vehicleVolumeMl: vehicle.volume,
+                                    durationH: infusionDuration || 12,
+                                  });
+
+                                  const selectedFluid = (vehicle as any).fluid === 'NaCl 0.9%' ? 'sf' : 
+                                                       (vehicle as any).fluid === 'Ringer Lactato' ? 'rl' : 
+                                                       (vehicle as any).fluid === 'SG 5%' ? 'd5' : 'sf';
+                                  const compat = checkFluidCompatibility(selectedFluid, (selectedDrug as any).cri?.compatibility || { preferred: 'rl' });
+
+                                  return (
+                                    <div className="space-y-4">
+                                      {compat && (
+                                        <CompatibilityAlertBar
+                                          level={compat.level as any}
+                                          message={compat.level === 'danger' ? `🚨 Incompatível com ${selectedFluid.toUpperCase()}` : `${compat.label} com ${selectedFluid.toUpperCase()}`}
+                                          reason={compat.reason}
+                                        />
+                                      )}
+                                      <ResultsCard
+                                        results={{
+                                          drugVolume: calc.results.drugVolumeMl,
+                                          diluentVolume: calc.results.diluentVolumeMl,
+                                          finalConcMgMl: calc.results.finalConcMgMl,
+                                          rateMlH: calc.results.rateMlH
+                                        }}
+                                      />
+                                      <CalculationSteps steps={criCalculation.steps} />
+                                    </div>
+                                  );
+                                })()}
                                 </div>
                             )}
 
@@ -1419,67 +1133,42 @@ export default function App() {
                                 />
                             )}
                                
-                            {calculationMode === 'cri' && criCalculation && (criCalculation.drugVolume || criCalculation.isCombo || criCalculation.error || criCalculation.notesAndWarnings) && (
+                            {calculationMode === 'cri' && criCalculation && criCalculation.ready && (
                                 <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-dashed border-blue-200 dark:border-blue-900 rounded-lg mt-4 space-y-3">
                                     <h4 className="text-lg font-bold text-blue-800 dark:text-blue-300">Resultado da CRI</h4>
                                     <div className="text-xs text-slate-700 dark:text-slate-300">
                                         Boas práticas: bomba de seringa/volumétrica; linha dedicada para aminas/nitroprussiato; dupla checagem em drogas high-alert. Evite bicarbonato com catecolaminas, RL com remifentanil, nitroprussiato fora de SG5% sem proteção de luz.
                                     </div>
                                     
-                                     {criCalculation.isCombo && criCalculation.comboResult ? (
-                                        <div className="space-y-4">
-                                            <p className="text-base text-slate-700 text-center">Para preparar {vehicle.volume}mL para infusão em {infusionDuration}h:</p>
-                                            <ul className="list-disc list-inside space-y-1 text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
-                                                {criCalculation.comboResult.instructions.map((inst, i) => <li key={i} dangerouslySetInnerHTML={{ __html: inst }} />)}
-                                            </ul>
-                                            <p className="font-bold text-lg text-blue-700 dark:text-blue-300 text-center py-2">Taxa de Infusão Final: {criCalculation.comboResult.finalRate} mL/h <span className="text-sm font-normal text-slate-500 dark:text-slate-400">(≈{criCalculation.comboResult.finalRate} gtt/min)</span></p>
-                                        </div>
-                                    ) : criCalculation.error ? (
-                                        <WarningComponent text={criCalculation.error} type="critical" icon={<AlertTriangleIcon className="w-5 h-5"/>} />
-                                    ) : criCalculation.message ? (
-                                        <div className="space-y-3">
-                                            <p className="text-base text-slate-700 dark:text-slate-200 text-center" dangerouslySetInnerHTML={{ __html: criCalculation.message }}></p>
-                                                <div className="grid grid-cols-3 gap-2 text-sm text-center">
-                                                <div className="bg-white dark:bg-slate-900 p-2 rounded-md border border-slate-200 dark:border-slate-700">
-                                                    <p className="font-bold text-blue-600 dark:text-blue-300 text-lg">{criCalculation.drugVolume}</p>
-                                                    <p className="text-slate-600 dark:text-slate-300">mL de Fármaco</p>
-                                                </div>
-                                                <div className="bg-white dark:bg-slate-900 p-2 rounded-md border border-slate-200 dark:border-slate-700">
-                                                    <p className="font-bold text-blue-600 dark:text-blue-300 text-lg">{criCalculation.diluentVolume}</p>
-                                                    <p className="text-slate-600 dark:text-slate-300">mL de Diluente</p>
-                                                </div>
-                                                 <div className="bg-white dark:bg-slate-900 p-2 rounded-md border border-slate-200 dark:border-slate-700">
-                                                    <p className="font-bold text-blue-600 dark:text-blue-300 text-lg">{criCalculation.finalRate}</p>
-                                                     <p className="text-slate-600 dark:text-slate-300">mL/h <span className="text-xs">(≈{criCalculation.finalRate} gtt/min)</span></p>
-                                                </div>
+                                    <div className="space-y-3">
+                                        <p className="text-base text-slate-700 dark:text-slate-200 text-center">
+                                            Resultado do cálculo CRI
+                                        </p>
+                                        <div className="grid grid-cols-2 gap-2 text-sm text-center">
+                                            <div className="bg-white dark:bg-slate-900 p-2 rounded-md border border-slate-200 dark:border-slate-700">
+                                                <p className="font-bold text-blue-600 dark:text-blue-300 text-lg">{criCalculation.results.mlPerH.toFixed(2)}</p>
+                                                <p className="text-slate-600 dark:text-slate-300">mL/h</p>
+                                            </div>
+                                            <div className="bg-white dark:bg-slate-900 p-2 rounded-md border border-slate-200 dark:border-slate-700">
+                                                <p className="font-bold text-blue-600 dark:text-blue-300 text-lg">{criCalculation.results.totalMl.toFixed(2)}</p>
+                                                <p className="text-slate-600 dark:text-slate-300">mL total</p>
                                             </div>
                                         </div>
-                                    ) : null}
+                                    </div>
 
-                                    {criCalculation.notesAndWarnings && criCalculation.notesAndWarnings.messages.length > 0 ? (
-                                        <div className="mt-4 pt-4 border-t border-dashed border-blue-300 dark:border-blue-700 space-y-3">
-                                            {criCalculation.notesAndWarnings.messages.map((w, i) => (
-                                                <WarningComponent key={`warning-${i}`} {...w} />
-                                            ))}
-                                            
-                                            {criCalculation.notesAndWarnings.showComorbidityOverride && (
-                                                <label className="flex items-center gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg cursor-pointer hover:bg-yellow-100/70 dark:hover:bg-yellow-900/30">
-                                                    <input 
-                                                        type="checkbox"
-                                                        checked={overrideComorbidityDoseReduction}
-                                                        onChange={(e) => setOverrideComorbidityDoseReduction(e.target.checked)}
-                                                        className="h-5 w-5 rounded border-gray-400 text-red-600 focus:ring-red-500"
-                                                    />
-                                                    <span className="text-sm text-yellow-900 dark:text-yellow-200 font-medium">
-                                                        Estou ciente dos riscos, mas quero continuar com a dose padrão.
-                                                    </span>
-                                                </label>
-                                            )}
-                                        </div>
-                                    ) : null}
+
+                                    {/* Avisos por comorbidade */}
+                                    {comorbidityWarnings(patient, selectedDrug).length > 0 && (
+                                      <div className="mt-3 rounded-md border border-yellow-300 bg-yellow-50 text-yellow-800 p-3 dark:bg-yellow-900/20 dark:text-yellow-300">
+                                        <p className="font-medium mb-1">⚠️ Ajustes por comorbidade:</p>
+                                        <ul className="list-disc ml-5">
+                                          {comorbidityWarnings(patient, selectedDrug).map((x, i) => <li key={i}>{x}</li>)}
+                                        </ul>
+                                      </div>
+                                    )}
 
                                     {/* Passos de cálculo e fontes */}
-                                    <CalculationSteps steps={criResult?.steps} />
+                                    <CalculationSteps steps={criCalculation.steps} />
                                     <SourcesFootnote drug={selectedDrug} />
 
                                 </div>
@@ -1518,233 +1207,129 @@ const BolusCalculator: React.FC<{
     onOverrideChange: (override: boolean) => void;
 }> = ({ patient, drug, concentration, doseAdjustment, overrideComorbidityDoseReduction, onOverrideChange }) => {
 
-    const appropriateBolusDose = useMemo(() => {
-        if (!drug.bolusDoses) return null;
-        const speciesKey = patient.species === Species.Canine ? 'dog' : 'cat';
-        return drug.bolusDoses.find(d => d.species === speciesKey) 
-            || drug.bolusDoses.find(d => d.species === 'both');
-    }, [drug, patient.species]);
+    const isContraindicated = drug.bolusDoses === undefined || drug.bolusDoses.length === 0;
+    const [doseUnit, setDoseUnit] = useState<BolusUnit>('mg/kg');
+    const [doseValue, setDoseValue] = useState<number>(1);
+    const [vialConc, setVialConc] = useState<{value:number, unit:'mg/mL'|'μg/mL'}>({value:20, unit:'mg/mL'});
 
-    const [bolusDoseValue, setBolusDoseValue] = useState(0);
-    const [bolusInfusionTime, setBolusInfusionTime] = useState<number | undefined>(appropriateBolusDose?.infusionTimeMin);
-
-    const adjustedBolusRange = useMemo(() => {
-        if (!appropriateBolusDose) return null;
-        return {
-            min: appropriateBolusDose.min * doseAdjustment.factor,
-            max: appropriateBolusDose.max * doseAdjustment.factor,
-        };
-    }, [appropriateBolusDose, doseAdjustment]);
-    
     useEffect(() => {
-        if(appropriateBolusDose && adjustedBolusRange) {
-            const defaultDose = (adjustedBolusRange.min + adjustedBolusRange.max) / 2;
-            setBolusDoseValue(defaultDose);
-            setBolusInfusionTime(appropriateBolusDose.infusionTimeMin);
-        }
-    }, [appropriateBolusDose]); // Removed adjustedBolusRange from deps to avoid re-triggering on every adjustment change
-
-    const bolusResult = React.useMemo(() => {
-        try {
-            if (!drug || !concentration || !patient?.weight) return null;
-
-            return calculateBolus({
-                dose: { value: bolusDoseValue, unit: appropriateBolusDose.unit as any }, // 'mg_kg' | 'mcg_kg'
-                weightKg: patient.weight,
-                stock: {
-                    value: concentration.value,
-                    unit: concentration.unit as any,
-                },
-                // Se o usuário escolhe diluir (ex.: 10 mL para lento), passe:
-                // finalVolumeMl: slowAdminVolume ?? undefined,
+        if (!drug || !concentration) return;
+        
+        // Usar a primeira concentração disponível do medicamento para bolus
+        const firstConcentration = drug.concentrations?.[0];
+        if (firstConcentration) {
+            setVialConc({ 
+                value: firstConcentration.value, 
+                unit: firstConcentration.unit as 'mg/mL'|'μg/mL' 
             });
-        } catch (e) {
-            console.error(e);
-            return null;
-        }
-    }, [
-        drug,
-        concentration,
-        patient?.weight,
-        bolusDoseValue,
-        appropriateBolusDose?.unit,
-        // slowAdminVolume,
-    ]);
-
-    // Classificação de faixa para Bólus
-    const bolusRange = React.useMemo(() => {
-        if (!drug || !bolusDoseValue) return null
-        return classifyBolusDose(drug as any, bolusDoseValue, appropriateBolusDose.unit as any)
-    }, [drug, bolusDoseValue, appropriateBolusDose?.unit])
-
-    const bolusCalculation = useMemo(() => {
-        if (!appropriateBolusDose || !concentration || !patient.weight || patient.weight <= 0 || bolusDoseValue <= 0) {
-            return null;
-        }
-
-        const notes: {text: string, type: 'critical'|'warning'|'info', icon: React.ReactNode}[] = [];
-        if (appropriateBolusDose.notes) {
-            notes.push({text: appropriateBolusDose.notes, type: 'info', icon: <InfoIcon className="w-5 h-5"/>});
-        }
-        if (doseAdjustment.hasAgeAdjustment) {
-            notes.push({ text: `A dose sugerida foi <strong>reduzida em 25%</strong> devido à idade do paciente (${patient.state}).`, type: 'info', icon: <InfoIcon className="w-5 h-5"/>});
-        }
-
-        const hasHepaticRisk = patient.hepaticDisease && !!drug.info?.adjustments.hepatic;
-        const hasRenalRisk = patient.renalDisease && !!drug.info?.adjustments.renal;
-
-        if (doseAdjustment.hasComorbidityAdjustment) {
-            if (overrideComorbidityDoseReduction) {
-                 notes.push({ 
-                    text: `O ajuste automático de dose para comorbidade foi <strong>ignorado por sua solicitação</strong>. A dose padrão está em uso. Monitore o paciente com atenção redobrada.`, 
-                    type: 'critical', 
-                    icon: <AlertTriangleIcon className="w-5 h-5"/> 
-                });
-            } else {
-                 let reductionPercent = 0;
-                if (hasHepaticRisk) reductionPercent += 25;
-                if (hasRenalRisk) reductionPercent += 25;
-                 notes.push({
-                    text: `A dose sugerida foi <strong>reduzida em ${reductionPercent}%</strong> devido ao(s) risco(s) de comorbidade.`,
-                    type: 'warning',
-                    icon: <AlertTriangleIcon className="w-5 h-5"/>
-                });
-            }
+        } else {
+            setVialConc({ value: concentration.value, unit: concentration.unit as 'mg/mL'|'μg/mL' });
         }
         
-        const totalDose = bolusDoseValue * patient.weight;
-        let concentrationValueInDoseUnit = concentration.value;
+        // unidade default: se o range do fármaco preferir mcg/kg, comece nela
+        const first = drug.bolusDoses?.[0]?.unit as BolusUnit | undefined;
+        if (first) setDoseUnit(first);
+    }, [drug, concentration]);
 
-        if (appropriateBolusDose.unit === BolusDoseUnit.mg_kg && concentration.unit === 'μg/mL') {
-            concentrationValueInDoseUnit = concentration.value / 1000;
-        } else if (appropriateBolusDose.unit === BolusDoseUnit.mcg_kg && concentration.unit === 'mg/mL') {
-            concentrationValueInDoseUnit = concentration.value * 1000;
-        } else if (appropriateBolusDose.unit === BolusDoseUnit.U_kg && concentration.unit !== 'U/mL') {
-            return { error: 'Incompatibilidade de unidade entre dose (U/kg) e concentração.' };
-        }
+    const calc = useMemo(() => {
+        if (!drug || !patient?.weight || patient.weight <= 0) return null;
+        return calculateBolus({ doseValue, doseUnit, weightKg: patient.weight, vialConc });
+    }, [drug, doseValue, doseUnit, patient.weight, vialConc]);
 
-        if(concentrationValueInDoseUnit === 0) {
-            return { error: 'Concentração do fármaco não pode ser zero.' };
-        }
-
-        const totalVolume = totalDose / concentrationValueInDoseUnit;
-        const finalRateMlh = (bolusInfusionTime && bolusInfusionTime > 0) ? (totalVolume / (bolusInfusionTime / 60)) : undefined;
-
-        return {
-            totalDose: totalDose.toFixed(2),
-            totalVolume: totalVolume.toFixed(3),
-            doseUnit: appropriateBolusDose.unit,
-            finalRate: finalRateMlh?.toFixed(2),
-            notesAndWarnings: {
-                messages: notes,
-                showComorbidityOverride: doseAdjustment.hasComorbidityAdjustment
-            }
-        };
-
-    }, [bolusDoseValue, patient, drug, concentration, appropriateBolusDose, doseAdjustment, overrideComorbidityDoseReduction, bolusInfusionTime]);
-
-    if (!appropriateBolusDose || !adjustedBolusRange || !concentration) {
-        return <p className="text-center text-slate-500">Não foi possível carregar os dados para o cálculo de bólus.</p>;
+    if (isContraindicated) {
+        return (
+            <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <div className="flex items-center gap-2">
+                    <AlertTriangleIcon className="w-5 h-5 text-red-600" />
+                    <h3 className="text-lg font-semibold text-red-800 dark:text-red-300">🚫 Bólus contraindicado</h3>
+                </div>
+                <p className="text-red-700 dark:text-red-300 mt-2">Este fármaco não deve ser administrado em bólus.</p>
+            </div>
+        );
     }
 
     return (
         <div className="space-y-6">
-            <div>
-                <label className="block text-sm font-medium text-slate-600 mb-2">
-                    Dose de Bólus ({appropriateBolusDose.unit})
-                </label>
-                <div className="flex items-center gap-2">
-                    <input
-                        type="range"
-                        min={adjustedBolusRange.min}
-                        max={adjustedBolusRange.max}
-                        step={0.05}
-                        value={bolusDoseValue}
-                        onChange={e => setBolusDoseValue(parseFloat(e.target.value))}
-                        className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                        disabled={adjustedBolusRange.min === adjustedBolusRange.max}
-                    />
-                    <NumberFieldBR
-                        id="bolus-dose"
-                        value={Number.isFinite(bolusDoseValue) ? bolusDoseValue : null}
-                        onChange={(v) => setBolusDoseValue(v ?? 0)}
-                        suffix={appropriateBolusDose.unit}
-                        decimals={3}
-                        // min={adjustedBolusRange.min} max={adjustedBolusRange.max} // (opcional para aviso)
-                    />
-                </div>
-                {bolusRange && (
-                    <div className="mt-2">
-                        <RangeAlert level={bolusRange.level} text={bolusRange.message} />
-                    </div>
-                )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <label className="block text-sm font-medium text-slate-600 mb-2">Apresentação</label>
-                     <p className="p-2 bg-slate-100 dark:bg-slate-800 rounded-md text-slate-700 dark:text-slate-200 min-h-[42px] flex items-center text-sm">{concentration.label}</p>
-                </div>
-                <div>
-                    <label htmlFor="bolusInfusionTime" className="block text-sm font-medium text-slate-600 mb-2">Tempo de Infusão (min)</label>
-                    <input id="bolusInfusionTime" type="number" value={bolusInfusionTime || ''} onChange={e => setBolusInfusionTime(parseFloat(e.target.value) || undefined)}
-                        className="w-full p-2 border bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-md text-slate-900 dark:text-slate-200 no-spinner"
-                        placeholder="Opcional"
-                    />
-                </div>
-            </div>
-
-            {bolusCalculation && (
-                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-dashed border-blue-200 dark:border-blue-900 rounded-lg mt-4 space-y-3">
-                    <h4 className="text-lg font-bold text-blue-800 dark:text-blue-300">Resultado do Bólus</h4>
-                    {bolusCalculation.error ? (
-                        <WarningComponent text={bolusCalculation.error} type="critical" icon={<AlertTriangleIcon className="w-5 h-5"/>} />
-                    ) : (
-                        <div className="space-y-3">
-                            <div className="grid grid-cols-2 gap-2 text-sm text-center">
-                                <div className="bg-white dark:bg-slate-900 p-2 rounded-md border border-slate-200 dark:border-slate-700">
-                                    <p className="font-bold text-blue-600 dark:text-blue-300 text-lg">{bolusCalculation.totalDose}</p>
-                                    <p className="text-slate-500 dark:text-slate-400">Dose Total ({bolusCalculation.doseUnit.replace('/kg', '')})</p>
-                                </div>
-                                <div className="bg-white dark:bg-slate-900 p-2 rounded-md border border-slate-200 dark:border-slate-700">
-                                    <p className="font-bold text-blue-600 dark:text-blue-300 text-lg">{bolusCalculation.totalVolume}</p>
-                                    <p className="text-slate-500 dark:text-slate-400">Volume Total (mL)</p>
-                                </div>
-                            </div>
-                            {bolusCalculation.finalRate && (
-                                <div className="bg-white dark:bg-slate-900 p-3 rounded-md border border-slate-200 dark:border-slate-700 text-center">
-                                    <p className="font-bold text-blue-600 dark:text-blue-300 text-lg">{bolusCalculation.finalRate} mL/h</p>
-                                    <p className="text-slate-500 dark:text-slate-400 text-sm">Taxa para Bomba de Infusão</p>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {bolusCalculation.notesAndWarnings && bolusCalculation.notesAndWarnings.messages.length > 0 && (
-                        <div className="mt-4 pt-4 border-t border-dashed border-blue-300 dark:border-blue-700 space-y-3">
-                            {bolusCalculation.notesAndWarnings.messages.map((w, i) => (
-                                <WarningComponent key={`bolus-warning-${i}`} {...w} />
-                            ))}
-                            
-                            {bolusCalculation.notesAndWarnings.showComorbidityOverride && (
-                                <label className="flex items-center gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg cursor-pointer hover:bg-yellow-100/70 dark:hover:bg-yellow-900/30">
-                                    <input 
-                                        type="checkbox"
-                                        checked={overrideComorbidityDoseReduction}
-                                        onChange={(e) => onOverrideChange(e.target.checked)}
-                                        className="h-5 w-5 rounded border-gray-400 text-red-600 focus:ring-red-500"
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-slate-600 dark:text-slate-300">
+                            Dose de Bólus
+                        </label>
+                        <div className="flex items-center gap-4">
+                            <div className="flex gap-4">
+                                <label className="flex items-center gap-2">
+                                    <input
+                                        type="radio"
+                                        value="mg/kg"
+                                        checked={doseUnit === 'mg/kg'}
+                                        onChange={(e) => setDoseUnit(e.target.value as BolusUnit)}
+                                        className="h-4 w-4"
                                     />
-                                    <span className="text-sm text-yellow-900 dark:text-yellow-200 font-medium">
-                                        Ignorar ajuste de comorbidade.
-                                    </span>
+                                    <span className="text-sm">mg/kg</span>
                                 </label>
-                            )}
+                                <label className="flex items-center gap-2">
+                                    <input
+                                        type="radio"
+                                        value="mcg/kg"
+                                        checked={doseUnit === 'mcg/kg'}
+                                        onChange={(e) => setDoseUnit(e.target.value as BolusUnit)}
+                                        className="h-4 w-4"
+                                    />
+                                    <span className="text-sm">mcg/kg</span>
+                                </label>
+                            </div>
+                            <input
+                                type="number"
+                                value={doseValue}
+                                onChange={e => setDoseValue(Number(e.target.value || 0))}
+                                className="w-36 p-2 border bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 border-slate-300 dark:border-slate-700 rounded-md text-center no-spinner"
+                                step="0.1"
+                            />
                         </div>
-                    )}
+                    </div>
 
-                    {/* Passos de cálculo e fontes */}
-                    <CalculationSteps isBolus steps={bolusResult?.steps} />
-                    <SourcesFootnote drug={drug} />
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-slate-600 dark:text-slate-300">
+                            Apresentação (concentração da ampola)
+                        </label>
+                        <select
+                            value={`${vialConc.value}-${vialConc.unit}`}
+                            onChange={(e) => {
+                                const [value, unit] = e.target.value.split('-');
+                                setVialConc({ value: Number(value), unit: unit as 'mg/mL'|'μg/mL' });
+                            }}
+                            className="w-full p-2 border bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 border-slate-300 dark:border-slate-700 rounded-md"
+                        >
+                            {drug.concentrations?.map((conc, index) => (
+                                <option key={index} value={`${conc.value}-${conc.unit}`}>
+                                    {conc.label || `${conc.value} ${conc.unit}`}
+                                </option>
+                            )) || (
+                                <>
+                                    <option value="1-mg/mL">1 mg/mL</option>
+                                    <option value="2-mg/mL">2 mg/mL</option>
+                                    <option value="10-mg/mL">10 mg/mL</option>
+                                    <option value="20-mg/mL">20 mg/mL</option>
+                                    <option value="100-μg/mL">100 μg/mL</option>
+                                    <option value="1000-μg/mL">1000 μg/mL</option>
+                                </>
+                            )}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {calc && (
+                <div className="space-y-4">
+                    <ResultsCard
+                        isBolus
+                        results={{
+                            totalDose: calc.results.totalDose,
+                            totalVolume: calc.results.totalVolume
+                        }}
+                    />
+                    <CalculationSteps steps={calc.steps.map(s => s.label)} isBolus />
                 </div>
             )}
         </div>
