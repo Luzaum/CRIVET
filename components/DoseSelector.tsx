@@ -23,29 +23,21 @@ function computeTrackPercents(min: number, max: number, rec: { min: number; max:
     };
   }
   
-  // Calcula as faixas baseadas na dose recomendada
-  const lowThreshold = rec.min * 0.5; // 50% abaixo da dose mínima
-  const highThreshold = rec.max * 1.5; // 50% acima da dose máxima
-  
-  // Usa a faixa recomendada como base, expandindo apenas o necessário
-  const range = rec.max - rec.min;
-  const margin = range * 0.5; // 50% da faixa como margem
-  
-  const adjustedMin = Math.max(0, rec.min - margin);
-  const adjustedMax = rec.max + margin;
-  
-  // Calcula os percentuais das faixas
+  // Usa o range absoluto (min, max) como base para a barra
+  const adjustedMin = min;
+  const adjustedMax = max;
   const totalRange = adjustedMax - adjustedMin;
   
-  // Faixa amarela: de 0% até o início da dose recomendada (cobre toda a subdose)
+  // Calcula os percentuais das faixas baseados no range absoluto
+  // Faixa amarela: de 0% até o início da dose recomendada (subdose)
   const lowLeft = 0;
-  const lowRight = ((rec.min - adjustedMin) / totalRange) * 100;
+  const lowRight = Math.max(0, Math.min(100, ((rec.min - adjustedMin) / totalRange) * 100));
   
   // Faixa verde: dose recomendada
-  const recLeft = ((rec.min - adjustedMin) / totalRange) * 100;
-  const recRight = ((rec.max - adjustedMin) / totalRange) * 100;
+  const recLeft = Math.max(0, Math.min(100, ((rec.min - adjustedMin) / totalRange) * 100));
+  const recRight = Math.max(0, Math.min(100, ((rec.max - adjustedMin) / totalRange) * 100));
   
-  // Faixa vermelha: de onde a verde termina até 100%
+  // Faixa vermelha: de onde a verde termina até 100% (sobredose)
   const highLeft = recRight;
   const highRight = 100;
   
@@ -85,14 +77,44 @@ const twValue = "text-2xl font-bold";
 // Value badge (green=in, amber=low, rose=high)
 // =============================================================
 function ValueBadge({ value, unit, rec }: { value: number; unit: string; rec: { min: number; max: number } }) {
-  const status = value < rec.min ? "low" : value > rec.max ? "high" : "in";
-  const clsNum = status === "in" ? "text-green-600" : status === "low" ? "text-amber-600" : "text-rose-600";
-  const clsTag =
-    status === "in"
-      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
-      : status === "low"
-      ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
-      : "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300";
+  // Classificação mais detalhada para doses extremas
+  let status: "in" | "low" | "very-low" | "high" | "very-high";
+  let message: string;
+  
+  if (value >= rec.min && value <= rec.max) {
+    status = "in";
+    message = "Faixa recomendada";
+  } else if (value < rec.min) {
+    // Detecção de subdose: considera valores muito baixos como subdose extrema
+    if (value < rec.min * 0.3 || value < 0.1) {
+      status = "very-low";
+      message = "Subdose extrema";
+    } else {
+      status = "low";
+      message = "Abaixo do recomendado";
+    }
+  } else {
+    // Detecção de sobredose: considera valores muito altos como sobredose extrema
+    if (value > rec.max * 3 || value > rec.max + (rec.max - rec.min) * 5) {
+      status = "very-high";
+      message = "Sobredose extrema";
+    } else {
+      status = "high";
+      message = "Acima do recomendado";
+    }
+  }
+  
+  const clsNum = status === "in" ? "text-green-600" : 
+                 (status === "low" || status === "very-low") ? "text-amber-600" : 
+                 "text-rose-600";
+                 
+  const clsTag = status === "in"
+    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+    : (status === "low" || status === "very-low")
+    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+    : status === "very-high"
+    ? "bg-red-200 text-red-800 dark:bg-red-900/40 dark:text-red-300 font-bold"
+    : "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300";
 
   return (
     <div className="flex items-center justify-between" aria-live="polite">
@@ -100,7 +122,7 @@ function ValueBadge({ value, unit, rec }: { value: number; unit: string; rec: { 
         {fmt(value)} <span className="text-base font-medium opacity-70">{unit}</span>
       </div>
       <span className={`text-xs px-2 py-1 rounded-full font-medium ${clsTag}`}>
-        {status === "in" ? "Faixa recomendada" : status === "low" ? "Abaixo do recomendado" : "Acima do recomendado"}
+        {message}
       </span>
     </div>
   );
@@ -140,6 +162,7 @@ function Track({
   const clampedRecRight = clamp(recRight, 0, 100);
   const clampedHighLeft = clamp(highLeft, 0, 100);
   const clampedHighRight = clamp(highRight, 0, 100);
+  
   
   const pos = valueToPercent(adjustedMin, adjustedMax, value);
   const clampedPos = clamp(pos, 0, 100);
@@ -200,10 +223,33 @@ function Track({
         aria-valuenow={Number(value.toFixed(2))}
         onKeyDown={onKeyDown}
       >
-        {/* zones - amarelo (50% abaixo), verde (recomendado), vermelho (50% acima) */}
-        <div className="absolute top-1/2 -translate-y-1/2 h-2 bg-amber-400/80 rounded-full" style={{ left: `${clampedLowLeft}%`, width: `${clampedLowRight - clampedLowLeft}%` }} />
-        <div className="absolute top-1/2 -translate-y-1/2 h-2 bg-green-500/90 border-2 border-green-600 shadow-sm rounded-full" style={{ left: `${clampedRecLeft}%`, width: `${clampedRecRight - clampedRecLeft}%` }} />
-        <div className="absolute top-1/2 -translate-y-1/2 h-2 bg-rose-500/80 rounded-full" style={{ left: `${clampedHighLeft}%`, width: `${clampedHighRight - clampedHighLeft}%` }} />
+        {/* zones - amarelo (subdose), verde (recomendado), vermelho (sobredose) */}
+        {/* Faixa amarela - subdose */}
+        <div 
+          className="absolute top-1/2 -translate-y-1/2 h-2 bg-amber-400/80 rounded-full" 
+          style={{ 
+            left: `${clampedLowLeft}%`, 
+            width: `${Math.max(0, clampedLowRight - clampedLowLeft)}%` 
+          }} 
+        />
+        
+        {/* Faixa verde - dose recomendada */}
+        <div 
+          className="absolute top-1/2 -translate-y-1/2 h-2 bg-green-500/90 border-2 border-green-600 shadow-sm rounded-full" 
+          style={{ 
+            left: `${clampedRecLeft}%`, 
+            width: `${Math.max(0, clampedRecRight - clampedRecLeft)}%` 
+          }} 
+        />
+        
+        {/* Faixa vermelha - sobredose */}
+        <div 
+          className="absolute top-1/2 -translate-y-1/2 h-2 bg-rose-500/80 rounded-full" 
+          style={{ 
+            left: `${clampedHighLeft}%`, 
+            width: `${Math.max(0, clampedHighRight - clampedHighLeft)}%` 
+          }} 
+        />
 
         {/* indicator (draggable visual) - centralizado perfeitamente */}
         <div
@@ -220,18 +266,36 @@ function Track({
 // =============================================================
 function Advice({ value, rec }: { value: number; rec: { min: number; max: number } }) {
   if (value < rec.min) {
-    return (
-      <div className="mt-2 rounded-md border border-amber-300/70 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200 px-3 py-2 text-sm">
-        <b>SUBdose</b> — dose abaixo da faixa recomendada pode resultar em <b>efeito terapêutico insuficiente</b>, atraso na resposta clínica e <b>falha terapêutica</b>. Ajuste dentro da faixa azul sempre que possível.
-      </div>
-    );
+    // Detecção de subdose extrema: valores muito baixos
+    if (value < rec.min * 0.3 || value < 0.1) {
+      return (
+        <div className="mt-2 rounded-md border border-amber-400/70 bg-amber-100 dark:bg-amber-900/30 text-amber-900 dark:text-amber-100 px-3 py-2 text-sm">
+          <b>⚠️ SUBDOSE EXTREMA</b> — dose muito abaixo da faixa recomendada. Risco alto de <b>falha terapêutica completa</b>. Ajuste imediatamente para dentro da faixa verde.
+        </div>
+      );
+    } else {
+      return (
+        <div className="mt-2 rounded-md border border-amber-300/70 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200 px-3 py-2 text-sm">
+          <b>SUBdose</b> — dose abaixo da faixa recomendada pode resultar em <b>efeito terapêutico insuficiente</b>, atraso na resposta clínica e <b>falha terapêutica</b>. Ajuste dentro da faixa verde sempre que possível.
+        </div>
+      );
+    }
   }
   if (value > rec.max) {
-    return (
-      <div className="mt-2 rounded-md border border-rose-400/70 bg-rose-50 dark:bg-rose-900/20 text-rose-800 dark:text-rose-200 px-3 py-2 text-sm">
-        <b>Sobredose</b> — dose acima da faixa recomendada aumenta o risco de <b>eventos adversos</b> e <b>toxicidade</b>. Reduza para a faixa azul, a menos que haja justificativa clínica formal.
-      </div>
-    );
+    // Detecção de sobredose extrema: valores muito altos
+    if (value > rec.max * 3 || value > rec.max + (rec.max - rec.min) * 5) {
+      return (
+        <div className="mt-2 rounded-md border border-red-500/70 bg-red-100 dark:bg-red-900/30 text-red-900 dark:text-red-100 px-3 py-2 text-sm">
+          <b>🚨 SOBREDOSE EXTREMA</b> — dose perigosamente alta! Risco grave de <b>toxicidade severa</b> e <b>eventos adversos graves</b>. Reduza imediatamente para a faixa verde. Considere monitorização intensiva.
+        </div>
+      );
+    } else {
+      return (
+        <div className="mt-2 rounded-md border border-rose-400/70 bg-rose-50 dark:bg-rose-900/20 text-rose-800 dark:text-rose-200 px-3 py-2 text-sm">
+          <b>Sobredose</b> — dose acima da faixa recomendada aumenta o risco de <b>eventos adversos</b> e <b>toxicidade</b>. Reduza para a faixa verde, a menos que haja justificativa clínica formal.
+        </div>
+      );
+    }
   }
   return null;
 }
@@ -367,10 +431,10 @@ function SelfTest() {
   tests.push({ name: "step fine (0..5) = 0.05", pass: Math.abs(stepFine - 0.05) < 1e-9 });
   tests.push({ name: "step coarse (0..5) = 0.5", pass: Math.abs(stepCoarse - 0.5) < 1e-9 });
 
-  // track percents - agora com faixas baseadas na dose recomendada
+  // track percents - agora com faixas baseadas no range absoluto
   const { recLeft, recRight } = computeTrackPercents(0, 5, { min: 1.5, max: 3.0 });
-  tests.push({ name: "track recLeft% = 25", pass: Math.round(recLeft) === 25 });
-  tests.push({ name: "track recRight% = 75", pass: Math.round(recRight) === 75 });
+  tests.push({ name: "track recLeft% = 30", pass: Math.round(recLeft) === 30 });
+  tests.push({ name: "track recRight% = 60", pass: Math.round(recRight) === 60 });
 
   // value ↔ percent
   const pMid = valueToPercent(0, 5, 2.5);

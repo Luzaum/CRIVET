@@ -45,8 +45,19 @@ export function formatDisplayNumber(
 export function parseNumberPTBR(value: string): number {
   if (!value || value.trim() === '') return 0;
   
-  // Remove espaços e converte vírgula para ponto
-  const cleanValue = value.trim().replace(',', '.');
+  // Remove espaços
+  const trimmed = value.trim();
+  
+  // Verifica se há múltiplas vírgulas ou pontos (formato inválido)
+  const commaCount = (trimmed.match(/,/g) || []).length;
+  const dotCount = (trimmed.match(/\./g) || []).length;
+  
+  if (commaCount > 1 || dotCount > 1 || (commaCount > 0 && dotCount > 0)) {
+    return 0; // Formato inválido
+  }
+  
+  // Converte vírgula para ponto
+  const cleanValue = trimmed.replace(',', '.');
   
   const parsed = parseFloat(cleanValue);
   return isNaN(parsed) ? 0 : parsed;

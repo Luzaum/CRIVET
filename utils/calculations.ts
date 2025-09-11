@@ -180,7 +180,7 @@ export function calculateCRI(input: CriInput): CriResult {
   const steps: CalcStep[] = [
     {
       label: 'Passo 1: Dose em mg/kg/h',
-      formula: 'Converte a unidade selecionada para mg/kg/h',
+      formula: 'Dose convertida para mg/kg/h',
       example: (() => {
         const doseMgKgH =
           dose.unit === 'mcg_kg_min' ? round((dose.value * 60) / 1000, 3) :
@@ -193,19 +193,14 @@ export function calculateCRI(input: CriInput): CriResult {
       })(),
     },
     {
-      label: 'Passo 2: Dose por hora',
-      formula: 'Dose (mg/kg/h) × Peso (kg) = mg/h',
-      example: `${round(massMgPerHour / weightKg, 3)} × ${weightKg} = ${round(massMgPerHour, 3)} mg/h`,
-    },
-    {
-      label: 'Passo 3: Concentração necessária',
+      label: 'Passo 2: Concentração necessária',
       formula: 'mg/h ÷ mL/h = mg/mL',
       example: `${round(massMgPerHour, 3)} ÷ ${round(pumpRateMlPerHour, 3)} = ${round(neededConcMgPerMl, 3)} mg/mL`,
     },
     {
-      label: 'Passo 4: Volume do fármaco',
-      formula: '(mg/mL × Volume total) ÷ Concentração do frasco = mL de fármaco',
-      example: `(${round(neededConcMgPerMl, 3)} × ${vehicle.volume}) ÷ ${round(stockMcgPerMl/1000, 3)} = ${round(volumeDrugMl, 3)} mL`,
+      label: 'Passo 3: Volume do fármaco',
+      formula: 'Concentração necessária × Volume total ÷ Concentração do frasco = mL de fármaco',
+      example: `${round(neededConcMgPerMl, 3)} × ${vehicle.volume} ÷ ${round(stockMcgPerMl/1000, 3)} = ${round(volumeDrugMl, 3)} mL`,
     },
   ];
   
