@@ -972,30 +972,40 @@ export default function App() {
 
                                     {/* DoseCRICard integrado */}
                                     {(() => {
-                                      // 1) Backend manda a faixa numa unidade canônica (mg/kg/h)
-                                      const guidelineRecBaseMgPerKgPerH: Record<string, RecRange | null> = {
-                                        ketamine: { min: 1, max: 3 }, // EXEMPLO - ajuste conforme seus dados
-                                        morphine: { min: 0.1, max: 0.3 },
-                                        fentanyl: { min: 0.002, max: 0.01 },
-                                        lidocaine: { min: 0.5, max: 2 },
-                                        // Adicione outras drogas conforme necessário
-                                      };
-                                      
-                                      // 2) Obter faixa base e converter para unidade atual
+                                      // 1) Obter faixa recomendada do medicamento selecionado
                                       const unit: DoseUnit = customCriUnit as DoseUnit;
-                                      const drugId = selectedDrug?.id || '';
-                                      const baseRec = guidelineRecBaseMgPerKgPerH[drugId];
                                       
-                                      // Se não houver faixa, passe {0,0}; se houver, CONVERTA:
-                                      const rec = baseRec ? convertRange(baseRec, "mg/kg/h", unit) : { min: 0, max: 0 };
+                                      // Buscar a dose recomendada do medicamento na unidade atual
+                                      const selectedDose = selectedDrug?.criDoses?.find(d => d.cri.unit === unit);
                                       
-                                      // 3) Range absoluto coerente (2x o máximo recomendado)
+                                      let rec: RecRange;
+                                      let presets: number[] | undefined;
+                                      
+                                      if (selectedDose) {
+                                        // Usar dados reais do medicamento
+                                        rec = {
+                                          min: selectedDose.cri.min,
+                                          max: selectedDose.cri.max
+                                        };
+                                        
+                                        // Presets baseados na faixa real do medicamento
+                                        const range = rec.max - rec.min;
+                                        const step = range / 4; // 5 presets
+                                        presets = [
+                                          rec.min,
+                                          rec.min + step,
+                                          rec.min + step * 2,
+                                          rec.min + step * 3,
+                                          rec.max
+                                        ].map(v => Math.round(v * 100) / 100); // Arredondar para 2 casas decimais
+                                      } else {
+                                        // Fallback se não encontrar a unidade
+                                        rec = { min: 0, max: 0 };
+                                        presets = undefined;
+                                      }
+                                      
+                                      // 2) Range absoluto coerente (2x o máximo recomendado)
                                       const abs = buildAbs(rec);
-                                      
-                                      // 4) Presets na mesma unidade (exemplo)
-                                      const presets = unit === "mcg/kg/min" ? [16.67, 33.33, 50, 66.67, 83.33] : 
-                                                     unit === "mg/kg/h" ? [1, 1.5, 2, 2.5, 3] :
-                                                     unit === "mcg/kg/h" ? [1000, 1500, 2000, 2500, 3000] : undefined;
 
                                       return (
                                         <DoseCRICard

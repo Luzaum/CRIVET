@@ -1440,23 +1440,59 @@ export const DRUGS: Drug[] = [
       { source: 'BSAVA Small Animal Formulary (10ª ed.)' },
     ],
     info: {
-        indicationSummary: ["Antiarrítmico (Classe IB) para taquicardias ventriculares, e analgesia sistêmica em cães."],
+        indicationSummary: [
+          "Anestesia Local e Regional: Bloqueios de nervos, anestesia infiltrativa, epidural, dessensibilização da laringe antes da intubação",
+          "Tratamento de Arritmias Ventriculares: Fármaco de eleição para taquicardias ventriculares e complexos ventriculares prematuros (CVPs) em cães",
+          "Analgesia Sistêmica (CRI): Parte de protocolos de analgesia multimodal no trans e pós-operatório, especialmente em cirurgias abdominais, torácicas e ortopédicas",
+          "Procinético (Cavalos): Efeito procinético para restaurar motilidade intestinal no pós-operatório de cólica"
+        ],
+        mechanism: "Anestésico local do tipo amida e antiarrítmico da Classe IB. Anestesia local: bloqueio dos canais de sódio dependentes de voltagem. Antiarrítmico: liga-se aos canais de sódio inativados, encurtando a duração do potencial de ação. Analgesia sistêmica: propriedades anti-inflamatórias e modulação da dor neuropática.",
         dosesText: {
-            dog: { cri: "25-50 µg/kg/min (analgesia); 25-100 µg/kg/min (antiarrítmico)", bolus: "1-2 mg/kg IV em alíquotas (antiarrítmico)"},
-            cat: { cri: "10-40 µg/kg/min (antiarrítmico)", bolus: "0.25-0.75 mg/kg IV muito lento (5-10 min)" },
-            notes: "ALERTA: Gatos são extremamente sensíveis à toxicidade. O uso como analgésico sistêmico em gatos é contraindicado pelo alto risco."
+            dog: { cri: "25-80 µg/kg/min (analgesia)", bolus: "1-2 mg/kg IV lento (antiarrítmico/analgesia)"},
+            cat: { cri: "Uso controverso - mais sensível aos efeitos cardiodepressores e no SNC", bolus: "0.25-0.75 mg/kg IV muito lento (5-10 min)" },
+            notes: "Gatos são mais sensíveis aos efeitos cardiodepressores e no SNC. Uso em gatos deve ser feito com cautela."
         },
-        diluents: { recommended: ['NaCl 0.9%', 'SG 5%', 'Ringer Lactato'] },
+        diluents: { 
+          recommended: ['Ringer Lactato', 'NaCl 0.9%', 'SG 5%'], 
+          notes: "Compatível com múltiplos diluentes. Para CRI: adicionar dose total para 24h na bolsa de fluido do paciente." 
+        },
         photoprotection: false,
-        compatibility: { incompatibilities: ["Anfotericina B", "Pantoprazol"], ySite: ["Fentanil", "Cetamina", "Dobutamina"] },
-        adjustments: {
-            hepatic: "Metabolismo hepático. Reduzir a dose em 50% em disfunção hepática severa.",
-            cardiac: "Reduzir dose em pacientes com baixo débito cardíaco (ex: choque, ICC).",
+        compatibility: { 
+          incompatibilities: ["Anfotericina B", "Pantoprazol", "Formulações com epinefrina"], 
+          ySite: ["Fentanil", "Cetamina", "Dobutamina", "Midazolam"] 
         },
-        monitoring: ["ECG contínuo", "Pressão arterial", "Sinais de toxicidade do SNC (tremores, convulsões, nistagmo, depressão)"],
-        goodPractice: ["Sempre usar bomba de infusão.", "Verificar se a apresentação é SEM EPINEFRINA para uso IV."],
-        contraindications: ["Hipersensibilidade a anestésicos locais do tipo amida", "Bloqueio atrioventricular de alto grau (sem marcapasso)."],
-        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed.", "BSAVA Small Animal Formulary, 10th Ed."]
+        adjustments: {
+            hepatic: "Metabolismo hepático. Reduzir a dose em 25-50% em disfunção hepática severa.",
+            cardiac: "Reduzir dose em pacientes com baixo débito cardíaco (ex: choque, ICC).",
+            renal: "Ajustar dose em insuficiência renal quando houver comorbidades associadas."
+        },
+        monitoring: [
+          "ECG contínuo", 
+          "Pressão arterial", 
+          "Sinais de toxicidade do SNC (tremores, convulsões, nistagmo, depressão)",
+          "Função hepática",
+          "Estado neurológico"
+        ],
+        goodPractice: [
+          "🚫 NUNCA usar formulações com epinefrina para administração IV (risco de arritmias ventriculares fatais)",
+          "Sempre usar bomba de infusão para CRI",
+          "Administrar bolus lentamente para evitar toxicidade",
+          "Dose cumulativa máxima: 8 mg/kg",
+          "CRI pode ser mantida por 24-72 horas",
+          "Verificar se a apresentação é SEM EPINEFRINA para uso IV"
+        ],
+        contraindications: [
+          "Hipersensibilidade a anestésicos locais do tipo amida", 
+          "Bloqueio atrioventricular de alto grau (sem marcapasso)",
+          "Formulações com epinefrina para uso IV",
+          "Bradicardia grave não tratada"
+        ],
+        citations: [
+          "Plumb's Veterinary Drug Handbook, 10th Edition",
+          "BSAVA Small Animal Formulary, 10th Edition", 
+          "Textbook of Small Animal Emergency Medicine (Drobatz et al.)",
+          "Small Animal Clinical Pharmacology and Therapeutics, 2nd Edition"
+        ]
     }
   },
   {
@@ -1591,28 +1627,79 @@ export const DRUGS: Drug[] = [
     name: 'Dobutamina',
     category: 'Agentes Cardiovasculares',
     concentrations: [{ value: 12500, unit: 'μg/mL', label: '250mg em 20mL (padrão)' }],
-    preparationGuide: `A dobutamina deve ser diluída. Uma preparação comum é adicionar <strong>250mg (20mL)</strong> em uma bolsa de <strong>250mL</strong> de SG 5% ou NaCl 0.9%, resultando em uma concentração de <strong>1000 µg/mL (1mg/mL)</strong>. A calculadora pode usar a concentração do frasco ou a da sua solução final.`,
+    preparationGuide: `🧠 Dobutamina: O Inotrópico de Escolha para Suporte Cardíaco<br/><br/>
+<strong>Mecanismo de Ação:</strong><br/>
+• <strong>Ação Beta-1 (β₁):</strong> Principal mecanismo - aumenta a força de contração do miocárdio (inotropismo positivo), resultando em aumento do volume sistólico e débito cardíaco<br/>
+• <strong>Ação Beta-2 (β₂) e Alfa-1 (α₁):</strong> Efeitos leves e variáveis que se equilibram, resultando em efeito mínimo sobre a pressão arterial sistêmica<br/><br/>
+
+<strong>Preparo:</strong><br/>
+<ul class="list-disc list-inside space-y-1">
+  <li><strong>Fluido recomendado:</strong> Solução Glicosada 5% (D5W) - protege da oxidação</li>
+  <li><strong>Diluições comuns:</strong>
+    <ul class="list-disc list-inside ml-4 mt-1">
+      <li>250 mg em 250 mL = 1000 mcg/mL (1 mg/mL)</li>
+      <li>250 mg em 500 mL = 500 mcg/mL (0,5 mg/mL)</li>
+      <li>250 mg em 1000 mL = 250 mcg/mL (0,25 mg/mL)</li>
+    </ul>
+  </li>
+  <li>A solução pode adquirir coloração rosa (não indica perda de potência)</li>
+  <li><strong>NUNCA administrar em bolus!</strong> Risco de taquicardia severa e arritmias</li>
+</ul>
+<div class="mt-2 text-xs bg-yellow-50 p-2 rounded">⚠️ Incompatível com soluções alcalinas (bicarbonato) e heparina</div>`,
     criDoses: [
-        { species: 'dog', cri: { min: 2, max: 20, default: 7.5, unit: CriDoseUnit.mcg_kg_min } },
-        { species: 'cat', cri: { min: 1, max: 10, default: 5, unit: CriDoseUnit.mcg_kg_min } },
+        { species: 'dog', cri: { min: 2, max: 15, default: 7.5, unit: CriDoseUnit.mcg_kg_min } },
+        { species: 'cat', cri: { min: 1, max: 5, default: 3, unit: CriDoseUnit.mcg_kg_min } },
     ],
     info: {
-        indicationSummary: ["Suporte inotrópico para disfunção miocárdica e choque cardiogênico (ex: CMD, ICC severa)."],
-        mechanism: "Agonista β1-adrenérgico que aumenta a contratilidade com menor efeito na frequência cardíaca.",
+        indicationSummary: [
+          "Insuficiência Cardíaca Congestiva (ICC) Descompensada: Especialmente em cardiomiopatia dilatada ou doença valvar crônica grave",
+          "Choque Cardiogênico: Restaurar contratilidade e perfusão quando o coração é a causa primária",
+          "Suporte Hemodinâmico Pós-Parada Cardíaca: Superar o 'miocárdio stunned' com contratilidade reduzida",
+          "Hipotensão Anestésica: Tratar hipotensão durante anestesia por depressão miocárdica"
+        ],
+        mechanism: "Catecolamina sintética que atua predominantemente como agonista dos receptores β₁-adrenérgicos no músculo cardíaco, aumentando a força de contração (inotropismo positivo) com menor efeito cronotrópico e arrítmico.",
         dosesText: {
-            dog: { cri: "2-20 µg/kg/min", bolus: "Não recomendado" },
-            cat: { cri: "1-10 µg/kg/min", bolus: "Não recomendado"},
-            notes: "Gatos são mais sensíveis a taquiarritmias; iniciar com doses mais baixas (1-5 μg/kg/min). Taquifilaxia (perda de efeito) pode ocorrer após 48-72h."
+            dog: { cri: "2-15 µg/kg/min" },
+            cat: { cri: "1-5 µg/kg/min (gatos mais sensíveis)" },
+            notes: "Gatos são mais sensíveis e doses mais altas podem causar convulsões. Taquifilaxia pode ocorrer após 24-72h de uso prolongado."
         },
-        diluents: { recommended: ['NaCl 0.9%', 'SG 5%'], notes: "A solução pode ficar rosada, o que não indica perda de potência." },
+        diluents: { 
+          recommended: ['SG 5%', 'NaCl 0.9%', 'Ringer Lactato'], 
+          notes: "SG 5% é preferida para proteger da oxidação. A solução pode ficar rosada, o que não indica perda de potência." 
+        },
         photoprotection: false,
-        compatibility: { incompatibilities: ["Bicarbonato", "Furosemida", "Diazepam"], ySite: ["Norepinefrina", "Dopamina", "Fentanil"] },
-        adjustments: {
-            cardiac: "Titular para o efeito desejado. Doses altas podem causar taquicardia e arritmias.",
+        compatibility: { 
+          incompatibilities: ["Bicarbonato", "Heparina", "Furosemida", "Diazepam"], 
+          ySite: ["Norepinefrina", "Dopamina", "Fentanil"] 
         },
-        monitoring: ["ECG contínuo", "Pressão arterial", "Ecocardiograma para avaliar contratilidade", "Lactato"],
-        goodPractice: ["Titular a dose lentamente para atingir o efeito clínico desejado.", "Corrigir hipovolemia antes de iniciar."],
-        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
+        adjustments: {
+            cardiac: "Titular para o efeito desejado. Doses altas podem causar taquicardia e arritmias."
+        },
+        monitoring: [
+          "ECG contínuo", 
+          "Pressão arterial", 
+          "Ecocardiograma para avaliar contratilidade", 
+          "Lactato sérico",
+          "Débito urinário",
+          "Sinais de taquifilaxia"
+        ],
+        goodPractice: [
+          "🚫 NUNCA administrar em bolus! Risco de taquicardia severa e arritmias",
+          "Titular a dose lentamente para atingir o efeito clínico desejado",
+          "Corrigir hipovolemia antes de iniciar",
+          "Uso prolongado pode levar à taquifilaxia (24-72h)",
+          "Monitorar resposta hemodinâmica constantemente"
+        ],
+        contraindications: [
+          "Taquiarritmias ventriculares não tratadas", 
+          "Obstrução do trato de saída ventricular esquerda",
+          "Hipersensibilidade conhecida"
+        ],
+        citations: [
+          "Plumb's Veterinary Drug Handbook, 10th Edition",
+          "Small Animal Critical Care Medicine, 3rd Edition",
+          "BSAVA Small Animal Formulary, 10th Edition"
+        ]
     }
   },
   {
@@ -1644,44 +1731,157 @@ export const DRUGS: Drug[] = [
     }
   },
   {
+    id: 'efedrina',
+    name: 'Efedrina',
+    category: 'Agentes Cardiovasculares',
+    concentrations: [{ value: 50, unit: 'mg/mL', label: '50 mg/mL' }],
+    preparationGuide: `🧠 Efedrina: O Simpaticomimético de Ação Mista<br/><br/>
+<strong>Mecanismo de Ação:</strong><br/>
+• <strong>Ação Indireta (Principal):</strong> Estimula a liberação de norepinefrina das terminações nervosas simpáticas<br/>
+• <strong>Ação Direta:</strong> Agonista direto dos receptores alfa (α) e beta (β) adrenérgicos<br/>
+• <strong>Resultado:</strong> Aumento da frequência cardíaca, contratilidade miocárdica e pressão arterial por vasoconstrição periférica<br/><br/>
+
+<strong>Preparo:</strong><br/>
+<ul class="list-disc list-inside space-y-1">
+  <li><strong>Diluição obrigatória:</strong> 1 mL (50 mg/mL) + 9 mL SF 0,9% = 5 mg/mL</li>
+  <li><strong>Administração:</strong> Bolus IV lento (1-2 minutos)</li>
+  <li><strong>NÃO usar em CRI:</strong> Taquifilaxia e meia-vida longa inadequada para titulação</li>
+  <li><strong>Duração:</strong> 15-60 minutos</li>
+</ul>
+<div class="mt-2 text-xs bg-yellow-50 p-2 rounded">⚠️ Taquifilaxia: resposta diminui com administrações repetidas</div>`,
+    bolusDoses: [
+        { species: 'dog', min: 0.05, max: 0.2, unit: BolusDoseUnit.mg_kg, notes: "Administrar lentamente IV (1-2 min). Pode repetir a cada 5-10 min se necessário." },
+        { species: 'cat', min: 0.05, max: 0.1, unit: BolusDoseUnit.mg_kg, notes: "Administrar lentamente IV (1-2 min). Gatos mais sensíveis." },
+    ],
+    info: {
+        indicationSummary: [
+          "Hipotensão Aguda (Principalmente Anestésica): Fármaco de primeira escolha para hipotensão durante anestesia, especialmente induzida por vasodilatadores como isoflurano ou propofol",
+          "Incontinência Urinária por Incompetência do Esfíncter Uretral (USMI): Uso crônico por via oral no manejo da incontinência urinária em cadelas castradas"
+        ],
+        mechanism: "Alcaloide simpaticomimético de ação mista. Ação indireta: estimula liberação de norepinefrina das terminações nervosas simpáticas. Ação direta: agonista dos receptores α e β adrenérgicos. Resultado: aumento da FC, contratilidade e PA por vasoconstrição.",
+        dosesText: {
+            dog: { bolus: "0.05-0.2 mg/kg IV lento (1-2 min)" },
+            cat: { bolus: "0.05-0.1 mg/kg IV lento (1-2 min)" },
+            notes: "Início de ação: 1-2 minutos. Duração: 15-60 minutos. Pode repetir a cada 5-10 min se necessário."
+        },
+        diluents: { 
+          recommended: ['NaCl 0.9%'], 
+          notes: "Diluir 1:9 (1 mL de 50 mg/mL + 9 mL SF 0,9% = 5 mg/mL) para administração segura." 
+        },
+        photoprotection: false,
+        compatibility: { 
+          incompatibilities: [], 
+          ySite: [] 
+        },
+        adjustments: {
+            cardiac: "Monitorar ECG. Pode causar taquicardia e arritmias.",
+            geriatric: "Idosos podem ser mais sensíveis aos efeitos cardiovasculares.",
+            pediatric: "Filhotes podem ter maior sensibilidade."
+        },
+        monitoring: [
+          "Pressão arterial", 
+          "Frequência cardíaca", 
+          "ECG (taquicardia, arritmias)",
+          "Sinais de taquifilaxia"
+        ],
+        goodPractice: [
+          "Diluir obrigatoriamente antes da administração IV",
+          "Administrar bolus lentamente (1-2 minutos)",
+          "Monitorar resposta hemodinâmica",
+          "Considerar taquifilaxia com administrações repetidas",
+          "NÃO usar em CRI (inadequada para titulação)"
+        ],
+        contraindications: [
+          "Taquiarritmias ventriculares não tratadas", 
+          "Feocromocitoma",
+          "Hipersensibilidade conhecida",
+          "Hipertensão severa não controlada"
+        ],
+        citations: [
+          "Plumb's Veterinary Drug Handbook, 10th Edition",
+          "BSAVA Small Animal Formulary, 10th Edition",
+          "Small Animal Critical Care Medicine, 3rd Edition"
+        ]
+    }
+  },
+  {
     id: 'norepinephrine',
     name: 'Norepinefrina',
     category: 'Agentes Cardiovasculares',
     concentrations: [{ value: 1, unit: 'mg/mL', label: '1 mg/mL' }],
-    criDoses: [ { species: 'both', cri: { min: 0.05, max: 2, default: 0.2, unit: CriDoseUnit.mcg_kg_min } } ],
+    criDoses: [ { species: 'both', cri: { min: 0.1, max: 3, default: 0.5, unit: CriDoseUnit.mcg_kg_min } } ],
     specialWarnings: [WarningType.Photoprotection, WarningType.Vesicant],
-    preparationGuide: `Preparo (proteger da luz):<br/>
+    preparationGuide: `🧠 Norepinefrina: A Ferramenta Essencial do Intensivista<br/><br/>
+<strong>Mecanismo de Ação:</strong><br/>
+• <strong>Ação Alfa-1 (α₁):</strong> Vasoconstrição potente na musculatura lisa dos vasos periféricos, aumentando a resistência vascular sistêmica (RVS) e pressão arterial<br/>
+• <strong>Ação Beta-1 (β₁):</strong> Aumento da frequência cardíaca e força de contração (inotropismo positivo), parcialmente contraposto pelo reflexo vagal<br/><br/>
+
+<strong>Preparo (proteger da luz):</strong><br/>
 <ul class="list-disc list-inside space-y-1">
-  <li>Preferir diluição em <strong>SG 5%</strong> (menor oxidação). <em>SF 0,9% aceitável conforme protocolo local.</em></li>
-  <li>Concentrações usuais: <strong>4 mg/250 mL (16 µg/mL)</strong> ou <strong>8 mg/250 mL (32 µg/mL)</strong>.</li>
-  <li>Cobrir <strong>bolsa e equipo</strong> com material opaco.</li>
-  <li>Usar <strong>linha dedicada</strong> e preferir <strong>cateter venoso central</strong>.</li>
-  <li><strong>Desmame progressivo</strong> para evitar hipotensão rebote.</li>
+  <li><strong>Fluido de eleição:</strong> Solução Glicosada 5% (D5W) - pH levemente ácido protege da degradação</li>
+  <li><strong>Diluições comuns:</strong>
+    <ul class="list-disc list-inside ml-4 mt-1">
+      <li>4 mg em 250 mL = 16 mcg/mL</li>
+      <li>4 mg em 500 mL = 8 mcg/mL</li>
+      <li>4 mg em 1000 mL = 4 mcg/mL</li>
+    </ul>
+  </li>
+  <li>Cobrir <strong>bolsa e equipo</strong> com material opaco</li>
+  <li>Usar <strong>linha dedicada</strong> e preferir <strong>cateter venoso central</strong></li>
+  <li><strong>NUNCA administrar em bolus!</strong> Risco de pico hipertensivo severo</li>
 </ul>
-<div class="mt-2 text-xs">Extravasamento: infiltrar <strong>fentolamina 5–10 mg</strong> em 10–15 mL de SF 0,9% ao redor da área.</div>`,
+<div class="mt-2 text-xs bg-red-50 p-2 rounded">🚨 Extravasamento: infiltrar <strong>fentolamina 5–10 mg</strong> em 10–15 mL de SF 0,9% ao redor da área.</div>`,
     info: {
-        indicationSummary: ["Vasopressor de primeira escolha para o tratamento da hipotensão em choque séptico e outros choques distributivos."],
-        mechanism: "Potente agonista α1-adrenérgico (vasoconstrição) com efeito β1 moderado (inotropismo).",
-        dosesText: {
-            dog: { cri: "0.05-2 µg/kg/min (titulável)" },
-            cat: { cri: "0.05-2 µg/kg/min (titulável)" },
-            notes: "Titular para atingir a meta de pressão arterial média (ex: PAM > 65-70 mmHg)."
-        },
-        diluents: { recommended: ['SG 5%'], notes: "Preferir SG 5% (menor oxidação). Evitar bicarbonato no Y-site. SF 0,9% pode ser usado conforme protocolo local." },
-        photoprotection: true,
-        compatibility: { incompatibilities: ["Bicarbonato", "Aminofilina", "Pantoprazol", "Insulina"], ySite: ["Dobutamina", "Dopamina", "Fentanil", "Vasopressina"] },
-        adjustments: {
-            sepsis: "Titular para atingir a meta de pressão arterial média. Reavaliar a perfusão (lactato, débito urinário) frequentemente."
-        },
-        monitoring: ["Pressão arterial invasiva (obrigatório)", "ECG contínuo", "Lactato sérico", "Perfusão periférica", "Débito urinário"],
-        goodPractice: [
-          "ALERTA VESICANTE: preferir acesso venoso central; monitorar local se periférico.",
-          "Proteger bolsa e equipo da luz durante a infusão.",
-          "Titular em incrementos a cada 5–10 min até atingir PAM alvo.",
-          "Extravasamento: infiltrar <strong>fentolamina 5–10 mg</strong> em 10–15 mL de SF 0,9% ao redor da área.",
-          "Desmame progressivo para evitar hipotensão rebote."
+        indicationSummary: [
+          "Choque Séptico e Distributivo: Indicação primária para vasodilatação generalizada",
+          "Hipotensão Refratária a Fluidos: Quando fluidoterapia isolada não restaura PAM > 65 mmHg",
+          "Suporte Hemodinâmico na Anestesia: Hipotensão severa não responsiva a medidas iniciais"
         ],
-        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
+        mechanism: "Catecolamina endógena, principal neurotransmissor do sistema nervoso simpático. Potente agonista α1-adrenérgico (vasoconstrição) com efeito β1 moderado (inotropismo).",
+        dosesText: {
+            dog: { cri: "0.1-0.5 µg/kg/min (inicial), até 2-3 µg/kg/min (máximo)" },
+            cat: { cri: "0.1-0.5 µg/kg/min (inicial), até 2-3 µg/kg/min (máximo)" },
+            notes: "Dose inicial: 0.1-0.5 µg/kg/min. Titular para PAM > 65-70 mmHg. Dose máxima: 2-3 µg/kg/min."
+        },
+        diluents: { 
+          recommended: ['SG 5%'], 
+          notes: "SG 5% é o fluido de eleição (pH ácido protege da oxidação). Compatível com Ringer Lactato. Evitar SF 0,9% isoladamente." 
+        },
+        photoprotection: true,
+        compatibility: { 
+          incompatibilities: ["Bicarbonato", "Aminofilina", "Pantoprazol", "Insulina"], 
+          ySite: ["Dobutamina", "Dopamina", "Fentanil", "Vasopressina"] 
+        },
+        adjustments: {
+            sepsis: "Titular para atingir PAM > 65-70 mmHg. Reavaliar perfusão (lactato, débito urinário) frequentemente.",
+            cardiac: "Monitorar ECG contínuo. Efeito β1 pode causar taquicardia, mas é contrabalançado pelo reflexo vagal."
+        },
+        monitoring: [
+          "Pressão arterial invasiva (obrigatório)", 
+          "ECG contínuo", 
+          "Lactato sérico", 
+          "Perfusão periférica", 
+          "Débito urinário",
+          "Função renal"
+        ],
+        goodPractice: [
+          "🚫 NUNCA administrar em bolus! Risco de arritmias ventriculares e isquemia miocárdica",
+          "ALERTA VESICANTE: preferir acesso venoso central; monitorar local se periférico",
+          "Proteger bolsa e equipo da luz durante toda a infusão",
+          "Titular em incrementos a cada 5–10 min até atingir PAM alvo",
+          "Extravasamento: infiltrar fentolamina 5–10 mg em 10–15 mL de SF 0,9%",
+          "Desmame progressivo para evitar hipotensão rebote"
+        ],
+        contraindications: [
+          "Feocromocitoma", 
+          "Taquiarritmias ventriculares não tratadas",
+          "Hipersensibilidade conhecida"
+        ],
+        citations: [
+          "Plumb's Veterinary Drug Handbook, 10th Edition: Monografia da Norepinefrina, páginas 983-985",
+          "Small Animal Critical Care Medicine, 3rd Edition: Capítulo sobre Choque",
+          "Textbook of Small Animal Emergency Medicine (Drobatz et al.): Manejo Hemodinâmico e Choque"
+        ]
     }
   },
    {
@@ -1753,7 +1953,31 @@ export const DRUGS: Drug[] = [
     id: 'esmolol',
     name: 'Esmolol',
     category: 'Agentes Cardiovasculares',
-    concentrations: [{ value: 10, unit: 'mg/mL', label: '10 mg/mL' }],
+    concentrations: [{ value: 10, unit: 'mg/mL', label: '10 mg/mL (solução estoque)' }],
+    preparationGuide: `🧠 Esmolol: O β-Bloqueador Ultracurto e Titulável<br/><br/>
+<strong>Mecanismo de Ação:</strong><br/>
+• <strong>Bloqueador β₁-adrenérgico:</strong> Cardiosseletivo, atuando preferencialmente nos receptores β₁ do coração<br/>
+• <strong>Cronotropismo negativo:</strong> Redução acentuada da frequência cardíaca<br/>
+• <strong>Dromotropismo negativo:</strong> Diminuição da velocidade de condução através do nodo AV<br/>
+• <strong>Inotropismo negativo:</strong> Redução da força de contração do miocárdio<br/><br/>
+
+<strong>Farmacocinética Única:</strong><br/>
+• <strong>Meia-vida:</strong> ~9 minutos (metabolizado por esterases plasmáticas)<br/>
+• <strong>Duração:</strong> Efeitos cessam 15-30 min após interrupção<br/>
+• <strong>Titulabilidade:</strong> Controle preciso e imediato da frequência cardíaca<br/><br/>
+
+<strong>Preparo:</strong><br/>
+<ul class="list-disc list-inside space-y-1">
+  <li><strong>Passo 1:</strong> Criar solução estoque 10 mg/mL (10 mL de 250 mg/mL + 240 mL fluido)</li>
+  <li><strong>Passo 2:</strong> Adicionar à bolsa de CRI:
+    <ul class="list-disc list-inside ml-4 mt-1">
+      <li>25 mL em 250 mL = 1 mg/mL (1000 mcg/mL)</li>
+      <li>50 mL em 500 mL = 1 mg/mL (1000 mcg/mL)</li>
+    </ul>
+  </li>
+  <li><strong>Fluido:</strong> Glicose 5% ou SF 0,9%</li>
+</ul>
+<div class="mt-2 text-xs bg-red-50 p-2 rounded">🚨 Incompatível com bicarbonato de sódio. Monitorar PA (hipotensão comum)</div>`,
     criDoses: [
       { species: 'both', cri: { min: 25, max: 200, default: 50, unit: CriDoseUnit.mcg_kg_min } }
     ],
@@ -1762,21 +1986,58 @@ export const DRUGS: Drug[] = [
       { species: 'cat', min: 50, max: 250, unit: BolusDoseUnit.mcg_kg, infusionTimeMin: 1 },
     ],
     info: {
-        indicationSummary: ["β-bloqueador cardiosseletivo (β1) de ação ultracurta para controle rápido de taquiarritmias supraventriculares."],
+        indicationSummary: [
+          "Taquiarritmias Supraventriculares (TSV): Controle rápido da frequência ventricular em fibrilação atrial, flutter atrial ou taquicardia atrial",
+          "Taquicardia Sinusal Inapropriada: Hiperatividade simpática severa (feocromocitoma, tireotoxicose)",
+          "Taquiarritmias Induzidas por Estímulo Simpático: Durante anestesia quando taquicardia severa compromete estabilidade hemodinâmica",
+          "Diagnóstico Diferencial: Teste para diferenciar taquicardias supraventriculares de ventriculares"
+        ],
+        mechanism: "Antiarrítmico da Classe II - bloqueador dos receptores β₁-adrenérgicos. Cardiosseletivo, atuando preferencialmente nos receptores β₁ do coração. Metabolizado rapidamente por esterases plasmáticas (meia-vida ~9 min), permitindo titulação precisa.",
         dosesText: {
-            dog: { cri: "25-200 µg/kg/min", bolus: "0.25-0.5 mg/kg IV em 1 min" },
-            cat: { cri: "25-200 µg/kg/min", bolus: "0.05-0.25 mg/kg IV em 1 min" },
+            dog: { cri: "25-200 µg/kg/min", bolus: "0.25-0.5 mg/kg IV lento (1-2 min)" },
+            cat: { cri: "25-200 µg/kg/min", bolus: "0.05-0.25 mg/kg IV lento (1-2 min)" },
+            notes: "Dose de ataque: 0.25-0.5 mg/kg IV lento. CRI: 25-200 µg/kg/min titulada para FC desejada."
         },
-        diluents: { recommended: ['NaCl 0.9%', 'SG 5%', 'Ringer Lactato'] },
+        diluents: { 
+          recommended: ['SG 5%', 'NaCl 0.9%'], 
+          notes: "Preparar solução estoque 10 mg/mL primeiro, depois adicionar à bolsa de CRI." 
+        },
         photoprotection: false,
-        compatibility: { },
-        adjustments: {
-            cardiac: "Usar com cautela extrema em pacientes com função sistólica comprometida.",
+        compatibility: { 
+          incompatibilities: ["Bicarbonato de sódio"], 
+          ySite: [] 
         },
-        monitoring: ["ECG contínuo", "Pressão arterial"],
-        goodPractice: ["Seu efeito cessa rapidamente após a interrupção da infusão."],
-        contraindications: ["Insuficiência cardíaca descompensada", "Choque cardiogênico", "Bradicardia sinusal severa", "Bloqueio AV de alto grau."],
-        citations: ["Plumb's Veterinary Drug Handbook, 10th Ed."]
+        adjustments: {
+            cardiac: "Usar com cautela extrema em pacientes com função sistólica comprometida. Pode causar depressão miocárdica.",
+            geriatric: "Idosos podem ter maior sensibilidade aos efeitos cardiovasculares.",
+            pediatric: "Filhotes podem ter maior sensibilidade."
+        },
+        monitoring: [
+          "ECG contínuo", 
+          "Pressão arterial (hipotensão é efeito adverso comum)",
+          "Frequência cardíaca",
+          "Função miocárdica"
+        ],
+        goodPractice: [
+          "Efeito cessa rapidamente após interrupção (15-30 min)",
+          "Titular para atingir frequência cardíaca desejada",
+          "Monitorar pressão arterial de perto (hipotensão comum)",
+          "Usar para controle agudo de curta duração",
+          "Considerar terapia antiarrítmica de longo prazo"
+        ],
+        contraindications: [
+          "Insuficiência cardíaca descompensada", 
+          "Choque cardiogênico", 
+          "Bradicardia sinusal severa", 
+          "Bloqueio AV de alto grau",
+          "Hipotensão severa",
+          "Asma brônquica (cautela com β₂)"
+        ],
+        citations: [
+          "Plumb's Veterinary Drug Handbook, 10th Edition",
+          "BSAVA Small Animal Formulary, 10th Edition",
+          "Small Animal Critical Care Medicine, 3rd Edition"
+        ]
     }
   },
   {

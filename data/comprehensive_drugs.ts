@@ -341,6 +341,111 @@ export const COMPREHENSIVE_DRUGS: Drug[] = [
         hepatic: 'Metabolismo hepático - pode prolongar duração'
       }
     }
+  },
+
+  // BENZODIAZEPÍNICOS
+  {
+    id: 'midazolam',
+    name: 'Midazolam',
+    category: 'Sedativos/Anestésicos',
+    concentrations: [
+      { label: '5 mg/mL', value: 5, unit: 'mg/mL' },
+      { label: '15 mg/3 mL (5 mg/mL)', value: 5, unit: 'mg/mL' }
+    ],
+    bolusDoses: [
+      {
+        species: 'both',
+        min: 0.1, max: 0.3, unit: BolusDoseUnit.mg_kg,
+        infusionTimeMin: 2,
+        useCase: 'Sedação/MPA',
+        notes: 'Benzodiazepínico solúvel em água. Compatível com maioria dos fármacos. IV, IM ou IN.'
+      },
+      {
+        species: 'both',
+        min: 0.2, max: 0.5, unit: BolusDoseUnit.mg_kg,
+        infusionTimeMin: 2,
+        useCase: 'Anticonvulsivante de emergência',
+        notes: 'Status epilepticus. Pode ser administrado IM ou IN quando acesso IV é difícil.'
+      }
+    ],
+    criDoses: [
+      {
+        species: 'both',
+        cri: { min: 0.1, default: 0.2, max: 0.5, unit: CriDoseUnit.mg_kg_h },
+        useCase: 'Sedação contínua/CRI',
+        notes: 'Dose de ataque: 0.1-0.3 mg/kg IV. Compatível com RL, SF 0.9% e G5%.'
+      }
+    ],
+    preparationGuide: 'Preparo do Midazolam:<br/>1. Solúvel em água - compatível com RL, SF 0.9% e G5%<br/>2. Pode ser misturado com maioria dos fármacos<br/>3. Dose de ataque: 0.1-0.3 mg/kg IV<br/>4. CRI: 0.1-0.5 mg/kg/h (mais comum: mg/kg/h)<br/>5. Exemplo diluição: 24 mg em 500 mL = 0.048 mg/mL<br/>6. Apresentações: Dormonid® 15mg/3mL, genéricos 5mg/mL',
+    info: {
+      indicationSummary: ['Medicação pré-anestésica', 'Co-indução anestésica', 'Anticonvulsivante de emergência', 'Sedação contínua'],
+      mechanism: 'Benzodiazepínico - potencializa GABA-A, hiperpolariza neurônios',
+      dosesText: {
+        dog: { 
+          bolus: '0.1-0.3 mg/kg (sedação), 0.2-0.5 mg/kg (convulsões)', 
+          cri: '0.1-0.5 mg/kg/h (1.6-8.3 mcg/kg/min)' 
+        },
+        cat: { 
+          bolus: '0.1-0.3 mg/kg (sedação), 0.2-0.5 mg/kg (convulsões)', 
+          cri: '0.1-0.5 mg/kg/h (1.6-8.3 mcg/kg/min)' 
+        }
+      },
+      adjustments: {
+        hepatic: 'Metabolismo hepático - pode prolongar duração',
+        renal: 'Monitorar em DRC'
+      }
+    }
+  },
+
+  // ANTICONVULSIVANTES
+  {
+    id: 'phenobarbital',
+    name: 'Fenobarbital',
+    category: 'Anticonvulsivantes',
+    concentrations: [
+      { label: '200 mg/mL', value: 200, unit: 'mg/mL' }
+    ],
+    bolusDoses: [
+      {
+        species: 'both',
+        min: 16, max: 20, unit: BolusDoseUnit.mg_kg,
+        infusionTimeMin: 60,
+        useCase: 'Dose de ataque (Status epilepticus)',
+        notes: 'Administrar IV LENTO. Dividir em 4 alíquotas (4-5 mg/kg cada) a cada 20-30 min. NUNCA administrar dose total rapidamente.'
+      },
+      {
+        species: 'dog',
+        min: 2, max: 3, unit: BolusDoseUnit.mg_kg,
+        infusionTimeMin: 0,
+        useCase: 'Dose de manutenção oral',
+        notes: 'A cada 12 horas. Monitorar níveis séricos (15-35 µg/mL) e hepatotoxicidade.'
+      },
+      {
+        species: 'cat',
+        min: 1.5, max: 2.5, unit: BolusDoseUnit.mg_kg,
+        infusionTimeMin: 0,
+        useCase: 'Dose de manutenção oral',
+        notes: 'A cada 12 horas. Monitorar níveis séricos (15-35 µg/mL) e hepatotoxicidade.'
+      }
+    ],
+    specialWarnings: [WarningType.SlowInfusion],
+    preparationGuide: 'Preparo do Fenobarbital:<br/>1. NÃO usar em CRI - meia-vida longa (40-90h)<br/>2. Dose de ataque: 16-20 mg/kg IV LENTO<br/>3. Dividir em 4 alíquotas de 4-5 mg/kg cada<br/>4. Administrar a cada 20-30 min<br/>5. Diluir em SF 0.9% para reduzir irritação<br/>6. Apresentações: Gardenal® 200mg/mL, Fenocris® 200mg/mL',
+    info: {
+      indicationSummary: ['Controle crônico da epilepsia', 'Status epilepticus', 'Sedação'],
+      mechanism: 'Barbitúrico - potencializa GABA-A (prolonga abertura do canal), inibe glutamato',
+      dosesText: {
+        dog: { 
+          bolus: '16-20 mg/kg IV lento (ataque), 2-3 mg/kg PO q12h (manutenção)' 
+        },
+        cat: { 
+          bolus: '16-20 mg/kg IV lento (ataque), 1.5-2.5 mg/kg PO q12h (manutenção)' 
+        }
+      },
+      adjustments: {
+        hepatic: 'Monitorar hepatotoxicidade e níveis séricos',
+        renal: 'Considerar ajuste em DRC'
+      }
+    }
   }
 ];
 
@@ -363,6 +468,16 @@ export const COMPATIBILITY_MATRIX = {
   'dexmedetomidine': {
     '🟢': ['SF 0.9%', 'G5%', 'RL'],
     '🔴': ['diazepam', 'pantoprazole', 'amphotericin B', 'blood/plasma']
+  },
+  'midazolam': {
+    '🟢': ['SF 0.9%', 'G5%', 'RL', 'lidocaine', 'morphine', 'fentanyl', 'ketamine', 'propofol'],
+    '🟡': ['ampicillin-sulbactam', 'cefazolin'],
+    '🔴': ['barbiturates', 'phenytoin', 'heparin', 'bicarbonate']
+  },
+  'phenobarbital': {
+    '🟢': ['SF 0.9%'],
+    '🟡': ['G5%', 'RL'],
+    '🔴': ['midazolam', 'diazepam', 'barbiturates', 'heparin', 'bicarbonate', 'propofol']
   }
 };
 
@@ -388,5 +503,15 @@ export const EXAMPLES = [
     title: 'Metoclopramida CRI',
     description: '1 mg/kg/dia (0.042 mg/kg/h), 10 kg, sol. 1 mg/mL',
     calculation: '0.42 mg/h → 0.42 mL/h'
+  },
+  {
+    title: 'Midazolam CRI',
+    description: '0.2 mg/kg/h, 10 kg, diluição 0.048 mg/mL',
+    calculation: '0.2×10=2 mg/h → 2/0.048 = 41.7 mL/h'
+  },
+  {
+    title: 'Fenobarbital Ataque',
+    description: '16 mg/kg, 15 kg, sol. 200 mg/mL',
+    calculation: '16×15=240 mg → 240/200 = 1.2 mL (dividir em 4 doses)'
   }
 ];

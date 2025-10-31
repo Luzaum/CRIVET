@@ -9,44 +9,44 @@ import { CriDoseUnit, BolusDoseUnit } from '../types';
  * Conversão para mg/kg/h (unidade padrão interna)
  */
 export const toMgPerKgPerH = {
-  [CriDoseUnit.mcg_kg_min]: (x: number) => x * 0.06,     // 1 mcg/kg/min = 0.06 mg/kg/h
-  [CriDoseUnit.mcg_kg_h]: (x: number) => x * 0.001,      // 1 mcg/kg/h = 0.001 mg/kg/h
-  [CriDoseUnit.mg_kg_min]: (x: number) => x * 60,        // 1 mg/kg/min = 60 mg/kg/h
-  [CriDoseUnit.mg_kg_h]: (x: number) => x,               // 1 mg/kg/h = 1 mg/kg/h
-  [CriDoseUnit.mg_kg_day]: (x: number) => x / 24,        // 1 mg/kg/dia = 0.0417 mg/kg/h
-  [CriDoseUnit.U_kg_h]: (x: number) => x,                // Unidades por kg/h (assumindo 1 U = 1 mg)
-  [CriDoseUnit.mU_kg_min]: (x: number) => x * 0.06,      // 1 mU/kg/min = 0.06 U/kg/h
+  [CriDoseUnit.MCG_KG_MIN]: (x: number) => x * 0.06,     // 1 mcg/kg/min = 0.06 mg/kg/h
+  [CriDoseUnit.MCG_KG_H]: (x: number) => x * 0.001,      // 1 mcg/kg/h = 0.001 mg/kg/h
+  [CriDoseUnit.MG_KG_MIN]: (x: number) => x * 60,        // 1 mg/kg/min = 60 mg/kg/h
+  [CriDoseUnit.MG_KG_H]: (x: number) => x,               // 1 mg/kg/h = 1 mg/kg/h
+  [CriDoseUnit.MG_KG_DAY]: (x: number) => x / 24,        // 1 mg/kg/dia = 0.0417 mg/kg/h
+  [CriDoseUnit.U_KG_H]: (x: number) => x,                // Unidades por kg/h (assumindo 1 U = 1 mg)
+  [CriDoseUnit.MU_KG_MIN]: (x: number) => x * 0.06,      // 1 mU/kg/min = 0.06 U/kg/h
 } as const;
 
 /**
  * Conversão de mg/kg/h para unidade específica
  */
 export const fromMgPerKgPerH = {
-  [CriDoseUnit.mcg_kg_min]: (x: number) => x / 0.06,     // mg/kg/h → mcg/kg/min
-  [CriDoseUnit.mcg_kg_h]: (x: number) => x / 0.001,      // mg/kg/h → mcg/kg/h
-  [CriDoseUnit.mg_kg_min]: (x: number) => x / 60,        // mg/kg/h → mg/kg/min
-  [CriDoseUnit.mg_kg_h]: (x: number) => x,               // mg/kg/h → mg/kg/h
-  [CriDoseUnit.mg_kg_day]: (x: number) => x * 24,        // mg/kg/h → mg/kg/dia
-  [CriDoseUnit.U_kg_h]: (x: number) => x,                // mg/kg/h → U/kg/h
-  [CriDoseUnit.mU_kg_min]: (x: number) => x / 0.06,      // mg/kg/h → mU/kg/min
+  [CriDoseUnit.MCG_KG_MIN]: (x: number) => x / 0.06,     // mg/kg/h → mcg/kg/min
+  [CriDoseUnit.MCG_KG_H]: (x: number) => x / 0.001,      // mg/kg/h → mcg/kg/h
+  [CriDoseUnit.MG_KG_MIN]: (x: number) => x / 60,        // mg/kg/h → mg/kg/min
+  [CriDoseUnit.MG_KG_H]: (x: number) => x,               // mg/kg/h → mg/kg/h
+  [CriDoseUnit.MG_KG_DAY]: (x: number) => x * 24,        // mg/kg/h → mg/kg/dia
+  [CriDoseUnit.U_KG_H]: (x: number) => x,                // mg/kg/h → U/kg/h
+  [CriDoseUnit.MU_KG_MIN]: (x: number) => x / 0.06,      // mg/kg/h → mU/kg/min
 } as const;
 
 /**
  * Conversão para bolus (mg/kg)
  */
 export const toMgPerKg = {
-  [BolusDoseUnit.mcg_kg]: (x: number) => x / 1000,       // mcg/kg → mg/kg
-  [BolusDoseUnit.mg_kg]: (x: number) => x,               // mg/kg → mg/kg
-  [BolusDoseUnit.U_kg]: (x: number) => x,                // U/kg → mg/kg (assumindo 1 U = 1 mg)
+  [BolusDoseUnit.MCG_KG]: (x: number) => x / 1000,       // mcg/kg → mg/kg
+  [BolusDoseUnit.MG_KG]: (x: number) => x,               // mg/kg → mg/kg
+  [BolusDoseUnit.U_KG]: (x: number) => x,                // U/kg → mg/kg (assumindo 1 U = 1 mg)
 } as const;
 
 /**
  * Conversão de mg/kg para unidade de bolus específica
  */
 export const fromMgPerKg = {
-  [BolusDoseUnit.mcg_kg]: (x: number) => x * 1000,       // mg/kg → mcg/kg
-  [BolusDoseUnit.mg_kg]: (x: number) => x,               // mg/kg → mg/kg
-  [BolusDoseUnit.U_kg]: (x: number) => x,                // mg/kg → U/kg
+  [BolusDoseUnit.MCG_KG]: (x: number) => x * 1000,       // mg/kg → mcg/kg
+  [BolusDoseUnit.MG_KG]: (x: number) => x,               // mg/kg → mg/kg
+  [BolusDoseUnit.U_KG]: (x: number) => x,                // mg/kg → U/kg
 } as const;
 
 /**

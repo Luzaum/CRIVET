@@ -32,6 +32,10 @@ export function convertRange(range: RecRange, from: DoseUnit, to: DoseUnit): Rec
 // Função para construir range absoluto coerente
 export function buildAbs(rec: RecRange): {min: number; max: number} {
   if (rec.min === 0 && rec.max === 0) return { min: 0, max: 10 }; // fallback seguro p/ UI
-  const max = Math.max(rec.max * 2, rec.max + (rec.max - rec.min)); // 2x o topo ou margem acima
+  
+  // Permite até 10x o máximo recomendado para detectar doses extremamente altas
+  // mas o componente ainda mostrará como "sobredose" acima de rec.max
+  const max = Math.max(rec.max * 10, rec.max + (rec.max - rec.min) * 5);
+  
   return { min: 0, max: Math.ceil(max * 10) / 10 }; // arredonda "bonito"
 }
